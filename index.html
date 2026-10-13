@@ -1227,7 +1227,7 @@ function careerScore(){
   return Math.round(S.log.reduce((s,r)=>s+seasonPts(r)*lgW(r.lv||'TW1'),0)+S.honors.reduce((s,h)=>s+honorPts(h),0));
 }
 /* 五帶門檻(批次模擬校準):傳奇 2%、巨星 8%、主力 25%、浮沉 40%、過客 25% */
-const TIER_TH=[720,480,295,160]; /* 600 段生涯模擬的 p98/p90/p65/p25 */
+const TIER_TH=[680,475,285,155]; /* 1400 段生涯模擬(含特質、升大學)的 p98/p90/p65/p25 */
 const TIERS=['傳奇','巨星','主力','浮沉','過客'];
 const HOF_TH=210; /* 單一聯賽(未加權)生涯分門檻 */
 function mainLeague(){ const m={}; S.log.forEach(r=>{ if(r.lv)m[r.lv]=(m[r.lv]||0)+r.st.Min*lgW(r.lv); }); /* 以加權上場時間選代表聯賽 */
