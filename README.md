@@ -4,7 +4,7 @@
 
 ▶ **線上試玩：** <https://footlife-eta.vercel.app>（Vercel）｜<https://antykx.github.io/footlife/>（GitHub Pages）
 
-目前進度：**M6 升大學**（18 歲可升大學、22 歲畢業進職業）；M0～M5 已完成。
+目前進度：**M7 互動改版**（關鍵時刻、教練信任／球迷人氣／狀態量表、場外對話、訓練營選課、合約談判、轉播風格介面與動畫）；M0～M6 已完成。
 
 ## 📄 授權條款 (License)
 本專案採用 [CC BY-NC 4.0](http://creativecommons.org/licenses/by-nc/4.0/) 授權條款。
