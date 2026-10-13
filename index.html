@@ -94,6 +94,30 @@ table.fin td:first-child,table.fin th:first-child{text-align:left}
 .abrow .val{font-family:var(--mono);width:58px;text-align:right;font-size:14px;flex:none}
 .abrow .val b{color:var(--good)}
 .abrow.capped{opacity:.45}
+/* 記分板能力面板 */
+#bd-abt{display:block;width:100%;margin-top:7px;background:#0e1226;border:1px solid var(--edge);border-radius:6px;color:var(--dim);
+  font:700 11px var(--sans);letter-spacing:.2em;padding:3px 0;cursor:pointer}
+#bd-abt:active{background:#161b36}
+#bd-ab{display:none;grid-template-columns:repeat(3,1fr);gap:4px 10px;margin-top:6px}
+#bd-ab.open{display:grid}
+.abc{font-size:11px;color:var(--dim);line-height:1.35}
+.abc.key .an{color:var(--amber)}
+.abc .av{float:right;font-family:var(--mono);color:var(--chalk)} .abc .av small{opacity:.45}
+.abc.up .av{animation:flash .8s ease;color:var(--good)}
+.abc .ab1{position:relative;height:4px;background:#0e1226;border-radius:2px;margin-top:1px}
+.abc .ab1 i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#7a6cff,var(--amber));border-radius:2px;transition:width .6s}
+.abc .ab1 em{position:absolute;top:-2px;bottom:-2px;width:2px;margin-left:-1px;background:#ffffff55}
+.abc .ab2{height:2px;background:#ffffff0d;border-radius:1px;margin-top:2px}
+.abc .ab2 i{display:block;height:100%;background:#6cc6ff;border-radius:1px;transition:width .6s}
+.abc.cap .ab2 i{background:#ff8a4c}
+/* 訓練卡預覽 */
+.tcard .tnow{font:700 11px var(--mono);color:var(--chalk)}
+.tcard .tnow b{color:var(--good);font-size:11px}
+.tcard .tprog{display:block;height:3px;background:#ffffff14;border-radius:2px;margin:1px 6px 0;overflow:hidden}
+.tcard .tprog i{display:block;height:100%;background:#6cc6ff}
+.trow{display:flex;align-items:center;gap:8px;margin:2px 0}
+.trow .tbar{flex:0 0 70px;height:5px;background:#ffffff14;border-radius:3px;overflow:hidden}
+.trow .tbar i{display:block;height:100%;background:#6cc6ff}
 #act .row2{display:flex;gap:8px}#act .row2 .btn{flex:1;text-align:center}
 /* 開場 */
 #start{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;
@@ -268,6 +292,7 @@ svg.scene{display:block;width:100%;height:auto;margin-top:8px;border-radius:8px;
       <div class="mt" id="mt-fans">球迷人氣<em>20</em><i><b></b></i></div>
       <div class="mt" id="mt-form">狀態<em>50</em><i><b></b></i></div>
     </div>
+    <button id="bd-abt">能力 ▾</button><div id="bd-ab"></div>
     <div id="bd-time" data-ph="0"><span id="lp0">熱身・季前</span><span id="lp1">上半場・賽季中</span><span id="lp2">下半場・季末</span><div id="bd-track"><i id="bd-fill"></i><b id="bd-ball"></b></div></div>
   </header>
   <main id="log"></main>
@@ -292,7 +317,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.8.0-M7';
+const APP_VER='v0.8.1';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -444,16 +469,18 @@ function playerType(){
 }
 /* 成本曲線:OVR 只計 4 項能力、集中加點效率高,所以中高段比棒球版陡;門將只有 5 項,更陡 */
 function stepCost(cur){ return isGK()?(cur>=60?7:cur>=53?4:cur>=46?2:1):(cur>=62?5:cur>=55?3:cur>=47?2:1); }
-function abCost(k){ /* 目前這一級要花幾點(須與 addAb 成本公式一致) */
-  const cur=S.ab[k], pk=(S.pot&&S.pot[k])||62;
-  let c=stepCost(cur); if(cur>=pk)c*=isGK()?4:3; return c;
-}
+function lvCost(k,cur){ /* 從 cur 升一級的成本;天花板之上:門將×4、場上×3 */
+  const pk=(S.pot&&S.pot[k])||62; let c=stepCost(cur); if(cur>=pk)c*=isGK()?4:3; return c; }
+function abCost(k){ return lvCost(k,S.ab[k]); } /* 目前這一級要花幾點 */
+/* 純試算:在 st={ab,carry} 上套用 v 點,不動 S;給訓練卡預覽用,公式與 addAb 相同 */
+function abSim(st,k,v){ let cur=st.ab[k],bud=v+(st.carry[k]||0);
+  while(bud>0&&cur<80){ const c=lvCost(k,cur); if(bud>=c){bud-=c;cur++;} else break; }
+  st.ab[k]=cur; st.carry[k]=cur>=80?0:bud; }
 function addAb(k,v){ if(!(k in S.ab))return 0; const o=S.ab[k];
   if(v<0){ S.ab[k]=clamp(o+v,1,80); return S.ab[k]-o; } /* 扣值 1:1,不吃量表成本 */
   let cur=o,bud=v+(S.carry[k]||0); /* 未滿一級的點數累積在進度槽 */
-  const pk=(S.pot&&S.pot[k])||62;
   while(bud>0&&cur<80){
-    let cost=stepCost(cur); if(cur>=pk)cost*=isGK()?4:3; /* 天花板之上:門將×4、場上×3 */
+    const cost=lvCost(k,cur);
     if(bud>=cost){bud-=cost;cur++;} else break; }
   S.carry[k]=cur>=80?0:bud;
   S.ab[k]=cur; return cur-o; }
@@ -504,6 +531,17 @@ function board(phase){ if(phase!==undefined)S.ph=phase; /* 不帶參數時沿用
   ['trust','fans','form'].forEach(k=>{ const el=$('mt-'+k); el.querySelector('b').style.width=S[k]+'%'; el.querySelector('em').textContent=S[k];
     el.classList.toggle('lo',S[k]<30); el.classList.toggle('hi',S[k]>=70); });
   $('bd-time').dataset.ph=S.ph||0; [0,1,2].forEach(i=>$('lp'+i).classList.toggle('on',i===(S.ph||0)));
+  abPanel();
+}
+/* 記分板能力面板:數值/潛力、能力條(白線＝潛力)、下方細條＝升下一級的累積進度;黃字＝計入目前位置綜合 */
+let AB_PREV=null;
+function abPanel(){
+  const p=$('bd-ab'), keys=GRP_AB[S.grp], w=DP_W[S.dpos], prev=AB_PREV||{};
+  p.innerHTML=keys.map(k=>{ const v=S.ab[k], pk=(S.pot&&S.pot[k])||62, c=lvCost(k,v), cr=(S.carry&&S.carry[k])||0;
+    const cls='abc'+(w[k]?' key':'')+(v>=pk?' cap':'')+(prev[k]!=null&&v>prev[k]?' up':'');
+    return `<div class="${cls}" title="${v>=80?'已達頂':`升下一級需 ${c} 點，已累積 ${cr}`}${v>=pk?'（已過潛力，成本加倍）':''}"><span class="an">${ABL[k]}</span><span class="av">${v}<small>/${pk}</small></span>`+
+      `<div class="ab1"><i style="width:${v/80*100}%"></i><em style="left:${pk/80*100}%"></em></div><div class="ab2"><i style="width:${v>=80?100:cr/c*100}%"></i></div></div>`; }).join('');
+  AB_PREV={...S.ab};
 }
 function actClear(){ const a=$('act'); a.innerHTML=''; a.classList.remove('collapsed');
   const t=$('act-toggle'); if(t)t.style.display='none'; }
@@ -831,7 +869,7 @@ const TRAIN_GK=[{n:'反應訓練',k:'ref',f:8},{n:'站位課',k:'gkp',f:4},{n:'�
   {n:'體能循環',k:'sta',f:15},{n:'點球分析',k:'gkp',f:0,form:4},{n:'戰術演練',k:'key',f:6,trust:4},{n:'弱點補強',k:'weak',f:10},{n:'恢復休息',k:null,f:-25,form:6}];
 function training(){
   const keys=Object.keys(DP_W[S.dpos]);
-  const hand=shuffle((isGK()?TRAIN_GK:TRAIN_OUT).slice()).slice(0,5).map(c=>{
+  const hand=shuffle((isGK()?TRAIN_GK:TRAIN_OUT).slice()).slice(0,5).map(c=>{ /* k 在這裡定案,預覽與套用一致 */
     const k=c.k==='key'?pick(keys):c.k==='weak'?keys.slice().sort((a,b)=>S.ab[a]-S.ab[b])[0]:c.k;
     const v=c.k?(S.traits.genius?ri(4,6):S.traits.late?ri(3,6):S.traits.scholar?ri(2,6):ri(1,6)):0;
     return {...c,k,v}; });
@@ -842,12 +880,20 @@ function training(){
 function trainUI(hand,need,done){
   actClear(); const a=$('act'), sel=[], keyAb=DP_W[S.dpos];
   a.innerHTML=`<div class="title">季前訓練營：選 ${need} 堂課（黃框＝目前位置計入綜合的能力）</div><div class="tgrid" id="tg"></div><div class="row2" id="tb"></div>`;
+  /* 預覽:已選的課依序先套用;未選的課顯示「加選它」之後的結果 */
+  function preview(i){ const st={ab:{...S.ab},carry:{...S.carry}};
+    const seq=sel.filter(j=>j!==i).sort((a,b)=>a-b);
+    seq.filter(j=>!sel.includes(i)||j<i).forEach(j=>{ const c=hand[j]; if(c.k){ abSim(st,c.k,c.v); if(c.x)abSim(st,c.x,1); } });
+    const c=hand[i], o=st.ab[c.k]; abSim(st,c.k,c.v); return {o,n:st.ab[c.k],cr:st.carry[c.k]||0,cost:lvCost(c.k,st.ab[c.k])}; }
   function render(){
     const tg=$('tg'); tg.innerHTML='';
     hand.forEach((c,i)=>{ const on=sel.includes(i), d=document.createElement('div');
+      const pv=c.k?preview(i):null;
+      const now=pv?(pv.n>pv.o?`<span class="tnow">${pv.o}→<b>${pv.n}</b></span>`:`<span class="tnow">${pv.o}</span>`)+
+        (pv.n<80?`<span class="tprog" title="升下一級進度 ${pv.cr}/${pv.cost}"><i style="width:${pv.cr/pv.cost*100}%"></i></span>`:''):'';
       d.className='tcard'+(on?' sel':'')+(c.k&&keyAb[c.k]?' key':'')+(c.v===6?' six':'');
       d.style.animationDelay=(i*70)+'ms';
-      d.innerHTML=`<b>${c.n}</b><span class="tab">${c.k?ABL[c.k]+(c.x?'＋'+ABL[c.x]:''):'恢復'}</span>`+
+      d.innerHTML=`<b>${c.n}</b><span class="tab">${c.k?ABL[c.k]+(c.x?'＋'+ABL[c.x]:''):'恢復'}</span>`+now+
         `<span class="tpow">${c.k?'★'.repeat(c.v)+'<i>'+'★'.repeat(6-c.v)+'</i>':'－'}</span>`+
         `<small>${[c.k?`+${c.v} 點`:'',c.f?`疲勞 ${c.f>0?'+':''}${c.f}`:'',c.form?`狀態 +${c.form}`:'',c.trust?`信任 +${c.trust}`:''].filter(Boolean).join('｜')}</small>`;
       if(on||sel.length<need)d.onclick=()=>{ if(on)sel.splice(sel.indexOf(i),1); else sel.push(i); render(); };
@@ -862,13 +908,14 @@ function trainUI(hand,need,done){
 function applyTraining(ch){
   const out=[]; let six=0, fat=20;
   ch.forEach(c=>{ fat+=c.f;
-    if(c.k){ const g=addAb(c.k,c.v); if(c.x)addAb(c.x,1);
-      out.push(`${c.n}：${ABL[c.k]} ${g>0?`<b class="up">+${g}</b>`:`<span style="color:var(--dim)">進度 ${S.carry[c.k]||0}/${abCost(c.k)}</span>`}`);
+    if(c.k){ const o=S.ab[c.k], g=addAb(c.k,c.v); if(c.x)addAb(c.x,1);
+      const cr=S.carry[c.k]||0, cst=abCost(c.k), bar=S.ab[c.k]<80?`<span class="tbar"><i style="width:${cr/cst*100}%"></i></span><small style="color:var(--dim)">${cr}/${cst}</small>`:'';
+      out.push(`<div class="trow">${c.n}：${ABL[c.k]} ${g>0?`${o} → <b class="up">${S.ab[c.k]}</b>`:`${o}`}${bar}</div>`);
       if(c.v===6&&S.age<21&&!S.traits.genius){ S.six++; six++; } }
-    else out.push(`${c.n}：疲勞 −25`);
+    else out.push(`<div class="trow">${c.n}：疲勞 −25</div>`);
     if(c.form)meter('form',c.form); if(c.trust)meter('trust',c.trust); });
   S.fatigue=clamp(fat,0,100);
-  card('good','訓練成果',out.join('<br>')+`<br>本季疲勞度 <b class="${S.fatigue>=55?'dn':'hl'}">${S.fatigue}</b>${S.fatigue>=55?'（受傷風險上升）':''}`+
+  card('good','訓練成果',out.join('')+`本季疲勞度 <b class="${S.fatigue>=55?'dn':'hl'}">${S.fatigue}</b>${S.fatigue>=55?'（受傷風險上升）':''}`+
     (six?`<br>滿強度訓練累計 <b class="hl">${S.six}/5</b> 次`:''));
   if(S.six>=5&&!S.traits.genius&&S.age<21)
     traitCard('genius','21 歲前五度完成滿強度訓練！從今以後，每堂訓練課<b class="hl">永久 4 星以上</b>，關鍵時刻成功率 <b class="hl">+12%</b>。'+awaken());
@@ -1740,6 +1787,9 @@ function shareImage(ev,out){
   if(t)t.onclick=()=>{ $('act').classList.toggle('collapsed');
     t.textContent=$('act').classList.contains('collapsed')?'⌃ 展開選項':'⌄ 收合選項'; };
 })();
+$('bd-abt').onclick=function(){ const p=$('bd-ab'), on=p.classList.toggle('open');
+  this.textContent=on?'能力 ▴':'能力 ▾'; try{localStorage.setItem('fl_abopen',on?'1':'');}catch(e){} };
+try{ if(localStorage.getItem('fl_abopen')){ $('bd-ab').classList.add('open'); $('bd-abt').textContent='能力 ▴'; } }catch(e){}
 $('btn-restart').onclick=function(){ if(confirm('確定要放棄這段人生，從頭開始嗎？'))location.href=location.pathname; };
 let selGrp='FW', selNat='TW';
 function natDesc(){ const n=NATS[selNat]; $('nat-desc').textContent=`國家隊實力：${NAT_TIERN[n.tier]}｜世界盃基準出線率 ${n.wc}%｜本土聯賽：${n.home.map(k=>LV[k].n).join('、')}${n.mil?'｜有兵役':''}`; }
