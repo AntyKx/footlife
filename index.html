@@ -258,8 +258,8 @@ const NATS={
   KR:{n:'韓國',tier:1,wc:85,cap:10,nt:49,home:['K1','K2'],scout:0,wp:0,mil:'KR'},
   AU:{n:'澳洲',tier:2,wc:70,cap:25,nt:46,home:['AUS'],scout:0,wp:0},
   CN:{n:'中國',tier:3,wc:30,cap:30,nt:42,home:['CSL','CHN2'],scout:1,wp:1},
-  VN:{n:'越南',tier:4,wc:10,cap:25,nt:38,home:['VIE'],scout:2,wp:1},
-  TH:{n:'泰國',tier:4,wc:10,cap:25,nt:38,home:['THA'],scout:2,wp:1},
+  VN:{n:'越南',tier:4,wc:6,cap:25,nt:38,home:['VIE'],scout:2,wp:1},
+  TH:{n:'泰國',tier:4,wc:6,cap:25,nt:38,home:['THA'],scout:2,wp:1},
 };
 const NAT_TIERN={1:'強',2:'中強',3:'中',4:'中弱',5:'弱'};
 const homeLow=()=>NATS[S.nat].home.at(-1), homeTop=()=>NATS[S.nat].home[0];
@@ -1227,7 +1227,7 @@ function careerScore(){
   return Math.round(S.log.reduce((s,r)=>s+seasonPts(r)*lgW(r.lv||'TW1'),0)+S.honors.reduce((s,h)=>s+honorPts(h),0));
 }
 /* 五帶門檻(批次模擬校準):傳奇 2%、巨星 8%、主力 25%、浮沉 40%、過客 25% */
-const TIER_TH=[680,475,285,155]; /* 1400 段生涯模擬(含特質、升大學)的 p98/p90/p65/p25 */
+const TIER_TH=[690,450,275,145]; /* 2400 段生涯模擬(含特質、升大學)的 p98/p90/p65/p25 */
 const TIERS=['傳奇','巨星','主力','浮沉','過客'];
 const HOF_TH=210; /* 單一聯賽(未加權)生涯分門檻 */
 function mainLeague(){ const m={}; S.log.forEach(r=>{ if(r.lv)m[r.lv]=(m[r.lv]||0)+r.st.Min*lgW(r.lv); }); /* 以加權上場時間選代表聯賽 */
