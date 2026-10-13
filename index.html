@@ -194,7 +194,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.4.0-M3';
+const APP_VER='v0.5.0-M4';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -637,10 +637,35 @@ function seasonResult(){
   const youth=S.stage==='YOUTH';
   const r=seasonRole();
   const st=youth?simSeason(YOUTH_PAR[S.youthTier],20,r):simSeason(LV[S.lv].par,LV[S.lv].g,r);
-  S.lastD=st.d;
+  S.lastD=st.d; S.lastSt=st;
+  if(!youth&&ovr()>=(S.peakOvr||0)){ S.peakOvr=ovr(); S.peakType=playerType(); } /* 結算圖顯示巔峰時期的類型 */
   logSeason(st,statLine(st));
   card('info',youth?'青年聯賽成績':`${LV[S.lv].n}成績`,`<div class="statline">${statLine(st)}</div>`);
+  leagueAwards(st);
   board(1); nextStep();
+}
+/* ---------- 個人獎項 ---------- */
+/* 聯賽獎項:門檻依輪數換算成 38 輪基準;達標後再擲骰(同季有其他候選人) */
+function leagueAwards(st){
+  if(S.stage!=='PRO'||!st.App)return;
+  const L=LV[S.lv], g38=L.g/38, Y=seasonLabel(S.year), main=st.role==='主力', got=[];
+  const add=n=>{ S.honors.push(`${Y} ${L.n}${n}`); got.push(n); };
+  if(!isGK()){ const th=Math.round((L.eu?22:18)*g38); if(st.G>=th&&chance(55+(st.G-th)*8))add('金靴'); }
+  else if(main&&st.CS>=Math.round(14*g38)&&chance(50))add('金手套');
+  if(main&&st.Rt>=7.6&&chance(40+(st.Rt-7.6)*100))add('最佳球員');
+  else if(S.age<=23&&st.Rt>=7.2&&chance(50))add('最佳年輕球員');
+  if(main&&st.Rt>=7.3&&chance(45))add('年度最佳陣容');
+  if(got.length)card('gold','個人獎項',`${L.n}：${got.map(x=>`<b class="hl">${x}</b>`).join('、')}`);
+}
+/* 年度獎項(季末,冠軍結果出爐後):亞洲足球先生、金球獎 */
+function yearAwards(){
+  const st=S.lastSt; if(S.stage!=='PRO'||!st||!st.App||st.role!=='主力')return;
+  const L=LV[S.lv], champ=S.champYear===S.year;
+  const score=st.Rt+(L.top5?0.6:L.eu?0.3:0)+(champ?0.2:0)+(S.ntOn?0.1:0);
+  if(score>=7.9&&chance(35+(score-7.9)*60)){ S.honors.push(`${S.year+1} 亞洲足球先生`);
+    card('gold','亞洲足球先生',`你被選為 <b class="hl">${S.year+1} 年亞洲足球先生</b>！`); }
+  if(L.top5&&champ&&st.Rt>=8.0&&chance(15)){ S.honors.push(`${S.year+1} 金球獎`);
+    card('gold','金球獎',`不可思議——你拿下了 <b class="hl">${S.year+1} 年金球獎</b>，世界足壇的最高個人榮譽。`); }
 }
 
 /* ---------- 季末 ---------- */
@@ -651,7 +676,7 @@ function phaseEnd(){
     let sal=S.ct.mil?30:salaryFor(S.ct.lv,ovr()-LV[S.ct.lv].par,S.ct.mult); if(S.seasonFactor===0)sal=Math.round(sal*0.5); /* 服役只領軍餉 */
     S.salary+=sal; S.ct.yrs--;
     card('','季末結算',`本季薪資：<b class="hl">${fmtMoney(sal)}</b>（生涯累計 ${fmtMoney(Math.round(S.salary))}）｜合約剩 ${S.ct.yrs} 年｜身價約 <b class="hl">${fmtMoney(marketValue())}</b>`);
-    teamStanding(); board(2);
+    teamStanding(); yearAwards(); board(2);
   }
   /* 國家隊 → 國際賽能力點 → 兵役 → 歸化 → 轉會 */
   const go=()=>militaryCheck(()=>naturalCheck(movement));
@@ -664,7 +689,7 @@ function phaseEnd(){
 function teamStanding(){
   const L=LV[S.lv], t=S.clubTier;
   if(chance({1:30,2:5,3:0.5}[t])){
-    S.honors.push(`${seasonLabel(S.year)} ${L.n}冠軍（${S.club}）`);
+    S.honors.push(`${seasonLabel(S.year)} ${L.n}冠軍（${S.club}）`); S.champYear=S.year;
     card('gold','聯賽冠軍',`${S.club}奪下 <b class="hl">${L.n}冠軍</b>！`);
     if(L.up&&!S.loan&&!S.ct.mil)promote();
     return; }
@@ -959,17 +984,124 @@ function naturalCheck(cont){
       card('bad','歸化',`你成為 <b class="hl">${T.n}</b> 公民，之後將代表${T.n}出賽。${NATS[S.natFrom].n}的球迷對此相當憤怒。`); board(2); cont(); }}]);
 }
 
-/* ================= 生涯終章（M4 補完評價與分享圖） ================= */
+/* ================= 生涯終章 ================= */
+/* 生涯分 = Σ 各季 (評分 − 6.0) × 上場 90 分鐘數 × 聯賽權重 + 榮譽加分 */
+const ASIA_TOP=['J1','K1','CSL','AUS'], ASIA_2=['J2','K2'];
+const lgW=k=>LV[k].top5?1:LV[k].eu?0.6:ASIA_TOP.includes(k)?0.5:ASIA_2.includes(k)?0.3:0.2;
+const seasonPts=r=>r.lv&&r.st.App?Math.max(0,r.st.Rt-6.0)*r.st.Min/90:0;
+/* 榮譽加分:由上往下取第一個符合的規則 */
+const HONOR_PTS=[[/金球獎/,300],[/世界盃（(冠軍|亞軍)/,200],[/世界盃（止步(8 強|4 強)/,100],[/世界盃/,40],
+  [/亞洲足球先生/,80],[/最佳球員/,60],[/(英超|西甲|德甲|義甲|法甲)冠軍/,60],[/金靴|金手套/,40],
+  [/亞洲盃（冠軍/,60],[/奧運（(金牌|銀牌|銅牌)/,40],[/亞運（金牌/,30],[/亞洲盃（亞軍/,30],
+  [/年度最佳陣容/,20],[/冠軍（/,20],[/最佳年輕球員/,10],[/亞洲盃/,10]];
+/* 聯賽獎項與冠軍乘上該聯賽權重;國際賽不打折 */
+const honorLv=h=>Object.keys(LV).find(k=>h.includes(LV[k].n));
+const honorPts=h=>{ const k=honorLv(h), w=k?lgW(k):1; for(const [re,v] of HONOR_PTS)if(re.test(h))return Math.round(v*w); return 0; };
+function careerScore(){
+  return Math.round(S.log.reduce((s,r)=>s+seasonPts(r)*lgW(r.lv||'TW1'),0)+S.honors.reduce((s,h)=>s+honorPts(h),0));
+}
+/* 五帶門檻(批次模擬校準):傳奇 2%、巨星 8%、主力 25%、浮沉 40%、過客 25% */
+const TIER_TH=[720,480,295,160]; /* 600 段生涯模擬的 p98/p90/p65/p25 */
+const TIERS=['傳奇','巨星','主力','浮沉','過客'];
+const HOF_TH=210; /* 單一聯賽(未加權)生涯分門檻 */
+function mainLeague(){ const m={}; S.log.forEach(r=>{ if(r.lv)m[r.lv]=(m[r.lv]||0)+r.st.Min*lgW(r.lv); }); /* 以加權上場時間選代表聯賽 */
+  return Object.keys(m).sort((a,b)=>m[b]-m[a])[0]||null; }
+function evaluate(){
+  const sc=careerScore(), ti=TIER_TH.findIndex(t=>sc>=t), tier=TIERS[ti<0?4:ti], lg=mainLeague(), lgn=lg?LV[lg].n:'';
+  const desc={傳奇:`${lgn}歷史級球星`,巨星:`${lgn}頂級球星`,主力:`穩定的${lgn}主力`,浮沉:'在各級聯賽浮沉的職業球員',過客:'職業足壇的過客'}[tier];
+  const lines=[`【${tier}】${desc}（生涯分 ${sc}）`];
+  /* 名人堂:單一聯賽未加權分 + 該聯賽榮譽 */
+  Object.keys(LV).forEach(k=>{ const v=S.log.filter(r=>r.lv===k).reduce((s,r)=>s+seasonPts(r),0)+S.honors.filter(h=>h.includes(LV[k].n)).reduce((s,h)=>s+honorPts(h),0);
+    if(v>=HOF_TH)lines.push(`${LV[k].n}名人堂`); });
+  const N=NATS[S.nat];
+  if(N.tier>=4&&S.honors.some(h=>/世界盃/.test(h)))lines.push(`${N.n}國家英雄：帶領國家踢上世界盃`);
+  else if(S.caps>=100)lines.push(`${N.n}國家隊百場功臣`);
+  const clubs={}; S.log.forEach(r=>{ if(r.lv&&!r.loan)clubs[r.tm]=(clubs[r.tm]||0)+1; });
+  const loyal=Object.keys(clubs).find(c=>clubs[c]>=8); if(loyal)lines.push(`${loyal}的一隊傳奇（效力 ${clubs[loyal]} 季）`);
+  if(S.natFrom)lines.push(`歸化球員：${NATS[S.natFrom].n} → ${N.n}`);
+  return {sc,tier,lines};
+}
+function careerTotals(){ return S.log.reduce((t,r)=>{ ['App','G','A','CS','GA'].forEach(k=>t[k]+=r.st[k]); return t; },{App:0,G:0,A:0,CS:0,GA:0}); }
 function endGame(reason){
   S.done=true; stepQ=[]; board(2);
+  const ev=evaluate(), tot=careerTotals();
   const rows=S.log.map(r=>{ const s=r.st;
     return `<tr><td>${seasonLabel(r.y)}</td><td>${r.age}</td><td>${r.tm}</td><td>${s.App}</td><td>${isGK()?s.CS:s.G}</td><td>${isGK()?s.GA:s.A}</td><td>${s.Rt||'—'}</td></tr>`; }).join('');
-  const tot=S.log.reduce((t,r)=>{ ['App','G','A','CS','GA'].forEach(k=>t[k]+=r.st[k]); return t; },{App:0,G:0,A:0,CS:0,GA:0});
   card('gold','生涯落幕',`${reason}<br>職業生涯 ${S.log.filter(r=>r.lv).length} 季，總出場 <b class="hl">${tot.App}</b>，${isGK()?`零封 <b class="hl">${tot.CS}</b>`:`進球 <b class="hl">${tot.G}</b>、助攻 <b class="hl">${tot.A}</b>`}。生涯總薪資 <b class="hl">${fmtMoney(Math.round(S.salary))}</b>。
-    ${S.caps?`<br>${NATS[S.nat].n}國家隊出賽 <b class="hl">${S.caps}</b> 場${isGK()?'':`、進 <b class="hl">${S.intlG}</b> 球`}。`:''}${S.natFrom?`<br>原為${NATS[S.natFrom].n}國籍，後歸化為${NATS[S.nat].n}。`:''}
+    ${S.caps?`<br>${NATS[S.nat].n}國家隊出賽 <b class="hl">${S.caps}</b> 場${isGK()?'':`、進 <b class="hl">${S.intlG}</b> 球`}。`:''}
     ${S.honors.length?`<div class="statline">${S.honors.join('<br>')}</div>`:''}
     <table class="fin"><tr><th>賽季</th><th>齡</th><th>球隊</th><th>出場</th><th>${isGK()?'零封':'進球'}</th><th>${isGK()?'失球':'助攻'}</th><th>評分</th></tr>${rows}</table>`);
-  choose('',[{t:'↺ 重新開始',main:true,f:()=>{ location.href=location.pathname; }}]);
+  card('gold','生涯評價',ev.lines.map((l,i)=>i?`★ ${l}`:`<b class="hl">${l}</b>`).join('<br>')+'<div id="share-out" style="margin-top:8px"></div>');
+  choose('',[{t:'▸ 產生結算圖',main:true,f:()=>{ shareImage(ev,$('share-out')); choose('',[{t:'↺ 重新開始',main:true,f:()=>{ location.href=location.pathname; }}]); }},
+    {t:'↺ 重新開始',f:()=>{ location.href=location.pathname; }}]);
+}
+/* 結算圖:畫在 canvas 上,版面比照棒球版 */
+function shareImage(ev,out){
+  const W=920, PAD=34, scale=2, gk=isGK(), tot=careerTotals();
+  const cv=document.createElement('canvas'), c=cv.getContext('2d');
+  /* 各聯賽累積 */
+  const lgs=Object.keys(S.stats).sort((a,b)=>LV[b].par-LV[a].par);
+  /* 榮譽:同名獎項合併年份 */
+  const m={}; S.honors.forEach(h=>{ const i=h.indexOf(' '), yr=h.slice(0,i), n=h.slice(i+1); (m[n]=m[n]||[]).push(yr); });
+  const honors=Object.keys(m).map(n=>m[n].length>1?`${n} ×${m[n].length}（${m[n].join('、')}）`:`${n}（${m[n][0]}）`);
+  c.font='13px sans-serif';
+  const colW=(W-PAD*2)/2, maxW=colW-20;
+  const blocks=honors.map(h=>{ const L=[]; let cur=''; for(const ch of '· '+h){ if(c.measureText(cur+ch).width>maxW&&cur){ L.push(cur); cur='  '+ch; } else cur+=ch; } if(cur)L.push(cur); return L; });
+  const half=Math.ceil(blocks.length/2), hH=Math.max(...[blocks.slice(0,half),blocks.slice(half)].map(b=>b.reduce((s,x)=>s+x.length*23,0)),0);
+  const pro=S.log.filter(r=>r.lv);
+  let H=140+30+ev.lines.length*24+14+34+(lgs.length+1)*26+16+(S.caps?56:0)+(honors.length?30+hH+16:0)+34+pro.length*20+24+70;
+  cv.width=W*scale; cv.height=H*scale; c.scale(scale,scale);
+  c.fillStyle='#0b1a12'; c.fillRect(0,0,W,H);
+  c.strokeStyle='#2b4a38'; c.lineWidth=3; c.strokeRect(10,10,W-20,H-20);
+  c.textBaseline='top';
+  c.fillStyle='#8fae9c'; c.font='13px sans-serif'; c.fillText('F o o t L i f e ・ 引 退 紀 念',PAD,30);
+  c.fillStyle='#ffc95c'; c.font='bold 36px sans-serif'; c.fillText(S.name,PAD,52);
+  c.fillStyle='#e8efe9'; c.font='15px sans-serif';
+  c.fillText(`${NATS[S.nat].n}｜${DPN[S.dpos]}｜${S.peakType||playerType()}｜${pro.length?pro[0].y+'–'+(pro.at(-1).y+1):'未登上職業舞台'}｜引退時 ${S.age} 歲`,PAD,98);
+  let y=130;
+  const hr=()=>{ c.strokeStyle='#2b4a38'; c.lineWidth=1; c.beginPath(); c.moveTo(PAD,y); c.lineTo(W-PAD,y); c.stroke(); y+=12; };
+  const title=t=>{ c.fillStyle='#8fae9c'; c.font='bold 13px sans-serif'; c.fillText(t,PAD,y); y+=22; };
+  hr(); title('生涯評價');
+  ev.lines.forEach((l,i)=>{ c.font=(i?'':'bold ')+'16px sans-serif'; c.fillStyle=i?'#9fd8a8':'#ffc95c'; c.fillText((i?'★ ':'')+l,PAD,y); y+=24; }); y+=6;
+  hr(); title('生涯累積數據');
+  const cols=[['聯賽',150],['季',50],['出場',70],['分鐘',90],[gk?'零封':'進球',70],[gk?'失球':'助攻',70],['平均評分',90]];
+  const row=(cells,head)=>{ let x=PAD; c.font=(head?'bold ':'')+'13px monospace'; c.fillStyle=head?'#8fae9c':'#e8efe9';
+    cells.forEach((v,i)=>{ c.fillText(String(v),x,y); x+=cols[i][1]; }); y+=head?24:26; };
+  row(cols.map(x=>x[0]),true);
+  lgs.forEach(k=>{ const b=S.stats[k], rs=S.log.filter(r=>r.lv===k&&r.st.App), avg=rs.length?(rs.reduce((s,r)=>s+r.st.Rt,0)/rs.length).toFixed(2):'-';
+    row([LV[k].n,b.yr,b.App,b.Min,gk?b.CS:b.G,gk?b.GA:b.A,avg]); });
+  row(['合計',pro.length,tot.App,'',gk?tot.CS:tot.G,gk?tot.GA:tot.A,'']); y+=6;
+  if(S.caps){ hr(); c.fillStyle='#e8efe9'; c.font='14px sans-serif'; c.fillText(`${NATS[S.nat].n}國家隊：出賽 ${S.caps} 場${gk?'':`、進 ${S.intlG} 球`}`,PAD,y); y+=32; }
+  if(honors.length){ hr(); title(`生涯榮譽（${honors.length} 項）`);
+    c.font='13px sans-serif'; c.fillStyle='#9fd8a8'; const y0=y; let cy=y0;
+    blocks.forEach((b,i)=>{ if(i===half)cy=y0; const x=PAD+(i>=half?colW:0); b.forEach(l=>{ c.fillText(l,x,cy); cy+=23; }); });
+    y=y0+hH+8; }
+  hr(); title('生涯年表');
+  const hc=[['賽季',70],['齡',36],['球隊',190],['聯賽',110],['位置',60],['出場',50],[gk?'零封':'進球',50],[gk?'失球':'助攻',50],['評分',60]];
+  let x=PAD; c.font='bold 12px monospace'; c.fillStyle='#8fae9c'; hc.forEach(h=>{ c.fillText(h[0],x,y); x+=h[1]; }); y+=20;
+  c.font='12px monospace';
+  pro.forEach(r=>{ x=PAD; c.fillStyle=r.inj?'#ff8b7a':'#cfe0d4'; const s=r.st;
+    [seasonLabel(r.y),r.age,r.tm,LV[r.lv].n,DPN[r.dp],s.App,gk?s.CS:s.G,gk?s.GA:s.A,s.Rt||'-'].forEach((v,i)=>{
+      let t=String(v); while(c.measureText(t).width>hc[i][1]-8&&t.length>1)t=t.slice(0,-1); c.fillText(t,x,y); x+=hc[i][1]; }); y+=20; });
+  y+=4;
+  c.fillStyle='#ffc95c'; c.font='bold 16px sans-serif'; c.fillText('生涯總薪資 '+fmtMoney(Math.round(S.salary))+' 台幣',PAD,y);
+  c.fillStyle='#8fae9c'; c.font='11px monospace'; c.fillText('seed: '+SEED,PAD,H-40);
+  c.textAlign='right'; c.fillText(APP_VER,W-PAD,H-40); c.textAlign='left';
+  const url=cv.toDataURL('image/png'), fileName='足球生涯結算_'+S.name+'.png';
+  out.innerHTML=`<img src="${url}" style="width:100%;border-radius:8px" alt="結算圖">
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn main" id="sh-save" style="flex:1">儲存／分享圖片</button>
+      <button class="btn" id="sh-dl" style="flex:1">下載到裝置</button>
+    </div>
+    <div class="statline" style="margin-top:6px">若按鈕無效，長按上方圖片也可儲存</div>`;
+  const dl=()=>{ const a=document.createElement('a'); a.href=url; a.download=fileName; document.body.appendChild(a); a.click(); a.remove(); };
+  out.querySelector('#sh-dl').onclick=dl;
+  /* 分享:優先 Web Share(可存相簿),不支援則退回下載 */
+  out.querySelector('#sh-save').onclick=async ()=>{
+    try{ const blob=await (await fetch(url)).blob(), file=new File([blob],fileName,{type:'image/png'});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'足球生涯結算',text:S.name+' 的足球人生'}); return; }
+    }catch(e){ if(e&&e.name==='AbortError')return; }
+    dl(); };
 }
 
 /* ================= 開場設定 ================= */
