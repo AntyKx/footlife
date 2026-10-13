@@ -911,7 +911,7 @@ const lastRoleIdx=()=>{ const r=S.log.length?S.log[S.log.length-1].st.role:'主�
 
 /* ---------- 合約與報價 ---------- */
 function tierOf(lv,club){ const a=TEAMS[lv], i=a.indexOf(club), n=a.length; return i<0?2:i<n/4?1:i>=n*3/4?3:2; }
-const ctYears=()=>S.age>=32?ri(1,2):ri(2,4);
+const ctYears=()=>S.age>=32?ri(1,2):S.age>=28?ri(2,3):ri(3,5); /* 年輕球員簽長約 */
 /* 從聯賽挑 n 支球隊報價;豪門只找綜合 ≥ par+2 的人 */
 function makeOffers(lv,n,ex){
   const o=ovr(), par=LV[lv].par;
@@ -955,6 +955,7 @@ function offerOpt(of,main,title){
 function signTo(of){
   if(of.club!==S.club)S.rivals=[]; /* 換隊就換一批競爭者 */
   S.stage='PRO'; S.lv=of.lv; S.club=of.club; S.clubTier=of.tier; S.loan=null;
+  if(of.club!==S.club)S.newSign=true; /* 新加盟第一個夏窗不會被賣、也沒人來談 */
   S.ct={yrs:of.yrs,mult:TIER_PAY[of.tier],lv:of.lv}; S.wantOut=false; S.relegated=false;
   card('gold','簽約',`與 <b class="hl">${of.club}</b>（${LV[of.lv].n}・${TIERN[of.tier]}）簽下 <b class="hl">${of.yrs} 年</b>合約。`);
   board(2);
@@ -1017,14 +1018,17 @@ function youthExit(){
 }
 /* 夏窗:合約內的轉會、租借、申請轉會、被動出售 */
 function summerWindow(){
-  const lastRole=lastRoleIdx(), mv=marketValue();
+  const lastRole=lastRoleIdx(), mv=marketValue(), fresh=S.newSign; S.newSign=false;
+  /* 有約在身時,先擲有沒有球隊感興趣:基本 15%,上季評分 ≥7.3 +35、≥6.9 +10,合約剩最後一年 +20,申請轉會 +30 */
+  const last=S.log[S.log.length-1], rt=last?last.st.Rt:0;
+  const interest=!fresh&&chance(15+(rt>=7.3?35:rt>=6.9?10:0)+(S.ct.yrs===1?20:0)+(S.wantOut?30:0));
   /* 被動出售:球隊收到報價想賣人;拒絕則下季上場地位 −1 */
-  if(lastRole<=1&&chance((S.clubTier===3?20:12)+(S.traits.cancer?20:0))){ const b=genOffers(1,false)[0];
+  if(!fresh&&lastRole<=1&&chance((S.clubTier===3?20:12)+(S.traits.cancer?20:0))){ const b=genOffers(1,false)[0];
     if(b){ choose(`${S.club}接受了 ${b.club} 的報價`,[
       {t:`同意轉會至 ${ofName(b)}`,main:true,s:`${b.yrs} 年｜${TIER_DESC[b.tier]}`,f:()=>{ card('good','轉會',`${S.club}以約 ${fmtMoney(mv)} 的價格把你賣給 ${b.club}。`); signTo(b); advance(); }},
       {t:'拒絕，留在隊上',warn:true,s:'球團不太高興，下季上場地位 −1',f:()=>{ S.roleAdj--; card('bad','拒絕轉會','你拒絕離開，但球團的態度明顯冷淡了。'); advance(); }}]);
       return; } }
-  const offers=genOffers(offerCount(false),lastRole>=2);
+  const offers=interest?genOffers(Math.max(1,offerCount(false)),lastRole>=2):[];
   /* 降級條款:上級聯賽球隊來挖角 */
   if(S.relegated){ const up=Object.keys(LV).find(k=>LV[k].rel===S.lv), of=up&&ovr()>=LV[up].min&&makeOffers(up,1,S.club)[0];
     if(of&&!offers.some(x=>x.club===of.club))offers.unshift(of); }
@@ -1042,7 +1046,7 @@ function summerWindow(){
   if(S.age>=30)opts.push(retireOpt());
   choose(`夏季轉會窗 · 合約剩 ${S.ct.yrs} 年 · 身價約 ${fmtMoney(mv)}`,opts);
 }
-/* 冬窗:預估角色為替補/板凳才有人找;23 歲以下可租借 */
+/* 冬窗:預估角色為替補/板凳才有人找;23 歲以下可租借,板凳球員 30% 有轉會報價 */
 function winterWindow(cont){
   if(S.stage!=='PRO'||S.loan){ cont(); return; }
   const role=clamp(roleOf(ovr()-rivalTop())-S.roleAdj,0,3);
@@ -1050,7 +1054,7 @@ function winterWindow(cont){
   const opts=[{t:'留隊爭取機會',main:true,f:cont}];
   if(S.age<=23){ const lo=loanOffer();
     if(lo)opts.push({t:`冬窗租借：${ofName(lo)}`,s:'下半季去累積上場時間',f:()=>{ startLoan(lo); fillRivals(); cont(); }}); }
-  const of=genOffers(1,true)[0];
+  const of=role===3&&chance(30)?genOffers(1,true)[0]:null; /* 冬窗以租借為主;只有坐板凳時偶爾有轉會報價 */
   if(of)opts.push({t:`冬窗轉會：${ofName(of)}`,s:`${of.yrs} 年｜${TIER_DESC[of.tier]}`,f:()=>{ signTo(of); fillRivals(); cont(); }});
   if(opts.length===1){ cont(); return; }
   choose(`冬季轉會窗 · 上場時間不足（預估${ROLES[role][0]}）`,opts);
@@ -1234,7 +1238,7 @@ function careerScore(){
   return Math.round(S.log.reduce((s,r)=>s+seasonPts(r)*lgW(r.lv||'TW1'),0)+S.honors.reduce((s,h)=>s+honorPts(h),0));
 }
 /* 五帶門檻(批次模擬校準):傳奇 2%、巨星 8%、主力 25%、浮沉 40%、過客 25% */
-const TIER_TH=[690,450,275,145]; /* 2400 段生涯模擬(含特質、升大學)的 p98/p90/p65/p25 */
+const TIER_TH=[645,440,260,147]; /* 2400 段生涯模擬(轉會頻率調整後)的 p98/p90/p65/p25 */
 const TIERS=['傳奇','巨星','主力','浮沉','過客'];
 const HOF_TH=210; /* 單一聯賽(未加權)生涯分門檻 */
 function mainLeague(){ const m={}; S.log.forEach(r=>{ if(r.lv)m[r.lv]=(m[r.lv]||0)+r.st.Min*lgW(r.lv); }); /* 以加權上場時間選代表聯賽 */
