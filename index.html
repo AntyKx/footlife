@@ -214,7 +214,14 @@ const DP_ADJ={W:['FB'],FB:['W'],AM:['W']}; /* 跨大類的相鄰位置(邊鋒↔
 const GOAL_BASE={ST:.45,SS:.38,W:.30,AM:.22,CM:.10,DM:.04,FB:.03,CB:.05,GK:0}; /* 每 90 分鐘 */
 const AST_BASE={AM:.28,W:.25,SS:.20,ST:.15,CM:.15,FB:.10,DM:.06,CB:.02,GK:0};
 /* 青訓隊:隱藏分級 T1 名門(競爭激烈)/T2 中堅/T3 弱旅(容易上場) */
-const YOUTH={'北區足球學院':1,'南區足球學院':1,'中部體育高中':2,'東部體育高中':2,'社區業餘隊':3,'偏鄉足球隊':3};
+const YOUTH={ /* 依國籍,隊名全虛構 */
+  TW:{'北區足球學院':1,'南區足球學院':1,'中部體育高中':2,'東部體育高中':2,'社區業餘隊':3,'偏鄉足球隊':3},
+  JP:{'東都FCユース':1,'浪華SCユース':1,'青嶺高校':2,'北辰学園高校':2,'港町FCクラブ':3,'山里高校サッカー部':3},
+  KR:{'漢江FC U18':1,'釜海FC U18':1,'清嵐體育高校':2,'月城工業高校':2,'小城業餘隊':3,'島嶼高校足球部':3},
+  AU:{'海港FC 青年隊':1,'南灣FC 青年隊':1,'藍嶺體育學院':2,'紅土中學':2,'郊區業餘俱樂部':3,'內陸小鎮足球隊':3},
+  CN:{'燕北足球學校':1,'申江足球學校':1,'嶺海體校':2,'蜀川體校':2,'縣城業餘隊':3,'山區中學足球隊':3},
+  VN:{'紅河足球學院':1,'南圻青訓中心':1,'香江體育中學':2,'長山體育中學':2,'鄉村業餘隊':3,'海島足球隊':3},
+  TH:{'湄南足球學院':1,'安達曼青訓中心':1,'北嶺體育學校':2,'碧武里體育學校':2,'社區業餘隊':3,'山區足球隊':3}};
 const YOUTH_PAR={1:30,2:27,3:24};
 /* 大學:校名全虛構;分級依入學時綜合決定(強校競爭較激烈) */
 const UNIS={TW:['北嶺體育大學','鳳林大學','海昇大學','雲嵐大學'],JP:['東都体育大学','青嶺大学','浪華経済大学','北辰学院大学'],
@@ -329,9 +336,9 @@ function newState(name,grp,nat){
   const pot={}, sh=shuffle(keys.slice());
   if(grp==='GK') sh.forEach((k,i)=>{ pot[k]= i===0?ri(70,80) : i===1?ri(56,66) : i===2?ri(48,58) : ri(40,50); });
   else sh.forEach((k,i)=>{ pot[k]= i===0?ri(72,80) : i===1?ri(60,70) : i===2?ri(52,62) : ri(40,56); });
-  const team=pick(Object.keys(YOUTH));
+  const yt=YOUTH[nat]||YOUTH.TW, team=pick(Object.keys(yt));
   return {name,grp,dpos:DP_DEFAULT[grp],nat,natFrom:null,age:15,year:2026,stage:'YOUTH',stageYr:1,
-    ab,pot,carry:{},team,youthTier:YOUTH[team],
+    ab,pot,carry:{},team,youthTier:yt[team],
     lv:null,club:null,clubTier:2,ct:null,rivals:[],loan:null,wantOut:false,relegated:false,honors:[],
     traits:Object.fromEntries(Object.keys(TRAITN).map(k=>[k,false])),removed:[],six:0,pendStat:0,tmpInj:0,rehab:0,seasonFactor:1,skipMid:false,
     roleAdj:0,salary:0,stats:{},log:[],done:false,
