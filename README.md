@@ -2,7 +2,7 @@
 
 純文字的足球生涯養成遊戲，架構沿用《野球人生模擬器》。從 15 歲青訓開始，經歷簽約、旅外、國家隊，直到引退。
 
-▶ **線上試玩：<https://antykx.github.io/footlife/>**
+▶ **線上試玩：** <https://footlife-eta.vercel.app>（Vercel）｜<https://antykx.github.io/footlife/>（GitHub Pages）
 
 目前進度：**M6 升大學**（18 歲可升大學、22 歲畢業進職業）；M0～M5 已完成。
 
