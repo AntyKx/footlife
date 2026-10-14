@@ -473,7 +473,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.11.0';
+const APP_VER='v0.11.1';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1997,8 +1997,8 @@ const T_WC={n:'世界盃',st:['小組賽','32 強','16 強','8 強','4 強','決
 const T_AC={n:'亞洲盃',st:['小組賽','16 強','8 強','4 強','決賽'],g:[.95,.85,.65,.45,.3],k:[.65,.55,.4,.3,.2]};
 const T_AG={n:'亞運',st:['小組賽','16 強','8 強','4 強','決賽'],g:[.92,.8,.6,.45,.3],k:[.75,.55,.4,.3,.2],u23:1};
 /* 區域賽事:不在 FIFA 強制放人期 */
-const T_E1={n:'東亞錦標賽',st:['循環賽','冠軍戰'],g:[.6,.5,.35,.2,.1],k:[.5,.45,.35,.25,.15],opp:['日本','韓國','中國','台灣','香港']};
-const T_AFF={n:'東協錦標賽',st:['小組賽','4 強','決賽'],g:[.95,.9,.85,.8,.5],k:[.7,.65,.6,.5,.25],opp:['越南','泰國','印尼','馬來西亞','新加坡','菲律賓']};
+const T_E1={n:'東亞錦標賽',st:['循環賽','冠軍戰'],reg:1,g:[.6,.5,.35,.2,.1],k:[.5,.45,.35,.25,.15],opp:['日本','韓國','中國','台灣','香港']};
+const T_AFF={n:'東協錦標賽',st:['小組賽','4 強','決賽'],reg:1,g:[.95,.9,.85,.8,.5],k:[.7,.65,.6,.5,.25],opp:['越南','泰國','印尼','馬來西亞','新加坡','菲律賓']};
 const T_OLY={n:'奧運',st:['小組賽','8 強','4 強','決賽'],g:[.55,.5,.45,.4,.35],k:[.4,.38,.35,.3,.25],u23:1};
 const ntBonus=()=>clamp((ovr()-NATS[S.nat].nt)*0.005,0,0.1);
 /* 世界盃出線率 = 國家基準 + min(上限, max(0, OVR−50)×0.8);只有國家隊主力才算個人加成 */
@@ -2023,7 +2023,7 @@ function natCallRoll(cont){
   if(S.ntOn){ const a=ri(3,6), q=ri(1,3), g=isGK()?0:Math.round(a*GOAL_BASE[S.dpos]*0.7*(0.6+R()*0.8));
     S.caps+=a; S.compCaps+=q; S.intlG+=g;
     card('info',was?'國家隊':'首次入選國家隊',`${was?'':'<b class="hl">夢想成真！</b>'}代表${N.n}出賽 ${a} 場（含資格賽 ${q} 場）${g?`，進 ${g} 球`:''}。國家隊生涯 ${S.caps} 場。`);
-    if(!S.ntCap&&S.caps>=60&&S.age>=25&&ovr()>=N.nt+9&&chance(12)){ S.ntCap=true; S.ntRep=clamp(S.ntRep+1,-3,3); meter('fans',5);
+    if(!S.ntCap&&S.caps-(S.regCaps||0)>=60&&S.age>=25&&ovr()>=N.nt+9&&chance(12)){ S.ntCap=true; S.ntRep=clamp(S.ntRep+1,-3,3); meter('fans',5);
       card('gold','國家隊隊長',`總教練把隊長袖標交到你手上：<b class="hl">${N.n}國家隊隊長</b>。`); } }
   else if(was)card('bad','落選國家隊',`本季沒有入選${N.n}國家隊名單。${S.ntRep<0?'（國家隊教練對你的印象不佳）':''}`);
   intlYear(S.year+1,cont);
@@ -2067,8 +2067,8 @@ function regionCycle(T,Y,next){
 }
 function wcCycle(Y,next){
   const N=NATS[S.nat], p0=Math.round(wcQualRate());
-  /* 亞洲區 18 強賽最後一輪:關鍵時刻成功出線率 +15%,失敗 −12% */
-  if(S.ntOn&&S.stage==='PRO'&&p0>=5&&p0<=93&&chance(70)){ const p1=clamp(p0+15,1,99), p2=clamp(p0-12,1,99);
+  /* 亞洲區 18 強賽最後一輪:關鍵時刻成功出線率 ×1.6(最多 +15%),失敗 ×0.7 */
+  if(S.ntOn&&S.stage==='PRO'&&p0>=5&&p0<=93&&chance(70)){ const p1=clamp(Math.min(p0+15,Math.round(p0*1.6)),1,99), p2=clamp(Math.round(p0*0.7),1,99); /* 依比例調整,弱國不會因一場比賽翻倍 */
     card('talk',`${Y} 世界盃資格賽`,`亞洲區 18 強賽最後一輪，${N.n}只要贏球就能${p0<50?'保住出線希望':'大幅接近世界盃門票'}。目前出線率 ${p0}%（贏球 → ${p1}%、失利 → ${p2}%）。`);
     bigMoment(`${Y} 世界盃資格賽18強賽`,N.n,pick(OPP_AS.filter(x=>x!==N.n)),TOUR_PAR.亞洲盃,ok=>wcRoll(Y,next,ok?p1:p2)); return; }
   wcRoll(Y,next,p0);
@@ -2132,7 +2132,7 @@ function playTourney(T,Y,senior,overage,done){
 }
 function playTourneyEnd(T,Y,senior,overage,i,moOk){
   const apps=3+Math.min(i,T.st.length-1), g=isGK()?0:Math.round(apps*GOAL_BASE[S.dpos]*0.8*(0.6+R()*0.8));
-  if(senior){ S.caps+=apps; S.compCaps+=apps; S.intlG+=g; }
+  if(senior){ S.caps+=apps; S.compCaps+=apps; S.intlG+=g; if(T.reg)S.regCaps=(S.regCaps||0)+apps; }
   let res, medal=null;
   if(i===T.st.length){ res='冠軍'; medal='金牌'; }
   else if(i===T.st.length-1){ res='亞軍'; medal='銀牌'; }
@@ -2141,7 +2141,7 @@ function playTourneyEnd(T,Y,senior,overage,i,moOk){
   const label=T.u23&&medal?medal:res;
   S.honors.push(`${Y} ${T.n}（${label}${overage?'・超齡':''}）`);
   S.pool+=Math.max(S.traits.intlace?2:0,Math.min(4,i));
-  S.intlCount++; if(i>=T.st.length-2)S.intlDeep++;
+  if(!T.reg){ S.intlCount++; if(i>=T.st.length-2)S.intlDeep++; } /* 區域賽事不算進國家隊英雄 */
   card(i>=T.st.length-2?'gold':'info',`${Y} ${T.n}`,`代表${NATS[S.nat].n}${T.u23?' U23':''}${overage?'（超齡球員）':''}出賽 ${apps} 場${g?`、進 ${g} 球`:''}，最終 <b class="hl">${label}</b>。${i>0?`<br>大賽經驗帶來 <b class="up">${Math.min(4,i)+(moOk?2:0)}</b> 點能力點${moOk?'（含淘汰賽關鍵表現 +2）':''}。`:''}`);
   if(medal==='金牌'||i>=T.st.length-1){ meter('fans',T===T_WC?12:6); if(medal==='金牌')confetti(); }
   /* 韓國兵役:亞運金牌或奧運獎牌免役 */
@@ -2281,7 +2281,7 @@ function careerScore(){
   return Math.round(S.log.reduce((s,r)=>s+seasonPts(r)*lgW(r.lv||'TW1'),0)+S.honors.reduce((s,h)=>s+honorPts(h),0));
 }
 /* 五帶門檻(批次模擬校準):傳奇 2%、巨星 8%、主力 25%、浮沉 40%、過客 25% */
-const TIER_TH=[845,565,351,185]; /* 2400 段生涯模擬(M8 國家隊與盃賽)的 p98/p90/p65/p25 */
+const TIER_TH=[1045,754,477,278]; /* 500 段生涯模擬(v0.11.1:自由加點、新賽事、完整名單)的 p98/p90/p65/p25 */
 const TIERS=['傳奇','巨星','主力','浮沉','過客'];
 const HOF_TH=210; /* 單一聯賽(未加權)生涯分門檻 */
 function mainLeague(){ const m={}; S.log.forEach(r=>{ if(r.lv)m[r.lv]=(m[r.lv]||0)+r.st.Min*lgW(r.lv); }); /* 以加權上場時間選代表聯賽 */
@@ -2295,7 +2295,7 @@ function evaluate(){
     if(v>=HOF_TH)lines.push(`${LV[k].n}名人堂`); });
   const N=NATS[S.nat];
   if(N.tier>=4&&S.honors.some(h=>/世界盃/.test(h)))lines.push(`${N.n}國家英雄：帶領國家踢上世界盃`);
-  else if(S.caps>=100)lines.push(`${N.n}國家隊百場功臣`);
+  else if(S.caps-(S.regCaps||0)>=100)lines.push(`${N.n}國家隊百場功臣`);
   if(S.ntCap)lines.push(`${N.n}國家隊隊長`);
   const RV=S.arcs&&S.arcs.rival; if(RV&&RV.w+RV.l>=3)lines.push(`與宿敵 ${RV.n} 交手 ${RV.w} 勝 ${RV.l} 敗`);
   const clubs={}; S.log.forEach(r=>{ if(r.lv&&!r.loan)clubs[r.tm]=(clubs[r.tm]||0)+1; });
