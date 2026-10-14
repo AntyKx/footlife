@@ -65,25 +65,6 @@ table.fin td:first-child,table.fin th:first-child{text-align:left}
 .yr-block.collapsed .yr-head::after{content:' ▸'}
 .yr-block:not(.collapsed) .yr-head.has-body::after{content:' ▾'}
 .divider::before,.divider::after{content:'———'}
-/* 賽季分段:季前/季中/季末,做完的階段收成一行摘要 */
-.yr-body,.ph-body{display:flex;flex-direction:column;gap:10px}
-.ph-head{display:flex;align-items:baseline;gap:8px;font-size:12px;color:var(--dim);cursor:pointer;user-select:none;
-  padding:7px 12px;border:1px solid var(--line,#ffffff14);border-radius:10px;background:#0e1226aa}
-.ph-head:hover{border-color:#7a6cff88}
-.ph-head b{flex:none;color:#aab2d0;letter-spacing:.15em;font-size:12px}
-.ph-head .phs{flex:1;min-width:0;line-height:1.6}
-.ph-head .phs i{font-style:normal;white-space:nowrap} .ph-head .phs i+i::before{content:'・';color:#ffffff33}
-.ph-head .phs .g{color:var(--amber)} .ph-head .phs .b{color:var(--bad)} .ph-head .phs .ok{color:var(--good)}
-.ph-sec.open .ph-head{border-color:transparent;background:none;padding:2px 4px}
-.ph-sec.open .ph-head .phs{display:none}
-.ph-sec:not(.open) .ph-body>:not(.pin){display:none}
-.ph-sec:not(.open) .ph-body{margin-top:8px}
-.ph-sec:not(.open) .ph-body:not(:has(.pin)){display:none}
-.ph-sec:not(.open) .pin{animation:none}
-.ph-sec:not(.open) .pin .tblwrap{display:none}
-.ph-sec:not(.open) .pin:has(.ltab){cursor:pointer}
-.ph-sec:not(.open) .pin:has(.ltab)::after{content:'點一下看完整積分榜 ▸';display:block;font-size:11px;color:var(--dim);margin-top:4px}
-.ph-sec.open .ph-head b::before{content:'▾ '} .ph-sec:not(.open) .ph-head b::before{content:'▸ '}
 /* ---------- 操作區 ---------- */
 #act{position:sticky;bottom:0;z-index:20;background:linear-gradient(#121630ee,#0c0f1d);border-top:2px solid var(--edge);
   padding:12px 14px calc(12px + env(safe-area-inset-bottom));backdrop-filter:blur(6px)}
@@ -494,7 +475,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.11.4';
+const APP_VER='v0.11.5';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -669,35 +650,8 @@ const seasonLabel=y=>`${y}/${String((y+1)%100).padStart(2,'0')}`;
 /* ================= UI 基礎 ================= */
 const $=id=>document.getElementById(id);
 var _curYearBody=null; /* 當前年度的內容容器 */
-var _curSec=null;        /* 當前階段(季前/季中/季末)的內容容器 */
 var MAX_YEARS=8;         /* DOM 最多保留幾個年度區塊 */
-function logTarget(){ return _curSec || _curYearBody || $('log'); }
-/* 開始新階段:上一個階段收成一行摘要(卡片標題,關鍵時刻與對話標 ✔/✘,金卡金字、壞事紅字) */
-const PH_N=['季前','季中','季末'];
-function phaseSec(i){ if(!_curYearBody)return; phaseFold();
-  const sec=document.createElement('div'); sec.className='ph-sec open';
-  sec.innerHTML=`<div class="ph-head"><b>${PH_N[i]}</b><span class="phs"></span></div><div class="ph-body"></div>`;
-  sec.firstChild.onclick=()=>sec.classList.toggle('open');
-  _curYearBody.appendChild(sec); _curSec=sec.lastChild; }
-function phaseFold(){ if(!_curSec)return; const sec=_curSec.parentNode, cards=[..._curSec.children].filter(c=>c.querySelector('h4'));
-  _curSec=null; if(!cards.length){ sec.remove(); return; }
-  const seen={}, items=[];
-  cards.forEach(c=>{ let t=c.querySelector('h4').textContent.trim().replace(/^\d{4}(\/\d{2})? /,'');
-    const r=c.querySelector('.mres b'), cls=/gold/.test(c.className)?'g':/bad/.test(c.className)?'b':'';
-    const info=!/gold|bad/.test(c.className);
-    /* 聯賽成績、積分榜收起後仍顯示(積分榜只留名次,點一下展開);例行卡不列;能力成長列成「射門+2」 */
-    if(/積分榜$/.test(t)||(c.querySelector('.statline')&&/成績$/.test(t))){ c.classList.add('pin');
-      if(/積分榜$/.test(t))c.onclick=()=>sec.classList.add('open'); return; }
-    if(/^(季前訓練營|訓練成果|季末結算|健康檢查)$/.test(t)||(info&&/位置競爭|個人獎項|年度獎項/.test(t)))return;
-    if(/^談判桌/.test(t))return;
-    if(t==='能力成長'){ const g=[...c.textContent.slice(4).matchAll(/([^\s｜]+) (\d+) → (\d+)/g)].map(m=>`${m[1]}+${m[3]-m[2]}`);
-      if(g.length)items.push({t:g.join(' '),n:1,cls:'ok'}); return; }
-    if(r){ t=(r.classList.contains('up')?'✔ ':'✘ ')+t.split('｜').pop(); }
-    if(t.length>14)t=t.slice(0,14)+'…';
-    if(!r&&seen[t]){ seen[t].n++; return; }
-    const it={t,n:1,cls:r?(r.classList.contains('up')?'ok':'b'):cls}; items.push(it); if(!r)seen[t]=it; });
-  sec.querySelector('.phs').innerHTML=items.map(x=>`<i class="${x.cls}">${x.t}${x.n>1?' ×'+x.n:''}</i>`).join('');
-  sec.classList.remove('open'); }
+function logTarget(){ return _curYearBody || $('log'); }
 function card(cls,title,html){ const d=document.createElement('div');
   /* 嚴重的壞事用紅牌;關鍵時刻與對話卡翻牌進場;大喜事放彩帶 */
   if(/\bbad\b/.test(cls)&&/重傷|降級|道歉無效|離婚|拒絕放人|落選/.test(title||''))cls+=' red';
@@ -715,12 +669,12 @@ function sideAdd(title,cls,el,txt){
   const t=(txt||'').replace(/\s+/g,' ').trim();
   b.innerHTML=`<small>${S.year}・${S.age} 歲</small><b>${title}</b>${t?`<span>${t.length>44?t.slice(0,44)+'…':t}</span>`:''}`;
   b.onclick=()=>{ $('side').classList.remove('open'); if(!el.isConnected){ b.title='這一年的紀錄已經清掉了'; b.style.opacity='.5'; return; }
-    const blk=el.closest('.yr-block'); if(blk)blk.classList.remove('collapsed'); const ps=el.closest('.ph-sec'); if(ps)ps.classList.add('open');
+    const blk=el.closest('.yr-block'); if(blk)blk.classList.remove('collapsed');
     el.scrollIntoView({block:'center'}); el.classList.add('ping'); setTimeout(()=>el.classList.remove('ping'),1400); };
   L.prepend(b); $('side-n').textContent=++SIDE_N;
 }
 function divider(t){ /* 每個 divider 開啟新的年度摺疊區塊 */
-  phaseFold(); const log=$('log'); const blocks=log.querySelectorAll('.yr-block');
+  const log=$('log'); const blocks=log.querySelectorAll('.yr-block');
   const prev=blocks[blocks.length-1];
   if(prev){ const h=prev.querySelector('.yr-head'); if(h&&prev.querySelector('.yr-body').children.length)h.classList.add('has-body'); }
   const prevPrev=blocks[blocks.length-2]; if(prevPrev)prevPrev.classList.add('collapsed');
@@ -1416,7 +1370,7 @@ function stageLabel(){
   if(S.stage==='UNI')return '大學'+UNI_YR[S.stageYr-1]+'年級';
   return LV[S.lv].n;
 }
-function startYear(){ stepQ=[()=>{ phaseSec(0); phasePre(); },()=>{ phaseSec(1); phaseMid(); },()=>{ phaseSec(2); phaseEnd(); }]; divider(`${seasonLabel(S.year)} 賽季 · ${S.age} 歲 · ${stageLabel()}`); nextStep(); }
+function startYear(){ stepQ=[phasePre,phaseMid,phaseEnd]; divider(`${seasonLabel(S.year)} 賽季 · ${S.age} 歲 · ${stageLabel()}`); nextStep(); }
 function advance(){ S.age++; S.year++; if(S.stage==='YOUTH'||S.stage==='UNI')S.stageYr++; startYear(); }
 
 /* ---------- 季前 ---------- */
