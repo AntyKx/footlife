@@ -292,7 +292,7 @@ svg.scene{display:block;width:100%;height:auto;margin-top:8px;border-radius:8px;
       <div class="mt" id="mt-fans">球迷人氣<em>20</em><i><b></b></i></div>
       <div class="mt" id="mt-form">狀態<em>50</em><i><b></b></i></div>
     </div>
-    <button id="bd-abt">能力 ▾</button><div id="bd-ab"></div>
+    <button id="bd-abt">收起能力 ▴</button><div id="bd-ab" class="open"></div>
     <div id="bd-time" data-ph="0"><span id="lp0">熱身・季前</span><span id="lp1">上半場・賽季中</span><span id="lp2">下半場・季末</span><div id="bd-track"><i id="bd-fill"></i><b id="bd-ball"></b></div></div>
   </header>
   <main id="log"></main>
@@ -317,7 +317,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.8.1';
+const APP_VER='v0.8.2';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1787,9 +1787,9 @@ function shareImage(ev,out){
   if(t)t.onclick=()=>{ $('act').classList.toggle('collapsed');
     t.textContent=$('act').classList.contains('collapsed')?'⌃ 展開選項':'⌄ 收合選項'; };
 })();
-$('bd-abt').onclick=function(){ const p=$('bd-ab'), on=p.classList.toggle('open');
-  this.textContent=on?'能力 ▴':'能力 ▾'; try{localStorage.setItem('fl_abopen',on?'1':'');}catch(e){} };
-try{ if(localStorage.getItem('fl_abopen')){ $('bd-ab').classList.add('open'); $('bd-abt').textContent='能力 ▴'; } }catch(e){}
+$('bd-abt').onclick=function(){ const on=$('bd-ab').classList.toggle('open'); /* 預設展開,只記住「收起」 */
+  this.textContent=on?'收起能力 ▴':'展開全部能力 ▾'; try{localStorage.setItem('fl_abshut',on?'':'1');}catch(e){} };
+try{ if(localStorage.getItem('fl_abshut')){ $('bd-ab').classList.remove('open'); $('bd-abt').textContent='展開全部能力 ▾'; } }catch(e){}
 $('btn-restart').onclick=function(){ if(confirm('確定要放棄這段人生，從頭開始嗎？'))location.href=location.pathname; };
 let selGrp='FW', selNat='TW';
 function natDesc(){ const n=NATS[selNat]; $('nat-desc').textContent=`國家隊實力：${NAT_TIERN[n.tier]}｜世界盃基準出線率 ${n.wc}%｜本土聯賽：${n.home.map(k=>LV[k].n).join('、')}${n.mil?'｜有兵役':''}`; }
