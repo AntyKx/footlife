@@ -291,6 +291,8 @@ svg.scene{display:block;width:100%;height:auto;margin-top:8px;border-radius:8px;
 .tcard b{font-size:12px;line-height:1.25} .tcard .tab{font-size:11px;color:var(--dim)}
 .tcard .tpow{font-size:9.5px;color:var(--amber);letter-spacing:-1px} .tcard .tpow i{font-style:normal;color:#ffffff22}
 .tcard small{font-size:9.5px;color:var(--dim);line-height:1.3}
+.tcard .tsp{font-size:10.5px;color:#9fd8ff} .tcard .tsp b{font-size:10.5px;color:#9fd8ff}
+.abrow .spc{font:700 10px var(--mono);color:#9fd8ff;margin-left:4px}
 .tcard.key{border-color:#ffcf4a77} .tcard.key .tab{color:var(--amber)}
 .tcard.six{box-shadow:0 0 10px #ffcf4a44}
 .tcard.sel{background:#2a2470;border-color:#7a6cff;transform:translateY(-4px);box-shadow:0 6px 14px #0008}
@@ -473,7 +475,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.11.1';
+const APP_VER='v0.11.2';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -731,19 +733,23 @@ function choose(title,opts){
     b.onclick=()=>{ actClear(); CUR_OPT=o; o.f(); }; a.appendChild(b); });
   actToggleSync(); scrollBottom();
 }
-/* 加點介面:mode {pool:n};每項能力 −/＋,點數用完才能確認 */
+/* 加點介面:mode {pool:n, spec:{k:n}};每項能力 −/＋,點數用完才能確認
+   spec = 訓練卡的專項點數:總點數的一部分,投在該能力上每 2 點多送 1 點(效果 ×1.5),投在別處就是一般點數 */
 function allocUI(mode,label,done){
-  actClear(); const a=$('act'), keys=GRP_AB[S.grp], w=DP_W[S.dpos], total=mode.pool||0, hist={}; let pool=total;
+  actClear(); const a=$('act'), keys=GRP_AB[S.grp], w=DP_W[S.dpos], total=mode.pool||0, hist={}, spec=mode.spec||{}, su={}; let pool=total;
+  const specLeft=k=>(spec[k]||0)-(su[k]||0);
   a.innerHTML=`<div class="title">${label}</div><div class="pool" id="al-top"></div><div id="al-rows"></div><div class="row2" id="al-btm"></div>`;
   const top=$('al-top'),rows=$('al-rows'),btm=$('al-btm'), used=k=>(hist[k]||[]).length;
-  function plus(k){ if(pool<=0||S.ab[k]>=80)return; const pc=S.carry[k]||0, got=addAb(k,1); (hist[k]=hist[k]||[]).push([got,pc]); pool--; render(); board(0); }
-  function minus(k,quiet){ const h=hist[k]; if(!h||!h.length)return; const [got,pc]=h.pop(); S.ab[k]-=got; S.carry[k]=pc; pool++; if(!quiet){ render(); board(0); } }
+  function plus(k){ if(pool<=0||S.ab[k]>=80)return; const sp=specLeft(k)>0; if(sp)su[k]=(su[k]||0)+1;
+    const pc=S.carry[k]||0, got=addAb(k,sp&&su[k]%2===0?2:1); (hist[k]=hist[k]||[]).push([got,pc,sp]); pool--; render(); board(0); }
+  function minus(k,quiet){ const h=hist[k]; if(!h||!h.length)return; const [got,pc,sp]=h.pop(); S.ab[k]-=got; S.carry[k]=pc; if(sp)su[k]--; pool++; if(!quiet){ render(); board(0); } }
   function render(){
-    top.innerHTML=`剩餘 <b>${pool}</b> / ${total} 點<small>黃字＝目前位置計入綜合｜「下一級」＝已累積／升一級所需點數，超過潛力成本加倍</small>`;
+    const spTxt=Object.keys(spec).filter(k=>spec[k]>0).map(k=>`${ABL[k]} ${specLeft(k)}/${spec[k]}`).join('、');
+    top.innerHTML=`剩餘 <b>${pool}</b> / ${total} 點${spTxt?`<small style="color:#9fd8ff">專項點數（投在該能力上效果 ×1.5，每 2 點多送 1 點）：${spTxt}</small>`:''}<small>黃字＝目前位置計入綜合｜「下一級」＝已累積／升一級所需點數，超過潛力成本加倍</small>`;
     rows.innerHTML='';
     keys.forEach(k=>{ const v=S.ab[k],cap=v>=80,pk=(S.pot&&S.pot[k])||62,cst=abCost(k),cr=(S.carry&&S.carry[k])||0,u=used(k);
       const r=document.createElement('div'); r.className='abrow'+(cap?' capped':'');
-      r.innerHTML=`<span class="nm"${w[k]?' style="color:var(--amber)"':''}>${ABL[k]}</span>`+
+      r.innerHTML=`<span class="nm"${w[k]?' style="color:var(--amber)"':''}>${ABL[k]}${spec[k]?`<span class="spc">專項${specLeft(k)>0?' '+specLeft(k):' ✓'}</span>`:''}</span>`+
         `<span class="bar"><i style="width:${v/80*100}%"></i><em style="left:${pk/80*100}%"></em></span>`+
         `<span class="val">${v}<small>/${pk}</small><span class="cst">${cap?'已達頂':`下一級 ${cr}/${cst}`}</span></span>`+
         `<span class="pm"><button class="mi"${u?'':' disabled'}>−</button><em>${u?'+'+u:''}</em><button class="pl"${!cap&&pool>0?'':' disabled'}>＋</button></span>`;
@@ -1275,13 +1281,14 @@ function ageMul(){ const a=S.age; return a<=17?1:a<=23?1.35:a<=26?0.9:a<=29?0.45
 function trainUI(hand,need,done){
   actClear(); const a=$('act'), sel=[], keyAb=DP_W[S.dpos], am=ageMul();
   const amTxt=am>1?`<span style="color:var(--good)">｜成長黃金期：點數 ×${am}</span>`:am<1?`<span style="color:var(--dim)">｜年齡：點數 ×${am}</span>`:'';
-  a.innerHTML=`<div class="title">季前訓練營：選 ${need} 堂課（星數＝訓練量，選完後自由分配點數）${amTxt}</div><div class="tgrid" id="tg"></div><div class="row2" id="tb"></div>`;
+  a.innerHTML=`<div class="title">季前訓練營：選 ${need} 堂課（星數＝訓練量；點數可自由分配，投在課程的專項能力上效果 ×1.5）${amTxt}</div><div class="tgrid" id="tg"></div><div class="row2" id="tb"></div>`;
   function render(){
     const tg=$('tg'); tg.innerHTML='';
     hand.forEach((c,i)=>{ const on=sel.includes(i), d=document.createElement('div');
       d.className='tcard'+(on?' sel':'')+(c.v===6?' six':'');
       d.style.animationDelay=(i*70)+'ms';
       d.innerHTML=`<b>${c.n}</b><span class="tab">${c.k?`訓練量 <b class="hl">+${c.p+(c.x?1:0)}</b>`:'恢復'}</span>`+
+        (c.k?`<span class="tsp">專項 <b>${ABL[c.k]}</b> ×1.5</span>`:'')+
         `<span class="tpow">${c.k?'★'.repeat(c.v)+'<i>'+'★'.repeat(6-c.v)+'</i>':'－'}</span>`+
         `<small>${[c.f?`疲勞 ${c.f>0?'+':''}${c.f}`:'',c.form?`狀態 +${c.form}`:'',c.trust?`信任 +${c.trust}`:''].filter(Boolean).join('｜')}</small>`;
       if(on||sel.length<need)d.onclick=()=>{ if(on)sel.splice(sel.indexOf(i),1); else sel.push(i); render(); };
@@ -1294,9 +1301,10 @@ function trainUI(hand,need,done){
   render(); scrollBottom();
 }
 function applyTraining(ch){
-  const out=[]; let six=0, fat=20, pool=0;
+  const out=[], spec={}; let six=0, fat=20, pool=0;
   ch.forEach(c=>{ fat+=c.f;
-    if(c.k){ const g=c.p+(c.x?1:0); pool+=g; out.push(`<div class="trow">${c.n}：訓練點數 <b class="up">+${g}</b></div>`);
+    if(c.k){ const g=c.p+(c.x?1:0); pool+=g; spec[c.k]=(spec[c.k]||0)+c.p;
+      out.push(`<div class="trow">${c.n}：訓練點數 <b class="up">+${g}</b>（專項 ${ABL[c.k]} ${c.p} 點）</div>`);
       if(c.v===6&&S.age<21&&!S.traits.genius){ S.six++; six++; } }
     else out.push(`<div class="trow">${c.n}：疲勞 −25</div>`);
     if(c.form)meter('form',c.form); if(c.trust)meter('trust',c.trust); });
@@ -1312,7 +1320,7 @@ function applyTraining(ch){
   board(0);
   if(!pool){ nextStep(); return; }
   const before={...S.ab};
-  allocUI({pool},`季前訓練：自由分配 ${pool} 點`,()=>{
+  allocUI({pool,spec},`季前訓練：分配 ${pool} 點`,()=>{
     const ch2=Object.keys(before).filter(k=>S.ab[k]!==before[k]).map(k=>`${ABL[k]} ${before[k]} → <b class="up">${S.ab[k]}</b>`);
     card('','能力成長',ch2.length?ch2.join('｜'):'點數都存進了升級進度，下一級就快到了。'); board(0); nextStep(); });
 }
