@@ -144,6 +144,11 @@ table.fin td:first-child,table.fin th:first-child{text-align:left}
 .sd b{display:block;font-size:13px;line-height:1.35}
 .sd span{display:block;font-size:12px;color:var(--dim);line-height:1.4;margin-top:1px}
 .card.ping{outline:2px solid var(--amber);outline-offset:2px}
+.tblwrap{overflow-x:auto}
+table.ltab tr.me td{color:var(--amber);font-weight:700;background:#ffcf4a14}
+table.ltab tr.gap td{text-align:center;color:var(--dim);padding:0}
+table.awd td:first-child{color:var(--dim);white-space:nowrap;width:6.5em}
+table.awd td{text-align:left!important}
 .card .call{margin-top:6px;font-size:12.5px;color:#9fd8ff;font-style:italic}
 .card .press{margin-top:6px;font-size:13px;color:var(--chalk);border-left:3px solid var(--amber);padding-left:8px}
 .card.story{border-color:#7a6cff;box-shadow:0 0 0 1px #7a6cff33 inset}
@@ -369,7 +374,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.10.2';
+const APP_VER='v0.10.3';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1539,8 +1544,26 @@ function seasonResult(){
 }
 /* ---------- 個人獎項 ---------- */
 /* 聯賽獎項:門檻依輪數換算成 38 輪基準;達標後再擲骰(同季有其他候選人) */
+/* 虛構得主:依聯賽所在地區取名,球隊取該聯賽前段班 */
+function awardee(lv,young){ const N=NAMES[LV[lv].cty]||NAMES.EU, T=TEAMS[lv].filter(x=>x!==S.club);
+  return {n:pick(N[0])+pick(N[1]),c:pick(T.slice(0,Math.max(3,Math.ceil(T.length/2)))),a:young?ri(19,23):ri(23,31)}; }
+function awardList(st,got){
+  const L=LV[S.lv], g38=L.g/38, me=`<b class="hl">${S.name}</b>（${S.club}）`, rows=[];
+  const row=(k,txt)=>rows.push(`<tr><td>${k}</td><td>${txt}</td></tr>`);
+  const oth=(young)=>{ const o=awardee(S.lv,young); return `${o.n}（${o.c}${young?`・${o.a} 歲`:''}）`; };
+  const gb=Math.max(Math.round((L.eu?22:18)*g38)+ri(-3,4),isGK()?0:st.G+ri(1,5));
+  row('金靴',got.includes('金靴')?`${me}・${st.G} 球`:`${oth()}・${gb} 球`);
+  row('金手套',got.includes('金手套')?`${me}・零封 ${st.CS} 場`:`${oth()}・零封 ${Math.round(14*g38)+ri(-2,3)} 場`);
+  row('最佳球員',got.includes('最佳球員')?`${me}・評分 ${st.Rt}`:oth());
+  row('最佳年輕球員',got.includes('最佳年輕球員')?me:oth(true));
+  if(got.includes('年度最佳陣容'))row('年度最佳陣容',me);
+  card(got.length?'gold':'info',got.length?'個人獎項':`${L.n}個人獎項`,
+    (got.length?`你拿下 ${got.map(x=>`<b class="hl">${x}</b>`).join('、')}！`:`${seasonLabel(S.year)} 球季${L.n}獎項揭曉。`)+
+    `<div class="tblwrap"><table class="fin awd">${rows.join('')}</table></div>`);
+}
 function leagueAwards(st){
-  if(S.stage!=='PRO'||!st.App)return;
+  if(S.stage!=='PRO')return;
+  if(!st.App){ awardList(st,[]); return; }
   const L=LV[S.lv], g38=L.g/38, Y=seasonLabel(S.year), main=st.role==='主力', got=[];
   const add=n=>{ S.honors.push(`${Y} ${L.n}${n}`); got.push(n); };
   if(!isGK()){ const th=Math.round((L.eu?22:18)*g38); if(st.G>=th&&chance(55+(st.G-th)*8))add('金靴'); }
@@ -1548,7 +1571,7 @@ function leagueAwards(st){
   if(main&&st.Rt>=7.6&&chance(40+(st.Rt-7.6)*100))add('最佳球員');
   else if(S.age<=23&&st.Rt>=7.2&&chance(50))add('最佳年輕球員');
   if(main&&st.Rt>=7.3&&chance(45))add('年度最佳陣容');
-  if(got.length)card('gold','個人獎項',`${L.n}：${got.map(x=>`<b class="hl">${x}</b>`).join('、')}`);
+  awardList(st,got);
   awardTraits(got); if(got.length)meter('fans',6);
 }
 /* 拿到聯賽獎項時的特質:兩度金靴解鎖進球機器;玻璃人拿大獎浴火重生;點球恐懼症痊癒 */
@@ -1562,13 +1585,21 @@ function awardTraits(got){
 }
 /* 年度獎項(季末,冠軍結果出爐後):亞洲足球先生、金球獎 */
 function yearAwards(){
-  const st=S.lastSt; if(S.stage!=='PRO'||!st||!st.App||st.role!=='主力')return;
-  const L=LV[S.lv], champ=S.champYear===S.year;
-  const score=st.Rt+(L.top5?0.6:L.eu?0.3:0)+(champ?0.2:0)+(S.ntOn?0.1:0);
-  if(score>=7.9&&chance(35+(score-7.9)*60)){ S.honors.push(`${S.year+1} 亞洲足球先生`);
-    card('gold','亞洲足球先生',`你被選為 <b class="hl">${S.year+1} 年亞洲足球先生</b>！`); }
-  if(L.top5&&champ&&st.Rt>=8.0&&chance(15)){ S.honors.push(`${S.year+1} 金球獎`);
-    card('gold','金球獎',`不可思議——你拿下了 <b class="hl">${S.year+1} 年金球獎</b>，世界足壇的最高個人榮譽。`); }
+  const st=S.lastSt; if(S.stage!=='PRO')return; let afc=false, gb=false;
+  if(st&&st.App&&st.role==='主力'){
+    const L=LV[S.lv], champ=S.champYear===S.year;
+    const score=st.Rt+(L.top5?0.6:L.eu?0.3:0)+(champ?0.2:0)+(S.ntOn?0.1:0);
+    if(score>=7.9&&chance(35+(score-7.9)*60)){ afc=true; S.honors.push(`${S.year+1} 亞洲足球先生`);
+      card('gold','亞洲足球先生',`你被選為 <b class="hl">${S.year+1} 年亞洲足球先生</b>！`); }
+    if(L.top5&&champ&&st.Rt>=8.0&&chance(15)){ gb=true; S.honors.push(`${S.year+1} 金球獎`);
+      card('gold','金球獎',`不可思議——你拿下了 <b class="hl">${S.year+1} 年金球獎</b>，世界足壇的最高個人榮譽。`); }
+  }
+  /* 其他年度得主(虛構) */
+  const top=['ENG','ESP','GER','ITA','FRA'], asia=pick(['J1','K1','CSL','AUS']);
+  const b=awardee(pick(top)), a=awardee(asia), lines=[];
+  if(!gb)lines.push(`金球獎：${b.n}（${b.c}）`);
+  if(!afc)lines.push(`亞洲足球先生：${a.n}（${a.c}）`);
+  if(lines.length)card('info',`${S.year+1} 年度獎項`,lines.join('<br>'));
 }
 
 /* ---------- 季末 ---------- */
@@ -1602,13 +1633,37 @@ function phaseEndIntl(){
 function teamStanding(){
   const L=LV[S.lv], t=S.clubTier;
   if(chance({1:30,2:5,3:0.5}[t]*(S.traits.clutch?1.25:1))){
+    leagueTable('champ');
     S.honors.push(`${seasonLabel(S.year)} ${L.n}冠軍（${S.club}）`); S.champYear=S.year; meter('fans',5);
     card('gold','聯賽冠軍',`${S.club}奪下 <b class="hl">${L.n}冠軍</b>！`);
     if(L.up&&!S.loan&&!S.ct.mil)promote();
     return; }
-  if(S.loan||S.ct.mil)return; /* 租借、服役期間不影響母隊升降 */
-  if(L.up&&chance({1:45,2:12,3:2}[t])){ promote(); return; }
-  if(L.rel&&chance({1:0,2:8,3:35}[t]))relegate();
+  if(S.loan||S.ct.mil){ leagueTable(null); return; } /* 租借、服役期間不影響母隊升降 */
+  if(L.up&&chance({1:45,2:12,3:2}[t])){ leagueTable('up'); promote(); return; }
+  if(L.rel&&chance({1:0,2:8,3:35}[t])){ leagueTable('down'); relegate(); return; }
+  leagueTable(null);
+}
+/* 季末積分榜:依本季結果決定自己的名次,其他列出的球隊依強弱加上隨機;沒列名的名次以「⋯」帶過 */
+function leagueTable(res){
+  const L=LV[S.lv], g=L.g, n=Math.round(g/2)+1, zone=n>=16?3:2, me=S.club, t=S.clubTier;
+  const mine=res==='champ'?1:res==='up'?ri(2,3):res==='down'?ri(n-zone+1,n):
+    t===1?ri(2,Math.min(6,n-zone-1)):t===3?ri(Math.max(2,n-zone-4),n-zone):ri(Math.max(2,Math.round(n*0.3)),Math.round(n*0.7));
+  /* 其他球隊:目標名次 = 強弱序換算 ± 隨機,再依序放進空位 */
+  const others=TEAMS[S.lv].filter(x=>x!==me), used={[mine]:me};
+  others.map((x,i)=>({x,tg:1+i/(Math.max(1,others.length-1))*(n-1)+ri(-2,2)})).sort((a,b)=>a.tg-b.tg).forEach((o,k)=>{ if(k===0&&mine!==1)o.tg=1; /* 冠軍一定是列名的球隊 */
+    let r=clamp(Math.round(o.tg),1,n); while(used[r])r++; if(r>n){ r=n; while(used[r])r--; } used[r]=o.x; });
+  /* 積分:冠軍約 2.1–2.45 分/場,往下遞減 */
+  const pts=[]; let p=Math.round(g*(2.1+R()*0.35));
+  for(let r=1;r<=n;r++){ pts[r]=p; p=Math.max(Math.round(g*0.45),p-ri(1,r<4?6:4)); }
+  const wdl=P=>{ let d=clamp(Math.round(g*0.22)+ri(-3,3),0,g), w=Math.floor((P-d)/3); d=P-3*w; if(w+d>g){ d=Math.max(0,g-w); } return [w,d,Math.max(0,g-w-d)]; };
+  const ranks=Object.keys(used).map(Number).sort((a,b)=>a-b);
+  let rows='', last=0;
+  ranks.forEach(r=>{ if(r>last+1)rows+=`<tr class="gap"><td colspan="6">⋯</td></tr>`;
+    const [w,d,l]=wdl(pts[r]), tag=r===1?' 🏆':r>n-zone&&L.rel?' ↓':(res==='up'&&used[r]===me)||(L.up&&r<=2&&r>1)?' ↑':'';
+    rows+=`<tr class="${used[r]===me?'me':''}"><td>${r}</td><td>${used[r]}${tag}</td><td>${w}</td><td>${d}</td><td>${l}</td><td><b>${pts[r]}</b></td></tr>`; last=r; });
+  if(last<n)rows+=`<tr class="gap"><td colspan="6">⋯</td></tr>`;
+  card('info',`${seasonLabel(S.year)} ${L.n}積分榜`,`${me}最終排名 <b class="hl">第 ${mine} 名</b>（共 ${n} 隊）`+
+    `<div class="tblwrap"><table class="fin ltab"><tr><th>#</th><th>球隊</th><th>勝</th><th>和</th><th>敗</th><th>積分</th></tr>${rows}</table></div>`);
 }
 function promote(){
   S.lv=LV[S.lv].up; S.clubTier=3;
