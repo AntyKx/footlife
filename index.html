@@ -94,6 +94,18 @@ table.fin td:first-child,table.fin th:first-child{text-align:left}
 .abrow .val{font-family:var(--mono);width:58px;text-align:right;font-size:14px;flex:none}
 .abrow .val b{color:var(--good)}
 .abrow.capped{opacity:.45}
+.abrow{cursor:default}
+.abrow .bar{position:relative}
+.abrow .bar em{position:absolute;top:-2px;bottom:-2px;width:2px;margin-left:-1px;background:#ffffff66}
+.abrow .val{width:84px;line-height:1.15} .abrow .val small{opacity:.5}
+.abrow .cst{display:block;font-size:10.5px;color:var(--dim);letter-spacing:.03em}
+.abrow .pm{display:flex;align-items:center;gap:4px;flex:none}
+.abrow .pm em{font-style:normal;width:26px;text-align:center;font:700 12px var(--mono);color:var(--good)}
+.abrow .pm button{width:32px;height:32px;border-radius:8px;border:1px solid var(--edge);background:var(--panel2);color:var(--chalk);
+  font:700 17px var(--sans);cursor:pointer;line-height:1}
+.abrow .pm .pl{background:linear-gradient(#5b4bff,#3d33c4);border-color:#7a6cff}
+.abrow .pm button:disabled{opacity:.25;cursor:default}
+.pool small{display:block;font:400 11px var(--sans);color:var(--dim);letter-spacing:.02em;margin-top:2px}
 /* 記分板能力面板 */
 #bd-abt{display:block;width:100%;margin-top:7px;background:#0e1226;border:1px solid var(--edge);border-radius:6px;color:var(--dim);
   font:700 11px var(--sans);letter-spacing:.2em;padding:3px 0;cursor:pointer}
@@ -119,6 +131,40 @@ table.fin td:first-child,table.fin th:first-child{text-align:left}
 .trow .tbar{flex:0 0 70px;height:5px;background:#ffffff14;border-radius:3px;overflow:hidden}
 .trow .tbar i{display:block;height:100%;background:#6cc6ff}
 #act .row2{display:flex;gap:8px}#act .row2 .btn{flex:1;text-align:center}
+/* 生涯大事記(寬螢幕右欄) */
+#side{display:none}
+#side h3{font-size:12px;letter-spacing:.2em;color:var(--dim);font-weight:700;margin:4px 2px 8px;display:flex;justify-content:space-between}
+#side h3 em{font-style:normal;color:var(--amber);font-family:var(--mono)}
+#side-empty{color:var(--dim);font-size:12.5px;padding:10px 4px}
+.sd{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--edge);border-left:3px solid var(--blue);border-radius:8px;
+  padding:6px 9px;margin-bottom:6px;color:var(--chalk);font-family:var(--sans);cursor:pointer;animation:pop .25s ease}
+.sd:hover{border-color:var(--amber)}
+.sd.gold{border-left-color:var(--amber)} .sd.red{border-left-color:var(--bad)} .sd.won{border-left-color:var(--good)} .sd.lost{border-left-color:#7a3a4a}
+.sd small{display:block;font:700 10.5px var(--mono);color:var(--dim);letter-spacing:.05em}
+.sd b{display:block;font-size:13px;line-height:1.35}
+.sd span{display:block;font-size:12px;color:var(--dim);line-height:1.4;margin-top:1px}
+.card.ping{outline:2px solid var(--amber);outline-offset:2px}
+#btn-side{background:none;border:1px solid #2a3354;color:#8b93b0;border-radius:8px;font:700 11px var(--sans);padding:4px 7px;cursor:pointer;margin-right:6px;white-space:nowrap}
+#side-x{background:none;border:1px solid var(--edge);color:var(--dim);border-radius:6px;padding:0 8px;cursor:pointer;font-size:12px}
+@media (max-width:1099px){
+  #side.open{display:block;position:fixed;inset:0;z-index:60;background:var(--bg);overflow-y:auto;padding:calc(14px + env(safe-area-inset-top)) 14px 24px}
+}
+@media (max-width:480px){ .abrow .nm{width:44px} .abrow .val{width:72px} .abrow{gap:6px;padding:6px 8px} }
+@media (min-width:1100px){
+  #app{max-width:1400px;display:grid;grid-template-columns:340px minmax(0,1fr) 300px;grid-template-rows:1fr auto auto;column-gap:18px;padding:0 16px}
+  #board{grid-column:1;grid-row:1/4;align-self:start;max-height:100vh;max-height:100dvh;overflow-y:auto;
+    border:1px solid var(--edge);border-top:none;border-radius:0 0 12px 12px;padding:14px 16px 12px}
+  #bd-ab{grid-template-columns:repeat(2,1fr);gap:6px 14px}
+  .abc{font-size:12px}
+  #log{grid-column:2;grid-row:1;padding:16px 4px 20px}
+  #act-toggle{grid-column:2;grid-row:2}
+  #act{grid-column:2;grid-row:3;border:1px solid var(--edge);border-bottom:none;border-radius:12px 12px 0 0;
+    display:grid;grid-template-columns:1fr 1fr;column-gap:10px;align-content:start}
+  #act>*:not(.btn){grid-column:1/-1}
+  #act>.btn:last-child:nth-child(even){grid-column:1/-1}
+  #btn-side,#side-x{display:none}
+  #side{display:block;grid-column:3;grid-row:1/4;align-self:start;position:sticky;top:0;max-height:100vh;max-height:100dvh;overflow-y:auto;padding:16px 2px 24px}
+}
 /* 開場 */
 #start{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;
   background-image:radial-gradient(ellipse 120% 50% at 50% -5%,#3b2a8aaa,transparent 60%)}
@@ -279,7 +325,7 @@ svg.scene{display:block;width:100%;height:auto;margin-top:8px;border-radius:8px;
 </div>
 <div id="app">
   <header id="board" style="display:none">
-    <div id="bd-top"><span id="bd-num">7</span><div id="bd-name"></div><button id="btn-restart" title="重新開始">↺</button></div>
+    <div id="bd-top"><span id="bd-num">7</span><div id="bd-name"></div><button id="btn-side" title="生涯大事記">大事記</button><button id="btn-restart" title="重新開始">↺</button></div>
     <div id="bd-bug"><span id="bd-lg">青訓</span><span id="bd-team"></span><span id="bd-clock">0'</span></div>
     <div id="bd-grid">
       <div class="bd-cell"><b id="bd-age">15</b><span>年齡</span></div>
@@ -298,6 +344,7 @@ svg.scene{display:block;width:100%;height:auto;margin-top:8px;border-radius:8px;
   <main id="log"></main>
   <button id="act-toggle" style="display:none">⌄ 收合選項</button>
   <footer id="act" style="display:none"></footer>
+  <aside id="side"><h3><span>生涯大事記 <em id="side-n">0</em></span><button id="side-x">關閉 ✕</button></h3><div id="side-list"><p id="side-empty">冠軍、轉會、國家隊、關鍵時刻……都會記在這裡，點一下可以跳回當時的畫面。</p></div></aside>
 </div>
 <script>
 /* ================= RNG（種子化） ================= */
@@ -317,7 +364,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.9.0-M8';
+const APP_VER='v0.9.1';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -501,7 +548,20 @@ function card(cls,title,html){ const d=document.createElement('div');
   d.className='card '+cls;
   d.innerHTML=(title?`<h4>${title}</h4>`:'')+html; logTarget().appendChild(d);
   if(/gold/.test(cls)&&/冠軍|個人獎項|升級|金牌|世界盃資格賽|名人堂/.test(title||''))confetti();
+  if(/\b(gold|red)\b/.test(cls)&&title)sideAdd(title,/red/.test(cls)?'red':'gold',d,d.textContent.slice(title.length));
   scrollBottom(); return d; }
+/* 生涯大事記:寬螢幕右欄,新的在上;點一下展開該年度並捲到那張卡 */
+let SIDE_N=0;
+function sideAdd(title,cls,el,txt){
+  const L=$('side-list'); if(!L||typeof S==='undefined'||!S)return; const e=$('side-empty'); if(e)e.remove();
+  const b=document.createElement('button'); b.className='sd '+cls;
+  const t=(txt||'').replace(/\s+/g,' ').trim();
+  b.innerHTML=`<small>${S.year}・${S.age} 歲</small><b>${title}</b>${t?`<span>${t.length>44?t.slice(0,44)+'…':t}</span>`:''}`;
+  b.onclick=()=>{ $('side').classList.remove('open'); if(!el.isConnected){ b.title='這一年的紀錄已經清掉了'; b.style.opacity='.5'; return; }
+    const blk=el.closest('.yr-block'); if(blk)blk.classList.remove('collapsed');
+    el.scrollIntoView({block:'center'}); el.classList.add('ping'); setTimeout(()=>el.classList.remove('ping'),1400); };
+  L.prepend(b); $('side-n').textContent=++SIDE_N;
+}
 function divider(t){ /* 每個 divider 開啟新的年度摺疊區塊 */
   const log=$('log'); const blocks=log.querySelectorAll('.yr-block');
   const prev=blocks[blocks.length-1];
@@ -562,40 +622,34 @@ function choose(title,opts){
     b.onclick=()=>{ actClear(); CUR_OPT=o; o.f(); }; a.appendChild(b); });
   actToggleSync(); scrollBottom();
 }
-/* 加點介面：mode {dice:[..]} 或 {pool:n} */
+/* 加點介面:mode {pool:n};每項能力 −/＋,點數用完才能確認 */
 function allocUI(mode,label,done){
-  actClear(); const a=$('act'); const keys=GRP_AB[S.grp];
-  let dice=mode.dice?mode.dice.slice():null, pool=mode.pool||0, idx=0, hist=[];
-  a.innerHTML=`<div class="title">${label}</div><div id="al-top"></div><div id="al-rows"></div><div class="row2" id="al-btm"></div>`;
-  const top=$('al-top'),rows=$('al-rows'),btm=$('al-btm');
-  function remaining(){ return dice?dice.length-idx:pool; }
+  actClear(); const a=$('act'), keys=GRP_AB[S.grp], w=DP_W[S.dpos], total=mode.pool||0, hist={}; let pool=total;
+  a.innerHTML=`<div class="title">${label}</div><div class="pool" id="al-top"></div><div id="al-rows"></div><div class="row2" id="al-btm"></div>`;
+  const top=$('al-top'),rows=$('al-rows'),btm=$('al-btm'), used=k=>(hist[k]||[]).length;
+  function plus(k){ if(pool<=0||S.ab[k]>=80)return; const pc=S.carry[k]||0, got=addAb(k,1); (hist[k]=hist[k]||[]).push([got,pc]); pool--; render(); board(0); }
+  function minus(k,quiet){ const h=hist[k]; if(!h||!h.length)return; const [got,pc]=h.pop(); S.ab[k]-=got; S.carry[k]=pc; pool++; if(!quiet){ render(); board(0); } }
   function render(){
-    if(dice){ top.innerHTML='<div id="dice">'+dice.map((v,i)=>`<div class="die ${i<idx?'used':''} ${i===idx?'active':''} ${v===6?'six':''}">${v}</div>`).join('')+'</div>'; }
-    else top.innerHTML=`<div class="pool">剩餘可分配點數：${pool} 點（點一下能力 +1）</div>`;
+    top.innerHTML=`剩餘 <b>${pool}</b> / ${total} 點<small>黃字＝目前位置計入綜合｜「下一級」＝已累積／升一級所需點數，超過潛力成本加倍</small>`;
     rows.innerHTML='';
-    keys.forEach(k=>{ const v=S.ab[k],cap=v>=80;
+    keys.forEach(k=>{ const v=S.ab[k],cap=v>=80,pk=(S.pot&&S.pot[k])||62,cst=abCost(k),cr=(S.carry&&S.carry[k])||0,u=used(k);
       const r=document.createElement('div'); r.className='abrow'+(cap?' capped':'');
-      const pk=(S.pot&&S.pot[k])||62, cst=abCost(k), cr=(S.carry&&S.carry[k])||0;
-      const key=DP_W[S.dpos][k]?' style="color:var(--amber)"':''; /* 目前位置計入 OVR 的能力標亮 */
-      r.innerHTML=`<span class="nm"${key}>${ABL[k]}</span><span class="bar"><i style="width:${v/80*100}%"></i><em style="left:${pk/80*100}%"></em></span><span class="val" style="line-height:1.1">${v}<small style="opacity:.5">/${pk}</small>${cst>1?`<span style="display:block;opacity:.5;font-size:10.5px;letter-spacing:1px;margin-top:-2px">${cr}/${cst}</span>`:''}</span>`;
-      if(!cap&&remaining()>0)r.onclick=()=>{ const amt=dice?dice[idx]:1;
-        const pc=(S.carry&&S.carry[k])||0;
-        const got=addAb(k,amt); hist.push([k,got,pc]); if(dice)idx++; else pool--;
-        render(); board(0); };
+      r.innerHTML=`<span class="nm"${w[k]?' style="color:var(--amber)"':''}>${ABL[k]}</span>`+
+        `<span class="bar"><i style="width:${v/80*100}%"></i><em style="left:${pk/80*100}%"></em></span>`+
+        `<span class="val">${v}<small>/${pk}</small><span class="cst">${cap?'已達頂':`下一級 ${cr}/${cst}`}</span></span>`+
+        `<span class="pm"><button class="mi"${u?'':' disabled'}>−</button><em>${u?'+'+u:''}</em><button class="pl"${!cap&&pool>0?'':' disabled'}>＋</button></span>`;
+      r.querySelector('.mi').onclick=()=>minus(k); r.querySelector('.pl').onclick=()=>plus(k);
       rows.appendChild(r); });
     btm.innerHTML='';
-    const u=document.createElement('button'); u.className='btn'; u.style.textAlign='center';
-    u.textContent='↩ 復原'; u.disabled=!hist.length;
-    u.style.opacity=hist.length?'1':'0.35'; u.style.cursor=hist.length?'pointer':'default';
-    if(hist.length)u.onclick=()=>{ const [k,got,pc]=hist.pop(); S.ab[k]-=got; S.carry[k]=pc; if(dice)idx--; else pool++; render(); board(0); };
+    const any=keys.some(k=>used(k)), u=document.createElement('button'); u.className='btn'; u.style.textAlign='center';
+    u.textContent='↩ 全部重來'; u.disabled=!any; u.style.opacity=any?'1':'.35';
+    if(any)u.onclick=()=>{ keys.forEach(k=>{ while(used(k))minus(k,true); }); render(); board(0); };
     btm.appendChild(u);
-    const allCap=keys.every(k=>S.ab[k]>=80);
-    if(remaining()===0||allCap){ const c=document.createElement('button'); c.className='btn main';
-      c.textContent=(remaining()>0&&allCap)?'能力已達上限，捨棄剩餘骰子 ▸':'確認 ▸';
-      c.onclick=()=>{ actClear(); done(); }; btm.appendChild(c); }
-    actToggleSync();
-  }
-  render();
+    const allCap=keys.every(k=>S.ab[k]>=80), c=document.createElement('button'); c.className='btn main';
+    if(pool>0&&!allCap){ c.disabled=true; c.style.opacity='.5'; c.textContent=`還有 ${pool} 點可分配`; }
+    else { c.textContent=pool>0?'能力已達上限，捨棄剩餘點數 ▸':'確認 ▸'; c.onclick=()=>{ actClear(); done(); }; }
+    btm.appendChild(c); actToggleSync(); }
+  render(); scrollBottom();
 }
 
 /* ================= 三條量表：教練信任 / 球迷人氣 / 狀態 ================= */
@@ -781,6 +835,7 @@ function resolveMoment(sc,o,read,p,el,next){
   setTimeout(()=>{ ball.style.transform=`translate(${end[0]-P.ball[0]}px,${end[1]-P.ball[1]}px)`; if(ok&&o.k==='G'||!ok&&def)svg.classList.add('hit'); },40);
   el.querySelector('.mres').innerHTML=`<b class="${ok?'up':'dn'}">${ok?'✔ ':'✘ '}${ok?o.ok:o.ng}</b>${read&&ok?'<span class="readok">讀對了對手的習慣！</span>':''}<br><span class="fx">${out.filter(Boolean).join('｜')}</span>`;
   el.classList.add(ok?'won':'lost');
+  sideAdd((MTAG||'關鍵時刻')+'｜'+sc.t,ok?'won':'lost',el,(ok?'✔ ':'✘ ')+(ok?o.ok:o.ng));
   if(ok&&BIGFX[o.k])bigText(BIGFX[o.k],o.k==='G'?'':'cool');
   if(S.pendTrait==='setpiece'){ S.pendTrait=null;
     traitCard('setpiece','角球、自由球，只要球停在地上，就是你的時間——<b class="hl">每季額外貢獻定位球進球與助攻</b>。'); }
@@ -910,43 +965,33 @@ function ageMul(){ const a=S.age; return a<=17?1:a<=23?1.35:a<=26?0.9:a<=29?0.45
 function trainUI(hand,need,done){
   actClear(); const a=$('act'), sel=[], keyAb=DP_W[S.dpos], am=ageMul();
   const amTxt=am>1?`<span style="color:var(--good)">｜成長黃金期：點數 ×${am}</span>`:am<1?`<span style="color:var(--dim)">｜年齡：點數 ×${am}</span>`:'';
-  a.innerHTML=`<div class="title">季前訓練營：選 ${need} 堂課（黃框＝目前位置計入綜合的能力）${amTxt}</div><div class="tgrid" id="tg"></div><div class="row2" id="tb"></div>`;
-  /* 預覽:已選的課依序先套用;未選的課顯示「加選它」之後的結果 */
-  function preview(i){ const st={ab:{...S.ab},carry:{...S.carry}};
-    const seq=sel.filter(j=>j!==i).sort((a,b)=>a-b);
-    seq.filter(j=>!sel.includes(i)||j<i).forEach(j=>{ const c=hand[j]; if(c.k){ abSim(st,c.k,c.p); if(c.x)abSim(st,c.x,1); } });
-    const c=hand[i], o=st.ab[c.k]; abSim(st,c.k,c.p); return {o,n:st.ab[c.k],cr:st.carry[c.k]||0,cost:lvCost(c.k,st.ab[c.k])}; }
+  a.innerHTML=`<div class="title">季前訓練營：選 ${need} 堂課（星數＝訓練量，選完後自由分配點數）${amTxt}</div><div class="tgrid" id="tg"></div><div class="row2" id="tb"></div>`;
   function render(){
     const tg=$('tg'); tg.innerHTML='';
     hand.forEach((c,i)=>{ const on=sel.includes(i), d=document.createElement('div');
-      const pv=c.k?preview(i):null;
-      const now=pv?(pv.n>pv.o?`<span class="tnow">${pv.o}→<b>${pv.n}</b></span>`:`<span class="tnow">${pv.o}</span>`)+
-        (pv.n<80?`<span class="tprog" title="升下一級進度 ${pv.cr}/${pv.cost}"><i style="width:${pv.cr/pv.cost*100}%"></i></span>`:''):'';
-      d.className='tcard'+(on?' sel':'')+(c.k&&keyAb[c.k]?' key':'')+(c.v===6?' six':'');
+      d.className='tcard'+(on?' sel':'')+(c.v===6?' six':'');
       d.style.animationDelay=(i*70)+'ms';
-      d.innerHTML=`<b>${c.n}</b><span class="tab">${c.k?ABL[c.k]+(c.x?'＋'+ABL[c.x]:''):'恢復'}</span>`+now+
+      d.innerHTML=`<b>${c.n}</b><span class="tab">${c.k?`訓練量 <b class="hl">+${c.p+(c.x?1:0)}</b>`:'恢復'}</span>`+
         `<span class="tpow">${c.k?'★'.repeat(c.v)+'<i>'+'★'.repeat(6-c.v)+'</i>':'－'}</span>`+
-        `<small>${[c.k?`+${c.p} 點`:'',c.f?`疲勞 ${c.f>0?'+':''}${c.f}`:'',c.form?`狀態 +${c.form}`:'',c.trust?`信任 +${c.trust}`:''].filter(Boolean).join('｜')}</small>`;
+        `<small>${[c.f?`疲勞 ${c.f>0?'+':''}${c.f}`:'',c.form?`狀態 +${c.form}`:'',c.trust?`信任 +${c.trust}`:''].filter(Boolean).join('｜')}</small>`;
       if(on||sel.length<need)d.onclick=()=>{ if(on)sel.splice(sel.indexOf(i),1); else sel.push(i); render(); };
       tg.appendChild(d); });
-    const tb=$('tb'); tb.innerHTML=''; const fat=clamp(20+sel.reduce((s,i)=>s+hand[i].f,0),0,100);
+    const tb=$('tb'); tb.innerHTML=''; const fat=clamp(20+sel.reduce((s,i)=>s+hand[i].f,0),0,100), pts=sel.reduce((s,i)=>s+hand[i].p+(hand[i].x?1:0),0);
     const c=document.createElement('button'); c.className='btn main';
     if(sel.length<need){ c.disabled=true; c.style.opacity='.5'; c.textContent=`再選 ${need-sel.length} 堂`; }
-    else { c.innerHTML=`確認訓練 ▸<small>預估疲勞 ${fat}${fat>=55?'（受傷風險上升）':''}</small>`; c.onclick=()=>{ actClear(); done(sel); }; }
+    else { c.innerHTML=`確認訓練 ▸<small>訓練點數 ${pts}｜預估疲勞 ${fat}${fat>=55?'（受傷風險上升）':''}</small>`; c.onclick=()=>{ actClear(); done(sel); }; }
     tb.appendChild(c); actToggleSync(); }
   render(); scrollBottom();
 }
 function applyTraining(ch){
-  const out=[]; let six=0, fat=20;
+  const out=[]; let six=0, fat=20, pool=0;
   ch.forEach(c=>{ fat+=c.f;
-    if(c.k){ const o=S.ab[c.k], g=addAb(c.k,c.p); if(c.x)addAb(c.x,1);
-      const cr=S.carry[c.k]||0, cst=abCost(c.k), bar=S.ab[c.k]<80?`<span class="tbar"><i style="width:${cr/cst*100}%"></i></span><small style="color:var(--dim)">${cr}/${cst}</small>`:'';
-      out.push(`<div class="trow">${c.n}：${ABL[c.k]} ${g>0?`${o} → <b class="up">${S.ab[c.k]}</b>`:`${o}`}${bar}</div>`);
+    if(c.k){ const g=c.p+(c.x?1:0); pool+=g; out.push(`<div class="trow">${c.n}：訓練點數 <b class="up">+${g}</b></div>`);
       if(c.v===6&&S.age<21&&!S.traits.genius){ S.six++; six++; } }
     else out.push(`<div class="trow">${c.n}：疲勞 −25</div>`);
     if(c.form)meter('form',c.form); if(c.trust)meter('trust',c.trust); });
   S.fatigue=clamp(fat,0,100);
-  card('good','訓練成果',out.join('')+`本季疲勞度 <b class="${S.fatigue>=55?'dn':'hl'}">${S.fatigue}</b>${S.fatigue>=55?'（受傷風險上升）':''}`+
+  card('good','訓練成果',out.join('')+`共 <b class="hl">${pool}</b> 點可自由分配｜本季疲勞度 <b class="${S.fatigue>=55?'dn':'hl'}">${S.fatigue}</b>${S.fatigue>=55?'（受傷風險上升）':''}`+
     (six?`<br>滿強度訓練累計 <b class="hl">${S.six}/5</b> 次`:''));
   if(S.six>=5&&!S.traits.genius&&S.age<21)
     traitCard('genius','21 歲前五度完成滿強度訓練！從今以後，每堂訓練課<b class="hl">永久 4 星以上</b>，關鍵時刻成功率 <b class="hl">+12%</b>。'+awaken());
@@ -954,7 +999,12 @@ function applyTraining(ch){
   const top3=ch.map(c=>c.v).sort((a,b)=>b-a).slice(0,3).reduce((a,b)=>a+b,0);
   if(!S.traits.late&&!S.traits.genius&&S.age>=25&&S.age<32&&ovr()<46&&top3>=15)
     traitCard('late','別人都以為你到頂了，你卻在這一年脫胎換骨——每堂訓練課<b class="hl">永久 3 星以上</b>，關鍵時刻成功率 <b class="hl">+12%</b>。'+awaken());
-  board(0); nextStep();
+  board(0);
+  if(!pool){ nextStep(); return; }
+  const before={...S.ab};
+  allocUI({pool},`季前訓練：自由分配 ${pool} 點`,()=>{
+    const ch2=Object.keys(before).filter(k=>S.ab[k]!==before[k]).map(k=>`${ABL[k]} ${before[k]} → <b class="up">${S.ab[k]}</b>`);
+    card('','能力成長',ch2.length?ch2.join('｜'):'點數都存進了升級進度，下一級就快到了。'); board(0); nextStep(); });
 }
 
 /* ================= 合約談判 ================= */
@@ -1939,6 +1989,7 @@ function shareImage(ev,out){
 $('bd-abt').onclick=function(){ const on=$('bd-ab').classList.toggle('open'); /* 預設展開,只記住「收起」 */
   this.textContent=on?'收起能力 ▴':'展開全部能力 ▾'; try{localStorage.setItem('fl_abshut',on?'':'1');}catch(e){} };
 try{ if(localStorage.getItem('fl_abshut')){ $('bd-ab').classList.remove('open'); $('bd-abt').textContent='展開全部能力 ▾'; } }catch(e){}
+$('btn-side').onclick=()=>$('side').classList.add('open'); $('side-x').onclick=()=>$('side').classList.remove('open');
 $('btn-restart').onclick=function(){ if(confirm('確定要放棄這段人生，從頭開始嗎？'))location.href=location.pathname; };
 let selGrp='FW', selNat='TW';
 function natDesc(){ const n=NATS[selNat]; $('nat-desc').textContent=`國家隊實力：${NAT_TIERN[n.tier]}｜世界盃基準出線率 ${n.wc}%｜本土聯賽：${n.home.map(k=>LV[k].n).join('、')}${n.mil?'｜有兵役':''}`; }
