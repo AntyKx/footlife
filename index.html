@@ -369,7 +369,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.10.1';
+const APP_VER='v0.10.2';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1830,6 +1830,9 @@ function contractEnd(){
 const T_WC={n:'世界盃',st:['小組賽','32 強','16 強','8 強','4 強','決賽'],g:[.8,.65,.5,.35,.25],k:[.5,.42,.35,.25,.18]};
 const T_AC={n:'亞洲盃',st:['小組賽','16 強','8 強','4 強','決賽'],g:[.95,.85,.65,.45,.3],k:[.65,.55,.4,.3,.2]};
 const T_AG={n:'亞運',st:['小組賽','16 強','8 強','4 強','決賽'],g:[.92,.8,.6,.45,.3],k:[.75,.55,.4,.3,.2],u23:1};
+/* 區域賽事:不在 FIFA 強制放人期 */
+const T_E1={n:'東亞錦標賽',st:['循環賽','冠軍戰'],g:[.6,.5,.35,.2,.1],k:[.5,.45,.35,.25,.15],opp:['日本','韓國','中國','台灣','香港']};
+const T_AFF={n:'東協錦標賽',st:['小組賽','4 強','決賽'],g:[.95,.9,.85,.8,.5],k:[.7,.65,.6,.5,.25],opp:['越南','泰國','印尼','馬來西亞','新加坡','菲律賓']};
 const T_OLY={n:'奧運',st:['小組賽','8 強','4 強','決賽'],g:[.55,.5,.45,.4,.35],k:[.4,.38,.35,.3,.25],u23:1};
 const ntBonus=()=>clamp((ovr()-NATS[S.nat].nt)*0.005,0,0.1);
 /* 世界盃出線率 = 國家基準 + min(上限, max(0, OVR−50)×0.8);只有國家隊主力才算個人加成 */
@@ -1865,11 +1868,13 @@ function intlYear(Y,cont){
   if(Y>=2027&&Y%4===3)q.push(()=>acCycle(Y,next));
   if(Y>=2026&&Y%4===2)q.push(()=>u23Cycle(T_AG,Y,true,next));
   if(Y>=2028&&Y%4===0)q.push(()=>u23Cycle(T_OLY,Y,false,next));
+  if(Y>=2027&&Y%2===1&&['JP','KR','CN','TW'].includes(S.nat))q.push(()=>regionCycle(T_E1,Y,next));
+  if(Y>=2026&&Y%2===0&&['VN','TH'].includes(S.nat))q.push(()=>regionCycle(T_AFF,Y,next));
   function next(){ const f=q.shift(); if(f)f(); else cont(); }
   next();
 }
-function wcCycle(Y,next){
-  const N=NATS[S.nat], p=Math.round(wcQualRate());
+function wcRoll(Y,next,p){
+  const N=NATS[S.nat];
   if(!chance(p)){ card('bad',`${Y} 世界盃資格賽`,`${N.n}在資格賽出局（出線率 ${p}%）。`); next(); return; }
   if(!S.ntOn){ card('info',`${Y} 世界盃`,`${N.n}打進世界盃（出線率 ${p}%），但你不在名單上。`); next(); return; }
   card('gold',`${Y} 世界盃資格賽`,`${N.n}拿到世界盃門票！（出線率 ${p}%）${N.tier>=4?'<br>這是國家足球史上最重要的一刻。':''}`);
@@ -1884,6 +1889,23 @@ function wcCycle(Y,next){
         card('info',`${Y} 世界盃`,`你忍痛退出名單，在電視機前看完了${N.n}的每一場比賽。${o.length?'<br><span class="fx">'+o.join('｜')+'</span>':''}`); board(); next(); }}]);
     return; }
   play();
+}
+/* 東亞/東協錦標賽:旅外球員俱樂部可能不放人;台灣要先打東亞預賽 */
+function regionCycle(T,Y,next){
+  const N=NATS[S.nat];
+  if(!S.ntOn||S.stage!=='PRO'){ next(); return; }
+  if(T===T_E1&&S.nat==='TW'&&!chance(35)){ card('bad',`${Y} ${T.n}`,`${N.n}在東亞錦標賽預賽止步，沒能打進決賽圈。`); next(); return; }
+  if(!N.home.includes(S.lv)&&chance(LV[S.lv].eu?80:40)){
+    card('info',`${Y} ${T.n}`,`${T.n}不在 FIFA 強制放人期，${S.club}沒有放你回國。${N.n}派出以國內聯賽球員為主的陣容。`); next(); return; }
+  playTourney(T,Y,true,false,next);
+}
+function wcCycle(Y,next){
+  const N=NATS[S.nat], p0=Math.round(wcQualRate());
+  /* 亞洲區 18 強賽最後一輪:關鍵時刻成功出線率 +15%,失敗 −12% */
+  if(S.ntOn&&S.stage==='PRO'&&p0>=5&&p0<=93&&chance(70)){ const p1=clamp(p0+15,1,99), p2=clamp(p0-12,1,99);
+    card('talk',`${Y} 世界盃資格賽`,`亞洲區 18 強賽最後一輪，${N.n}只要贏球就能${p0<50?'保住出線希望':'大幅接近世界盃門票'}。目前出線率 ${p0}%（贏球 → ${p1}%、失利 → ${p2}%）。`);
+    bigMoment(`${Y} 世界盃資格賽18強賽`,N.n,pick(OPP_AS.filter(x=>x!==N.n)),TOUR_PAR.亞洲盃,ok=>wcRoll(Y,next,ok?p1:p2)); return; }
+  wcRoll(Y,next,p0);
 }
 function acCycle(Y,next){
   const N=NATS[S.nat], p=N.tier>=5?Math.round(25+ntBonus()*100):N.tier>=4?Math.round(60+ntBonus()*100):100; /* 弱國要打會外賽 */
@@ -1922,10 +1944,10 @@ function u23Cycle(T,Y,isAG,next){
 const OPP_WC=['巴西','法國','阿根廷','英格蘭','西班牙','德國','葡萄牙','荷蘭','克羅埃西亞','烏拉圭','墨西哥','美國','摩洛哥','塞內加爾','比利時','瑞士'];
 const OPP_AS=['日本','韓國','澳洲','伊朗','沙烏地阿拉伯','卡達','伊拉克','烏茲別克','阿聯','中國','越南','泰國','約旦','阿曼'];
 const OPP_OLY=['巴西','西班牙','法國','阿根廷','日本','埃及','墨西哥','德國','摩洛哥','美國'];
-const TOUR_PAR={世界盃:57,亞洲盃:50,亞運:44,奧運:50}; /* 大賽關鍵時刻的對手強度 */
+const TOUR_PAR={世界盃:57,亞洲盃:50,亞運:44,奧運:50,東亞錦標賽:46,東協錦標賽:38}; /* 大賽關鍵時刻的對手強度 */
 function playTourney(T,Y,senior,overage,done){
   const t=NATS[S.nat].tier; let b=ntBonus()+(S.traits.intlace?0.05:0)+(S.traits.clutch?0.03:0)+(S.tourPen||0); S.tourPen=0;
-  const me=NATS[S.nat].n+(T.u23?' U23':''), opps=(T===T_WC?OPP_WC:T===T_OLY?OPP_OLY:OPP_AS).filter(x=>x!==NATS[S.nat].n);
+  const me=NATS[S.nat].n+(T.u23?' U23':''), opps=(T.opp||(T===T_WC?OPP_WC:T===T_OLY?OPP_OLY:OPP_AS)).filter(x=>x!==NATS[S.nat].n);
   let i=0, mo=false, moOk=null;
   const fin=()=>{ playTourneyEnd(T,Y,senior,overage,i,moOk); done(); };
   const step=()=>{
@@ -2018,7 +2040,8 @@ function naturalCheck(cont){
 /* ================= 生涯終章 ================= */
 /* 生涯分 = Σ 各季 (評分 − 6.0) × 上場 90 分鐘數 × 聯賽權重 + 榮譽加分 */
 /* ================= 俱樂部盃賽 ================= */
-/* 國內盃:每季參加,打進決賽才有關鍵時刻;洲際盃賽:豪門(或 30% 的中游)參加歐冠/亞冠,4 強起有關鍵時刻。一季最多一次盃賽關鍵時刻 */
+/* 國內盃:每季參加,打進決賽才有關鍵時刻;洲際盃賽:豪門踢歐冠/亞冠,中游踢歐冠/歐霸/歐協聯或亞冠/亞冠二級,4 強起有關鍵時刻;
+   拿下歐冠/亞冠,隔季踢世俱盃。一季最多一次盃賽關鍵時刻 */
 const CUP_N={ENG:'英格蘭足總盃',EFL:'英格蘭足總盃',ESP:'國王盃',ESP2:'國王盃',GER:'德國盃',GER2:'德國盃',ITA:'義大利盃',ITA2:'義大利盃',
   FRA:'法國盃',FRA2:'法國盃',NED:'荷蘭盃',POR:'葡萄牙盃',BEL:'比利時盃',J1:'天皇盃',J2:'天皇盃',K1:'韓國足協盃',K2:'韓國足協盃',
   CSL:'中國足協盃',CHN2:'中國足協盃',AUS:'澳洲盃',THA:'泰國足總盃',VIE:'越南盃',TW1:'台灣企業盃'};
@@ -2028,21 +2051,38 @@ const CL_ST=['小組賽','16 強','8 強','4 強','決賽'];
 /* 洲際盃賽每輪勝率:[小組出線, 淘汰賽] */
 const CL_P={ENG:[.85,.6],ESP:[.85,.6],GER:[.8,.55],ITA:[.8,.55],FRA:[.75,.5],NED:[.55,.4],POR:[.55,.4],BEL:[.45,.35],
   J1:[.6,.45],K1:[.6,.45],CSL:[.5,.4],AUS:[.45,.38],THA:[.3,.3],VIE:[.2,.25]};
+/* 洲際賽事:b = 對手較弱的勝率加成、par = 關鍵時刻對手強度修正 */
+const CONT={歐冠:{pool:CL_EU,b:0,par:3},歐霸:{pool:CL_EU,b:.08,par:0},歐協聯:{pool:CL_EU,b:.15,par:-3},亞冠:{pool:CL_AS,b:0,par:3},亞冠二級:{pool:CL_AS,b:.1,par:-1}};
+function contComp(){ const eu=CL_EU.includes(S.lv), as=CL_AS.includes(S.lv), t=S.clubTier; if(!eu&&!as)return null; const r=R()*100;
+  if(eu)return t===1?'歐冠':t===2?(r<30?'歐冠':r<70?'歐霸':r<90?'歐協聯':null):(r<15?'歐協聯':null);
+  return t===1?'亞冠':t===2?(r<30?'亞冠':r<75?'亞冠二級':null):null; }
+const CWC_OPP=['弗拉門哥','河床','博卡青年','帕梅拉斯','蒙特雷','艾阿赫利','西雅圖海灣人'];
 function clubCups(cont){
   const L=LV[S.lv], Y=seasonLabel(S.year), rel=clamp((ovr()-curPar())*0.01,-0.05,0.08), role=S.lastSt.role==='主力'?0.03:0;
   let usedMoment=false; const q=[];
+  /* 世俱盃:上季拿下歐冠/亞冠,且仍在同一隊 */
+  if(S.cwc&&S.cwc.y===S.year&&S.cwc.club===S.club){ const eu=S.cwc.eu; S.cwc=null;
+    q.push(()=>{ let i=0; const p=[eu?.85:.45,eu?.62:.25], b=rel+role;
+      const end=()=>{ const label=i===2?'冠軍':i===1?'亞軍':'止步準決賽';
+        S.honors.push(`${Y} 世俱盃（${label}・${S.club}）`); if(i===2){ S.cups++; meter('fans',10); confetti(); }
+        card(i>=1?'gold':'info',`${Y} 世俱盃`,`以${eu?'歐洲':'亞洲'}冠軍身分出戰世俱盃：<b class="hl">${label}</b>。`); board(); next(); };
+      if(!chance(p[0]*100+b*100)){ end(); return; } i=1;
+      if(!usedMoment){ usedMoment=true;
+        bigMoment(`${Y} 世俱盃決賽`,S.club,eu?pick(CWC_OPP):pick(TEAMS[pick(['ENG','ESP','GER','ITA'])].slice(0,3)),L.par+(eu?6:12),ok=>{ if(ok||chance(eu?35:15))i=2; end(); }); return; }
+      if(chance(p[1]*100+b*100))i=2; end(); }); }
   /* 洲際 */
-  const clName=CL_EU.includes(S.lv)?'歐冠':CL_AS.includes(S.lv)?'亞冠':null;
-  if(clName&&(S.clubTier===1||(S.clubTier===2&&chance(30)))){
-    q.push(()=>{ const P=CL_P[S.lv]; let i=0, b=rel+role+(S.clubTier===1?0.05:0);
-      const pool=(clName==='歐冠'?CL_EU:CL_AS).filter(k=>k!==S.lv), opp=()=>pick(TEAMS[pick(pool)]);
+  const clName=contComp();
+  if(clName){
+    q.push(()=>{ const P=CL_P[S.lv], C=CONT[clName]; let i=0, b=rel+role+(S.clubTier===1?0.05:0)+C.b;
+      const pool=C.pool.filter(k=>k!==S.lv), opp=()=>pick(TEAMS[pick(pool)]);
       const end=()=>{ const label=i===5?'冠軍':i===4?'亞軍':i===3?'4 強':`止步${CL_ST[i]}`;
         if(i>=3){ S.honors.push(`${Y} ${clName}（${label}・${S.club}）`); S.cups++; }
-        if(i===5){ meter('fans',10); meter('trust',5); confetti(); }
+        if(i===5){ meter('fans',clName==='歐冠'||clName==='亞冠'?10:6); meter('trust',5); confetti();
+          if(clName==='歐冠'||clName==='亞冠')S.cwc={y:S.year+1,club:S.club,eu:clName==='歐冠'}; }
         card(i>=3?'gold':'info',`${Y} ${clName}`,`${S.club}在${clName}的旅程：<b class="hl">${label}</b>。`); board(); next(); };
       const go=()=>{ while(i<5){
           if(i>=3&&!usedMoment){ usedMoment=true;
-            bigMoment(`${Y} ${clName}${CL_ST[i]}`,S.club,opp(),L.par+3,ok=>{ if(ok||chance(30))i++; else { end(); return; } if(ok)b+=0.05; go(); }); return; }
+            bigMoment(`${Y} ${clName}${CL_ST[i]}`,S.club,opp(),L.par+C.par,ok=>{ if(ok||chance(30))i++; else { end(); return; } if(ok)b+=0.05; go(); }); return; }
           if(chance((i===0?P[0]:P[1])*100+b*100))i++; else break; }
         end(); };
       go(); }); }
@@ -2062,7 +2102,8 @@ const ASIA_TOP=['J1','K1','CSL','AUS'], ASIA_2=['J2','K2'];
 const lgW=k=>LV[k].top5?1:LV[k].eu?0.6:ASIA_TOP.includes(k)?0.5:ASIA_2.includes(k)?0.3:0.2;
 const seasonPts=r=>r.lv&&r.st.App?Math.max(0,r.st.Rt-6.0)*r.st.Min/90:0;
 /* 榮譽加分:由上往下取第一個符合的規則 */
-const HONOR_PTS=[[/歐冠（冠軍/,150],[/歐冠（亞軍/,70],[/歐冠（4 強/,35],[/亞冠（冠軍/,60],[/亞冠（亞軍/,30],[/亞冠（4 強/,15],[/盃冠軍（/,30],[/金球獎/,300],[/世界盃（(冠軍|亞軍)/,200],[/世界盃（止步(8 強|4 強)/,100],[/世界盃/,40],
+const HONOR_PTS=[[/世俱盃（冠軍/,60],[/世俱盃（亞軍/,25],[/歐霸（冠軍/,70],[/歐霸（亞軍/,35],[/歐霸（4 強/,15],[/歐協聯（冠軍/,40],[/歐協聯（亞軍/,20],[/歐協聯（4 強/,8],
+  [/亞冠二級（冠軍/,30],[/亞冠二級（亞軍/,15],[/亞冠二級（4 強/,6],[/東協錦標賽（冠軍/,40],[/東亞錦標賽（冠軍/,25],[/(東協|東亞)錦標賽/,5],[/歐冠（冠軍/,150],[/歐冠（亞軍/,70],[/歐冠（4 強/,35],[/亞冠（冠軍/,60],[/亞冠（亞軍/,30],[/亞冠（4 強/,15],[/盃冠軍（/,30],[/金球獎/,300],[/世界盃（(冠軍|亞軍)/,200],[/世界盃（止步(8 強|4 強)/,100],[/世界盃/,40],
   [/亞洲足球先生/,80],[/最佳球員/,60],[/(英超|西甲|德甲|義甲|法甲)冠軍/,60],[/金靴|金手套/,40],
   [/亞洲盃（冠軍/,60],[/奧運（(金牌|銀牌|銅牌)/,40],[/亞運（金牌/,30],[/亞洲盃（亞軍/,30],
   [/年度最佳陣容/,20],[/冠軍（/,20],[/最佳年輕球員/,10],[/亞洲盃/,10]];
