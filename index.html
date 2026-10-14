@@ -8,7 +8,7 @@
 <meta name="description" content="從青訓到世界盃，一場種子化的足球員生涯模擬。簽約、租借、轉會、國家隊、傷病、引退——每一個決定都算數。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2214%22 fill=%22%23fff%22 stroke=%22%23222%22/%3E%3Cpolygon points=%2216,10 21,14 19,20 13,20 11,14%22 fill=%22%23222%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Oswald:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0c0f1d; --panel:#151a2e; --panel2:#1d2440; --edge:#2a3354;
@@ -307,30 +307,129 @@ svg.scene{display:block;width:100%;height:auto;margin-top:8px;border-radius:8px;
 .hlrow{font-size:13.5px;padding:5px 0;border-bottom:1px dashed var(--edge)} .hlrow:last-child{border-bottom:none}
 .hlrow b{font-family:var(--mono);color:var(--amber);font-weight:700}
 @media (prefers-reduced-motion:reduce){.var{display:none}}
+/* ================= v0.11 視覺 ================= */
+:root{--line:#ffffff14;--disp:'Oswald','Noto Sans TC',sans-serif}
+/* 首頁 */
+#start{background:radial-gradient(ellipse 90% 60% at 30% -10%,#3b2a8acc,transparent 60%),radial-gradient(ellipse 60% 50% at 100% 100%,#1b4a8a55,transparent 60%),var(--bg)}
+.s-sky{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.s-sky .lt{position:absolute;top:-20%;width:40vw;height:90vh;background:linear-gradient(180deg,#ffffff1a,transparent 70%);filter:blur(18px);transform-origin:top center}
+.s-sky .l1{left:-6vw;transform:rotate(-24deg);animation:sweep 9s ease-in-out infinite alternate}
+.s-sky .l2{right:-6vw;transform:rotate(24deg);animation:sweep2 11s ease-in-out infinite alternate}
+@keyframes sweep{to{transform:rotate(-14deg)}} @keyframes sweep2{to{transform:rotate(14deg)}}
+#start .wrap{position:relative;max-width:1080px;padding:36px 20px 56px;display:grid;gap:22px}
+.hero .kicker{display:flex;align-items:center;gap:8px;font:600 11px var(--disp);letter-spacing:.32em;color:#b7adff}
+.hero .kicker .dot{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 10px var(--good);animation:blink 1.6s steps(2) infinite}
+#start h1{margin-top:10px;line-height:1.05;letter-spacing:0}
+#start h1 .en{display:block;font:700 clamp(52px,11vw,92px)/.95 var(--disp);letter-spacing:.04em;
+  background:linear-gradient(180deg,#fff 30%,#b7c0e0);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 10px 40px #5b4bff55}
+#start h1 em{display:block;margin-top:8px;font-size:clamp(22px,4.6vw,30px);font-weight:900;letter-spacing:.18em;color:var(--amber)}
+#start .sub{margin:14px 0 6px;font-size:14px;line-height:1.8;letter-spacing:.04em;color:#aab2d0;max-width:30em}
+.hero-pitch{display:block;width:100%;max-width:480px;height:auto;margin-top:10px}
+.hero-pitch .run{animation:dash 2.4s linear infinite} @keyframes dash{to{stroke-dashoffset:-22}}
+.hero-pitch .hb{animation:bob 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center} @keyframes bob{50%{transform:translateY(-4px)}}
+.feat{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px;max-width:480px}
+.feat li{background:#ffffff08;border:1px solid var(--line);border-radius:10px;padding:8px 4px;text-align:center;font-size:11.5px;color:var(--dim)}
+.feat b{display:block;font:700 22px/1.1 var(--disp);color:var(--chalk)}
+#start .panel{background:linear-gradient(180deg,#1a2142e6,#11162ce6);border:1px solid var(--line);border-radius:18px;padding:22px 20px 18px;
+  box-shadow:0 20px 50px #000a,inset 0 1px 0 #ffffff12;backdrop-filter:blur(8px);align-self:start}
+.ptitle{font:700 12px var(--sans);letter-spacing:.3em;color:#b7adff;display:flex;align-items:center;gap:10px}
+.ptitle::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,#7a6cff66,transparent)}
+#start .field{margin-top:16px}
+.field input{background:#0d1124;border-color:var(--line);border-radius:12px}
+.seg button{background:#0d1124;border-color:var(--line);border-radius:12px;transition:.15s}
+.seg button:hover{border-color:#7a6cff88;color:var(--chalk)}
+.seg button.on{background:linear-gradient(180deg,#2a2470,#1d1a52);color:var(--amber);border-color:var(--amber);box-shadow:0 0 0 1px #ffcf4a33,0 6px 16px #0007}
+#nat-desc{color:var(--dim);font-size:12px;margin-top:8px;line-height:1.6}
+#btn-start{margin-top:22px;padding:15px;font-size:16px;letter-spacing:.06em}
+#start .seedline{margin-top:16px;line-height:1.8}
+@media (min-width:900px){ #start .wrap{grid-template-columns:1.1fr 1fr;align-items:center;min-height:100vh;min-height:100dvh;gap:48px} #start .panel{align-self:center} }
+/* 卡片 */
+.card{background:linear-gradient(180deg,#181f3b,#12172e);border:1px solid var(--line);border-radius:14px;padding:13px 16px;
+  box-shadow:0 6px 20px #0006,inset 0 1px 0 #ffffff0a}
+.card h4{color:#aab2d0;letter-spacing:.2em}
+.card.gold{background:linear-gradient(180deg,#272241,#161a31);border-color:#ffcf4a3a;box-shadow:0 6px 24px #0006,inset 0 1px 0 #ffcf4a1f}
+.card.gold h4{color:var(--amber)}
+.card.good{border-color:#5fe3a12e} .card.bad{border-color:#ff6b6b26}
+.card.red{background:linear-gradient(180deg,#2a1624,#151a2e);border-color:#ff4d4d55}
+.card.moment{background:linear-gradient(180deg,#1b2246,#121730)}
+.card.story{background:linear-gradient(180deg,#221d4a,#141832)}
+.statline{background:#0b0f22;border-color:var(--line);border-radius:8px}
+table.fin tr:nth-child(even) td{background:#ffffff05}
+table.fin th{font-family:var(--sans);font-size:11px}
+/* 年度分隔 */
+.yr-head{color:#aab2d0;font-weight:700;padding:14px 0 4px;background:linear-gradient(90deg,transparent 4%,#3a4470 22%,transparent 26%,transparent 74%,#3a4470 78%,transparent 96%) center 60%/100% 1px no-repeat}
+/* 記分板 */
+#board{position:sticky;background:linear-gradient(180deg,#1d2449,#121630);border-bottom:1px solid var(--line);box-shadow:0 10px 30px #000a}
+#board::before{content:'';position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,var(--club,#5b4bff),#ffcf4a)}
+.bd-cell{background:linear-gradient(180deg,#10152c,#0b0f22);border-color:var(--line);border-radius:9px}
+.bd-cell b{font-family:var(--disp);font-size:20px;font-weight:600;letter-spacing:.02em}
+#bd-name{font-size:18px}
+#bd-bug{border-color:var(--line);border-radius:8px}
+#bd-abt{background:#0b0f22;border-color:var(--line);border-radius:8px}
+/* 按鈕與操作區 */
+.btn{border-radius:12px;background:linear-gradient(180deg,#1f2747,#181f3b);border-color:var(--line);
+  transition:transform .15s,border-color .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px #0007;border-color:#ffcf4a88}
+.btn.main{background:linear-gradient(135deg,#6a5cff,#3d33c4);border-color:#8a7dff;box-shadow:0 6px 22px #5b4bff55}
+.btn.main:hover{box-shadow:0 8px 28px #5b4bff88}
+.btn.warn{border-color:#ff8a4c44} .btn.warn:hover{border-color:#ff8a4c}
+#act{background:linear-gradient(180deg,#151b36f2,#0c0f1df7);border-top:1px solid var(--line);box-shadow:0 -12px 30px #0009}
+#act .title{color:#b7adff}
+.abrow{background:#0f1428;border-color:var(--line);border-radius:10px}
+.tcard{background:linear-gradient(180deg,#1b2242,#131830);border-color:var(--line);border-radius:12px}
+@media (max-width:600px){ .hero-pitch{display:none} #start .wrap{padding-top:26px;gap:16px} .feat{margin-top:12px} }
+svg.scene{max-width:520px;margin-left:auto;margin-right:auto}
+.btn.main small{color:#ddd8ff}
+/* 大事記時間軸 */
+#side h3{position:sticky;top:0;z-index:2;background:linear-gradient(180deg,var(--bg) 70%,transparent);padding:4px 2px 10px;margin:0}
+#side-list{position:relative;padding-left:14px}
+#side-list::before{content:'';position:absolute;left:4px;top:4px;bottom:4px;width:2px;background:linear-gradient(180deg,#7a6cff66,#2a335400)}
+.sd{position:relative;background:linear-gradient(180deg,#181f3b,#12172e);border-color:var(--line);border-left-width:1px;border-radius:10px}
+.sd::before{content:'';position:absolute;left:-14px;top:12px;width:8px;height:8px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 3px var(--bg)}
+.sd.gold::before{background:var(--amber)} .sd.red::before{background:var(--bad)} .sd.won::before{background:var(--good)} .sd.lost::before{background:#7a3a4a} .sd.story::before{background:#a99bff}
 </style>
 </head>
 <body>
 <div id="start">
+  <div class="s-sky"><i class="lt l1"></i><i class="lt l2"></i></div>
   <div class="wrap">
-    <div class="ball"></div>
-    <h1 id="logo-tap">FootLife<br><em>足球人生模擬器</em></h1>
-    <div id="ver-badge" style="position:fixed;top:6px;right:8px;font-size:10px;letter-spacing:1px;color:var(--dim);opacity:.55;font-family:monospace;z-index:50;pointer-events:none"></div>
-    <p class="sub">青訓三年養成 → 職業合約・旅外 → 國家隊 → 衰退與引退。每一個關鍵時刻都算數。</p>
-    <div class="field"><label>球員姓名</label><input id="in-name" maxlength="10" placeholder="例如：陳柏良" value=""></div>
-    <div class="field"><label>位置</label>
+    <section class="hero">
+      <div class="kicker"><span class="dot"></span>FOOTBALL CAREER SIMULATOR</div>
+      <h1 id="logo-tap"><span class="en">FOOTLIFE</span><em>足球人生模擬器</em></h1>
+      <p class="sub">從 15 歲青訓走到世界盃。簽約、轉會、德比、國家隊、引退——每一個關鍵時刻都算數。</p>
+      <svg class="hero-pitch" viewBox="0 0 360 200" aria-hidden="true">
+        <defs><radialGradient id="hg" cx="50%" cy="30%" r="70%"><stop offset="0" stop-color="#3b2a8a" stop-opacity=".55"/><stop offset="1" stop-color="#0c0f1d" stop-opacity="0"/></radialGradient>
+          <linearGradient id="hl" x1="0" x2="1"><stop offset="0" stop-color="#ffcf4a" stop-opacity="0"/><stop offset=".5" stop-color="#ffcf4a"/><stop offset="1" stop-color="#ff8a4c"/></linearGradient></defs>
+        <rect width="360" height="200" fill="url(#hg)"/>
+        <g fill="none" stroke="#ffffff" stroke-opacity=".16" stroke-width="1.4">
+          <path d="M20 190 L80 40 L280 40 L340 190 Z"/><path d="M50 115 L310 115"/><ellipse cx="180" cy="115" rx="46" ry="16"/>
+          <path d="M140 40 L135 62 L225 62 L220 40"/><path d="M124 190 L132 158 L228 158 L236 190"/></g>
+        <path class="run" d="M96 170 C140 140 170 128 200 96 S250 58 262 50" fill="none" stroke="url(#hl)" stroke-width="2.4" stroke-dasharray="5 6"/>
+        <circle cx="96" cy="170" r="6" fill="#ffcf4a" stroke="#fff" stroke-width="1.5"/>
+        <g class="hb"><circle cx="262" cy="50" r="7" fill="#fff" stroke="#141a33" stroke-width="1.2"/><path d="M262 45.5 l3.6 2.6 -1.4 4.2 h-4.4 l-1.4 -4.2z" fill="#141a33"/></g>
+        <rect x="160" y="30" width="40" height="10" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1.4"/>
+      </svg>
+      <ul class="feat"><li><b>7</b>國籍可選</li><li><b>23</b>個聯賽</li><li><b>402</b>支真實球隊</li><li><b>∞</b>種人生</li></ul>
+    </section>
+    <section class="panel">
+      <div class="ptitle">建立你的球員</div>
+      <div class="field"><label>球員姓名</label><input id="in-name" maxlength="10" placeholder="例如：陳柏良" value=""></div>
+      <div class="field"><label>位置</label>
       <div class="seg" id="seg-pos">
         <button data-v="GK">門將</button><button data-v="DF">後衛</button>
         <button data-v="MF">中場</button><button data-v="FW" class="on">前鋒</button>
       </div></div>
-    <div class="field"><label>國籍</label>
+      <div class="field"><label>國籍</label>
       <div class="seg" id="seg-nat">
         <button data-v="TW" class="on">台灣</button><button data-v="JP">日本</button><button data-v="KR">韓國</button><button data-v="AU">澳洲</button>
         <button data-v="CN">中國</button><button data-v="VN">越南</button><button data-v="TH">泰國</button>
-      </div><p id="nat-desc" style="color:var(--dim);font-size:12px;margin-top:6px"></p></div>
-    <button class="btn main" style="margin-top:28px" id="btn-start">開始生涯 ▸ 15 歲・青訓第一年</button>
-    <p class="seedline">世界種子
+      </div><p id="nat-desc"></p></div>
+      <button class="btn main" id="btn-start">開始生涯 ▸ 15 歲・青訓第一年</button>
+      <p class="seedline">世界種子
       <input id="seed-show" maxlength="24" style="width:120px;background:#0f1428;color:#ffcf4a;border:1px solid #2a3354;border-radius:6px;padding:2px 6px;font-family:inherit;font-size:12px;text-align:center">
       · <a href="#" id="seed-re" style="color:var(--blue)">換一個</a><br>相同種子＋相同選擇＝相同人生（可直接輸入朋友的種子碼）</p>
+    </section>
+    <div id="ver-badge" style="position:fixed;top:6px;right:8px;font-size:10px;letter-spacing:1px;color:var(--dim);opacity:.55;font-family:monospace;z-index:50;pointer-events:none"></div>
   </div>
 </div>
 <div id="app">
@@ -374,7 +473,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.10.5';
+const APP_VER='v0.11.0';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -594,7 +693,7 @@ function setNum(id,v){ const el=$(id), t=String(v); if(el.textContent===t)return
   el.textContent=t; if(!first){ el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); } }
 function board(phase){ if(phase!==undefined)S.ph=phase; /* 不帶參數時沿用目前階段 */
   $('bd-name').innerHTML=`${S.name}<small>${NATS[S.nat].n}·${DPN[S.dpos]}·${playerType()}${S.traits.genius?' ★':''}</small>`;
-  const nb=$('bd-num'); nb.textContent=jersey(); nb.style.background=clubColor();
+  const nb=$('bd-num'); nb.textContent=jersey(); nb.style.background=clubColor(); $('board').style.setProperty('--club',clubColor());
   $('bd-lg').textContent=S.stage==='PRO'?LV[S.lv].n:S.stage==='UNI'?'大學':'青訓';
   $('bd-team').textContent=teamLabel();
   $('bd-clock').textContent=["0'","45'","90'"][S.ph||0];
