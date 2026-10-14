@@ -374,7 +374,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.10.4';
+const APP_VER='v0.10.5';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -782,6 +782,11 @@ const MOMENTS=[
 ];
 const BIGFX={G:'GOAL!',A:'ASSIST!',S:'SAVE!',D:'CLEARED!'};
 /* 成功率:風險基準 + 相關能力與球隊 par 的差 + 特質;讀對對手習慣的 +18 不顯示 */
+/* 成功點數:安全 1、正常 2、大膽 3(大心臟 4);兩項能力時第一項拿較多 */
+function momentMag(o){ return o.m==='safe'?1:o.m==='bold'?(S.traits.clutch?4:3):2; }
+function momentSplit(o,mag){ const a=o.ab.length>1&&mag>1?[Math.ceil(mag/2),Math.floor(mag/2)]:[mag]; return a.map((v,i)=>[o.ab[i],v]); }
+function momentSub(o,p){ const g=momentSplit(o,momentMag(o)).map(([k,v])=>`${ABL[k]}+${v}`).join(' ');
+  return `${MODEN[o.m]}｜成功率 ${p}%｜成功 ${g}${o.m==='safe'?'':`｜失敗 ${ABL[o.ab[0]]}−1`}`; }
 function momentOdds(o,par){ /* par:大賽與盃賽用對手強度,預設為目前球隊 par */
   const base={safe:70,norm:50,bold:S.traits.clutch?50:35}[o.m];
   const a=o.ab.reduce((s,k)=>s+S.ab[k],0)/o.ab.length;
@@ -833,7 +838,7 @@ function bigMoment(tag,me,opp,par,done){
   const min=ri(55,118), a=ri(0,1), el=momentCard(tag,sc,tell,see,min>90?`延長 ${min}`:min,me,a,a,opp);
   MTAG=tag;
   choose(`${tag} — 你的選擇？`,sc.opts.map((o,i)=>{ const p=momentOdds(o,par);
-    return {t:o.t,main:o.m==='norm',warn:o.m==='bold',s:`${MODEN[o.m]}｜成功率 ${p}%｜${o.ab.map(k=>ABL[k]).join('＋')}`,
+    return {t:o.t,main:o.m==='norm',warn:o.m==='bold',s:momentSub(o,p),
       f:()=>resolveMoment(sc,o,i===tell.o,p,el,ok=>{ MTAG=null; board(); done(ok); })}; }));
 }
 function keyMoments(n,done){
@@ -844,22 +849,23 @@ function keyMoments(n,done){
   STK=S.stage!=='PRO'?null:dby&&chance(25)?(vs=dby[0],dby[1]):n===1&&S.clubTier===1&&chance(35)?'爭冠關鍵戰':n===1&&S.clubTier===3&&chance(35)?'保級生死戰':null;
   const el=momentCard(STK?'關鍵時刻・'+STK:'關鍵時刻',sc,tell,see,min,me,a,b,vs);
   choose(`關鍵時刻 — 你的選擇？（本季剩 ${n} 次）`,sc.opts.map((o,i)=>{ const p=momentOdds(o);
-    return {t:o.t,main:o.m==='norm',warn:o.m==='bold',s:`${MODEN[o.m]}｜成功率 ${p}%｜${o.ab.map(k=>ABL[k]).join('＋')}`,
+    return {t:o.t,main:o.m==='norm',warn:o.m==='bold',s:momentSub(o,p),
       f:()=>resolveMoment(sc,o,i===tell.o,p,el,()=>{ STK=null; board(); keyMoments(n-1,done); })}; }));
 }
 function resolveMoment(sc,o,read,p,el,next){
   const ok=chance(clamp(p+(read?18:0),5,97)), m=o.m;
-  let mag=m==='safe'?1:m==='bold'?3:2; if(m==='bold'&&S.traits.clutch)mag=ok?4:2;
+  const mag=momentMag(o);
   if(m==='safe'&&ok)S.cntSaveWin++;
   if(m==='bold'){ if(ok)S.cntBoldWin++; else S.cntBoldFail++; }
   if(sc.set&&ok&&++S.setPieceWin>=4&&S.ab.pas>=55&&!S.traits.setpiece)S.pendTrait='setpiece';
   const out=[];
-  if(ok){ out.push(loveGainTxt(pick(o.ab),mag)); out.push(meter('form',mag*4)); out.push(meter('fans',o.k==='G'?(m==='bold'?6:3):1));
+  if(ok){ momentSplit(o,mag).forEach(([k,v])=>out.push(loveGainTxt(k,v))); out.push(meter('form',mag*4)); out.push(meter('fans',o.k==='G'?(m==='bold'?6:3):1));
     if(m==='bold')out.push(meter('trust',3));
     if(STK)out.push(meter('fans',3));
     if(o.k==='G'&&!isGK())S.mG++; else if(o.k==='A')S.mA++;
     if(m!=='safe'||MTAG)S.hl.push({y:S.year,age:S.age,t:`${MTAG?MTAG.replace(/^\S+ /,'')+'・':STK?STK+'・':''}${sc.t}：${o.ok}`,big:m==='bold'||!!MTAG||!!STK}); }
-  else { out.push(meter('form',m==='bold'?-6:-3)); if(m==='bold')out.push(meter('trust',-4)); }
+  else { out.push(meter('form',m==='bold'?-6:-3)); if(m==='bold')out.push(meter('trust',-4));
+    if(m!=='safe'&&abLose(o.ab[0],1))out.push(`<span class="dn">${ABL[o.ab[0]]} −1</span>`); }
   /* 動畫:球飛向落點;失敗時進球場景偏出、防守場景失球 */
   const svg=el.querySelector('svg'), ball=svg.querySelector('.ballp'), P=sc.pos;
   const def=['S','D'].includes(o.k)||sc.g.includes('GK');
@@ -894,11 +900,11 @@ const DIALOGS=[
  {n:'記者會風波',st:'PRO',d:'教練在賽後記者會點名你「比賽態度不夠積極」，記者們等著你的回應。',o:[
   {t:'當眾回嗆：「我照戰術在踢」',m:'bold',p:40,s:'球迷↑、教練信任可能大跌',ok:{fans:10,trust:-5},ng:{fans:4,trust:-15},okt:'球迷力挺你的態度，教練也沒再多說',ngt:'教練臉色鐵青，下一場把你放上板凳'},
   {t:'私下去辦公室找教練談',m:'norm',p:60,s:'教練信任↑',ok:{trust:12},ng:{trust:-3},okt:'兩人把話說開，教練開始信任你',ngt:'教練只丟下一句「用場上表現說話」'},
-  {t:'不回應，留下來加練',m:'safe',s:'狀態↑、能力小幅成長',ok:{form:6,ab:['key',1]},okt:'每天最後一個離開訓練場'}]},
+  {t:'不回應，留下來加練',m:'safe',s:'狀態↑',ok:{form:6,ab:['key',1]},okt:'每天最後一個離開訓練場'}]},
  {n:'隊友聚會',st:'ANY',d:'隔天還有訓練，隊長約大家晚上去唱歌。',o:[
   {t:'跟大家玩到深夜',m:'bold',p:50,en:1,s:'可能拉近關係，也可能隔天遲到',ok:{trust:5,form:-3},ng:{form:-12,trust:-6},okt:'更衣室氣氛超好，大家更願意傳球給你',ngt:'隔天訓練遲到，被教練當眾訓話'},
   {t:'露個臉就先走',m:'norm',s:'教練信任小幅↑',ok:{trust:3},okt:'跟大家喝杯飲料就回家睡覺'},
-  {t:'婉拒，去健身房',m:'safe',s:'狀態↑、能力小幅成長',ok:{form:6,ab:['key',1]},okt:'一個人在健身房練到很晚'}]},
+  {t:'婉拒，去健身房',m:'safe',s:'狀態↑',ok:{form:6,ab:['phy|sta',1]},okt:'一個人在健身房練到很晚'}]},
  {n:'社群炎上',st:'PRO',d:'輸球後，你的社群被灌爆，有人說你「不配穿這件球衣」。',o:[
   {t:'開直播霸氣回應',m:'bold',p:35,s:'可能圈粉，也可能更炎上',en:1,ok:{fans:12},ng:{fans:-15,form:-5},okt:'直播一句「下一場見」，留言區瞬間轉向',ngt:'直播失言被剪成梗圖，炎上更嚴重'},
   {t:'發文道歉並承諾改進',m:'norm',p:70,s:'球迷↑',ok:{fans:6},ng:{fans:-4},okt:'誠懇的道歉文獲得許多支持',ngt:'被說是公關文，沒什麼人買單'},
@@ -908,7 +914,7 @@ const DIALOGS=[
   {t:'只接一支',m:'norm',p:70,en:1,s:'收入、人氣小幅↑',ok:{pay:1.5,fans:4},ng:{form:-5},okt:'拍攝順利，沒影響訓練',ngt:'拍攝拖延，影響了一週訓練'},
   {t:'婉拒，專心踢球',m:'safe',s:'教練信任↑',ok:{trust:4},okt:'教練知道後對你點了點頭'}]},
  {n:'新教練上任',st:'PRO',d:'球隊換了新教練，他的戰術跟你的踢法不太合。',o:[
-  {t:'主動學新戰術',m:'norm',p:65,s:'教練信任↑、能力成長',ok:{trust:10,ab:['key',2]},ng:{form:-4},okt:'你很快就成了新戰術的核心',ngt:'一時還抓不到節奏'},
+  {t:'主動學新戰術',m:'norm',p:65,s:'教練信任↑',ok:{trust:10,ab:['vis|gkp',2]},ng:{form:-4},okt:'你很快就成了新戰術的核心',ngt:'一時還抓不到節奏'},
   {t:'堅持原本的打法',m:'bold',p:40,s:'賭教練為你調整',ok:{trust:8,form:6},ng:{trust:-15},okt:'教練看到你的價值，調整戰術配合你',ngt:'教練認為你不聽話，把你放上板凳'},
   {t:'默默觀察一陣子',m:'safe',s:'穩定',ok:{trust:2},okt:'先看清楚新教練要什麼'}]},
  {n:'更衣室質疑',st:'ANY',d:'有隊友在更衣室酸你「只會刷數據」。',o:[
@@ -937,7 +943,7 @@ const DIALOGS=[
   {t:'不需要',m:'bold',s:'省錢',ok:{},okt:'你相信球隊的體能教練就夠了'}]},
  {n:'考試週',st:'YU',d:'期末考跟球隊集訓撞期了。',o:[
   {t:'翹課去集訓',m:'bold',p:60,s:'可能大進步，也可能被抓回去讀書',ok:{ab:['key',2],trust:6},ng:{trust:-4,form:-6},okt:'集訓表現亮眼，教練對你另眼相看',ngt:'被學校約談，集訓也沒練好'},
-  {t:'白天考試、晚上加練',m:'norm',s:'能力小幅成長、狀態小幅↓',ok:{ab:['key',1],form:-3},okt:'兩邊都顧到了，就是有點累'},
+  {t:'白天考試、晚上加練',m:'norm',s:'狀態小幅↓',ok:{ab:['key',1],form:-3},okt:'兩邊都顧到了，就是有點累'},
   {t:'專心考試',m:'safe',s:'狀態↑',ok:{form:4},okt:'考完試，身心都放鬆了'}]},
  /* ---- v0.10 新增:c = 出現條件 ---- */
  {n:'經紀人的提議',st:'PRO',c:()=>S.age>=21,d:'一位大牌經紀人約你喝咖啡：「跟我簽，我保證你兩年內加薪一倍。抽成是 15%。」',o:[
@@ -986,7 +992,7 @@ const DIALOGS=[
   {t:'比賽結束後趕去聚餐',m:'norm',s:'球迷小幅↑',ok:{fans:3,form:2},okt:'你們聊到天亮，說好以後一起開足球學校'}]},
  {n:'青訓宿舍的夜晚',st:'YU',c:()=>S.stage==='YOUTH',d:'第一次離家住宿舍，夜裡你一直睡不著，想打電話回家。',o:[
   {t:'打電話給媽媽',m:'safe',s:'狀態↑',ok:{form:6},okt:'媽媽說：「想回來就回來，家裡永遠有你的位置。」你反而更想留下來了'},
-  {t:'去球場一個人練射門',m:'bold',p:60,s:'能力成長，也可能被舍監抓到',ok:{ab:['key',2]},ng:{trust:-5},okt:'月光下踢了兩百腳，回到床上一覺到天亮',ngt:'被舍監抓到，罰掃一週廁所'},
+  {t:'去球場一個人練射門',m:'bold',p:60,s:'可能被舍監抓到',ok:{ab:['sho|ref',2]},ng:{trust:-5},okt:'月光下踢了兩百腳，回到床上一覺到天亮',ngt:'被舍監抓到，罰掃一週廁所'},
   {t:'跟室友聊到天亮',m:'norm',s:'教練信任小幅↑',ok:{trust:3,form:-2},okt:'你們約好，以後要一起踢職業'}]},
  {n:'第一雙贊助球鞋',st:'YU',d:'一家球鞋品牌的業務在場邊看了你三場比賽，說想送你一雙新鞋。',o:[
   {t:'收下，並答應拍照',m:'norm',s:'球迷↑',ok:{fans:5},okt:'照片放上品牌官網，同學們都在傳'},
@@ -1001,8 +1007,10 @@ const DIALOGS=[
   {t:'跟球迷擊掌致意',m:'norm',s:'球迷小幅↑',ok:{fans:4},okt:'球迷熱情地回應你'},
   {t:'專注在比賽上',m:'safe',s:'狀態↑',ok:{form:5},okt:'心思全放在對手身上'}]},
 ];
+/* key = 目前位置權重最高的能力;'a|b' = 場上球員 a、門將 b */
 function dKey(k){ const keys=Object.keys(DP_W[S.dpos]);
-  if(k==='key')return pick(keys); if(k==='rand')return pick(GRP_AB[S.grp]);
+  if(k.includes('|')){ const [a,b]=k.split('|'); k=isGK()?b:a; if(k in S.ab)return k; k='key'; }
+  if(k==='key')return Object.entries(DP_W[S.dpos]).sort((a,b)=>b[1]-a[1])[0][0]; if(k==='rand')return pick(GRP_AB[S.grp]);
   if(k==='weak')return keys.slice().sort((a,b)=>S.ab[a]-S.ab[b])[0]; if(k==='best')return keys.slice().sort((a,b)=>S.ab[b]-S.ab[a])[0];
   return k in S.ab?k:pick(keys); }
 function applyFx(fx){ const out=[];
@@ -1026,7 +1034,8 @@ function dialogEvent(done){
   if(!arc){ S.seenDlg.push(dg.n); if(S.seenDlg.length>8)S.seenDlg.shift(); }
   const el=card(arc?'talk story':'talk',(arc?'劇情｜':'場外｜')+dg.n,`<p>${dg.d}</p><div class="mres"></div>`);
   choose(`${dg.n} — 你怎麼回應？`,dg.o.map((o,oi)=>{ const p=o.p!=null?clamp(o.p+(o.m==='bold'&&S.traits.clutch?10:0),5,95):null;
-    return {t:o.t,main:o.m==='norm',warn:o.m==='bold',s:(p!=null?`成功率 ${p}%｜`:'')+o.s,f:()=>{
+    const abTxt=o.ok&&o.ok.ab&&o.ok.ab[1]>0?`｜${ABL[dKey(o.ok.ab[0])]} +${o.ok.ab[1]}`:'';
+    return {t:o.t,main:o.m==='norm',warn:o.m==='bold',s:(p!=null?`成功率 ${p}%｜`:'')+o.s+abTxt,f:()=>{
       const ok=p==null||chance(p);
       if(o.m==='safe'&&ok)S.cntSaveWin++;
       if(p!=null&&o.m==='bold'){ if(ok)S.cntBoldWin++; else S.cntBoldFail++; }
@@ -1081,12 +1090,12 @@ const ARCS={
  ],
  mentor:[
   {id:'m0',when:()=>S.stage==='YOUTH',mk:m=>({n:'恩師的加練',d:`青訓教練 <b class="hl">${m.n}</b> 在訓練後把你留下：「你的天分夠，但還缺一樣東西。」`,o:[
-    {t:'請教練幫我補弱點',m:'norm',s:'最弱的關鍵能力成長',ok:{ab:['weak',2]},okt:'他陪你練到天黑，一句話都沒多說'},
-    {t:'我想把強項練到極致',m:'bold',s:'最強的關鍵能力成長',ok:{ab:['best',2]},okt:'「好，那就練到沒人擋得住。」'},
+    {t:'請教練幫我補弱點',m:'norm',s:'補最弱的關鍵能力',ok:{ab:['weak',2]},okt:'他陪你練到天黑，一句話都沒多說'},
+    {t:'我想把強項練到極致',m:'bold',s:'強化最強的關鍵能力',ok:{ab:['best',2]},okt:'「好，那就練到沒人擋得住。」'},
     {t:'謝謝教練，我會自己加練',m:'safe',s:'狀態↑',ok:{form:5},okt:'他點點頭：「那我等著看。」'}]})},
   {id:'m1',when:m=>S.stage==='PRO'&&m.done.m0,mk:m=>({n:'恩師的電話',d:`簽下職業合約那天，${m.n} 打電話來：「別忘了你為什麼開始踢球。」`,o:[
     {t:'回青訓隊探望他',m:'norm',s:'球迷↑、狀態↑',ok:{fans:4,form:4},okt:'學弟們圍著你要簽名，他站在後面笑'},
-    {t:'請他吃飯，聽他的建議',m:'safe',s:'關鍵能力小幅成長',ok:{ab:['key',1]},okt:'他在餐巾紙上畫了你的跑位，你一直留著'},
+    {t:'請他吃飯，聽他的建議',m:'safe',s:'聽取建議',ok:{ab:['key',1]},okt:'他在餐巾紙上畫了你的跑位，你一直留著'},
     {t:'忙著適應新球隊，改天再說',m:'bold',s:'教練信任↑',ok:{trust:4},okt:'你說改天，但那個改天一直沒有來'}]}),
    after:(m,i)=>{ if(i===2)m.cold=1; }},
   {id:'m2',when:m=>S.stage==='PRO'&&S.age>=24&&m.done.m1,mk:m=>({n:'恩師病倒',d:`${m.n} 住院了，手術就在週末——而那天你有一場重要的比賽。${m.cold?'你想起好幾年沒去看他了。':''}`,o:[
@@ -1344,6 +1353,9 @@ function loveGainTxt(k,amt){ /* 加點機制同事件卡;超過潛力的部分�
   if(over>0)return `<b class="up">本季成績加成 +${over}</b>（${ABL[k]} 已達潛力上限）`;
   return `${ABL[k]} 能力加點，但不足以提升一級`;
 }
+function abLose(k,n){ let lost=0; for(let i=0;i<n;i++){ if(!(k in S.ab))break;
+    if((S.carry[k]||0)>0){ S.carry[k]--; lost++; } else if(S.ab[k]>1){ S.ab[k]--; S.carry[k]=lvCost(k,S.ab[k])-1; lost++; } }
+  return lost; }
 function addAbStat(k,amt){
   if(amt<=0)return addAb(k,amt);
   const pk=(S.pot&&S.pot[k])||62; let cur=S.ab[k], bud=amt, cr=S.carry[k]||0, gained=0;
@@ -1626,7 +1638,7 @@ function phaseEndIntl(){
   const go=()=>militaryCheck(()=>naturalCheck(movement));
   natCall(()=>{
     if(S.pool>0){ const p=S.pool; S.pool=0;
-      choose('',[{t:`▸ 分配能力點（${p} 點・國際賽成果）`,main:true,f:()=>allocUI({pool:p},'季末能力點分配（國際賽成果）',go)}]); }
+      choose('',[{t:`▸ 分配能力點（${p} 點・賽事成果）`,main:true,f:()=>allocUI({pool:p},'季末能力點分配（盃賽與國際賽成果）',go)}]); }
     else go(); });
 }
 /* 球隊戰績:依檔次擲奪冠、升級、降級;租借期間只記冠軍 */
@@ -2119,8 +2131,8 @@ function clubCups(cont){
   if(S.cwc&&S.cwc.y===S.year&&S.cwc.club===S.club){ const eu=S.cwc.eu; S.cwc=null;
     q.push(()=>{ let i=0; const p=[eu?.85:.45,eu?.62:.25], b=rel+role;
       const end=()=>{ const label=i===2?'冠軍':i===1?'亞軍':'止步準決賽';
-        S.honors.push(`${Y} 世俱盃（${label}・${S.club}）`); if(i===2){ S.cups++; meter('fans',10); confetti(); }
-        card(i>=1?'gold':'info',`${Y} 世俱盃`,`以${eu?'歐洲':'亞洲'}冠軍身分出戰世俱盃：<b class="hl">${label}</b>。`); board(); next(); };
+        S.honors.push(`${Y} 世俱盃（${label}・${S.club}）`); if(i===2){ S.cups++; S.pool+=2; meter('fans',10); confetti(); }
+        card(i>=1?'gold':'info',`${Y} 世俱盃`,`以${eu?'歐洲':'亞洲'}冠軍身分出戰世俱盃：<b class="hl">${label}</b>。${i===2?'<br>賽事成果 <b class="up">+2</b> 點（季末自由分配）':''}`); board(); next(); };
       if(!chance(p[0]*100+b*100)){ end(); return; } i=1;
       if(!usedMoment){ usedMoment=true;
         bigMoment(`${Y} 世俱盃決賽`,S.club,eu?pick(CWC_OPP):pick(TEAMS[pick(['ENG','ESP','GER','ITA'])].slice(0,3)),L.par+(eu?6:12),ok=>{ if(ok||chance(eu?35:15))i=2; end(); }); return; }
@@ -2131,10 +2143,11 @@ function clubCups(cont){
     q.push(()=>{ const P=CL_P[S.lv], C=CONT[clName]; let i=0, b=rel+role+(S.clubTier===1?0.05:0)+C.b;
       const pool=C.pool.filter(k=>k!==S.lv), opp=()=>pick(TEAMS[pick(pool)]);
       const end=()=>{ const label=i===5?'冠軍':i===4?'亞軍':i===3?'4 強':`止步${CL_ST[i]}`;
+        const cp=i===5?3:i===4?2:i===3?1:0; S.pool+=cp;
         if(i>=3){ S.honors.push(`${Y} ${clName}（${label}・${S.club}）`); S.cups++; }
         if(i===5){ meter('fans',clName==='歐冠'||clName==='亞冠'?10:6); meter('trust',5); confetti();
           if(clName==='歐冠'||clName==='亞冠')S.cwc={y:S.year+1,club:S.club,eu:clName==='歐冠'}; }
-        card(i>=3?'gold':'info',`${Y} ${clName}`,`${S.club}在${clName}的旅程：<b class="hl">${label}</b>。`); board(); next(); };
+        card(i>=3?'gold':'info',`${Y} ${clName}`,`${S.club}在${clName}的旅程：<b class="hl">${label}</b>。${cp?`<br>賽事成果 <b class="up">+${cp}</b> 點（季末自由分配）`:''}`); board(); next(); };
       const go=()=>{ while(i<5){
           if(i>=3&&!usedMoment){ usedMoment=true;
             bigMoment(`${Y} ${clName}${CL_ST[i]}`,S.club,opp(),L.par+C.par,ok=>{ if(ok||chance(30))i++; else { end(); return; } if(ok)b+=0.05; go(); }); return; }
@@ -2143,8 +2156,8 @@ function clubCups(cont){
       go(); }); }
   /* 國內盃 */
   q.push(()=>{ let i=0; const p0={1:.6,2:.45,3:.33}[S.clubTier]+rel+role;
-    const end=win=>{ if(win){ S.honors.push(`${Y} ${CUP_N[S.lv]}冠軍（${S.club}・${L.n}）`); S.cups++; meter('fans',6); confetti(); }
-      card(win?'gold':'info',`${Y} ${CUP_N[S.lv]}`,win?`${S.club}捧起 <b class="hl">${CUP_N[S.lv]}</b>！`:`${S.club}在${CUP_N[S.lv]}${i===4?'決賽落敗，屈居<b>亞軍</b>':'止步'+CUP_ST[i]}。`); board(); next(); };
+    const end=win=>{ if(win){ S.honors.push(`${Y} ${CUP_N[S.lv]}冠軍（${S.club}・${L.n}）`); S.cups++; S.pool+=2; meter('fans',6); confetti(); }
+      card(win?'gold':'info',`${Y} ${CUP_N[S.lv]}`,win?`${S.club}捧起 <b class="hl">${CUP_N[S.lv]}</b>！<br>賽事成果 <b class="up">+2</b> 點（季末自由分配）`:`${S.club}在${CUP_N[S.lv]}${i===4?'決賽落敗，屈居<b>亞軍</b>':'止步'+CUP_ST[i]}。`); board(); next(); };
     while(i<4&&chance(p0*100))i++;
     if(i<4){ if(i>=2)end(false); else next(); return; } /* 早早出局就不另外報告 */
     if(!usedMoment){ usedMoment=true;
