@@ -8,7 +8,7 @@
 <meta name="description" content="從青訓到世界盃，一場種子化的足球員生涯模擬。簽約、租借、轉會、國家隊、傷病、引退——每一個決定都算數。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2214%22 fill=%22%23fff%22 stroke=%22%23222%22/%3E%3Cpolygon points=%2216,10 21,14 19,20 13,20 11,14%22 fill=%22%23222%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Oswald:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=IBM+Plex+Mono:wght@500;700&family=Oswald:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0c0f1d; --panel:#151a2e; --panel2:#1d2440; --edge:#2a3354;
@@ -16,6 +16,9 @@
   --good:#5fe3a1; --bad:#ff6b6b; --blue:#6cc6ff;
   --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
   --sans:'Noto Sans TC',-apple-system,'PingFang TC','Microsoft JhengHei',sans-serif;
+  --num:'Barlow Condensed','Oswald','Arial Narrow',sans-serif;
+  --pri:#5b4bff; --pri-txt:#fff; --sub:#0e1226; --btn:#1d2440; --hd:#aab2d0; --story:#a99bff; --on-amber:#141a33;
+  --pitch1:#1a2147; --pitch2:#18204a; --pline:#ffffff38; --glow:#ffffff14;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
@@ -189,6 +192,7 @@ table.awd td{text-align:left!important}
     display:grid;grid-template-columns:1fr 1fr;column-gap:10px;align-content:start}
   #act>*:not(.btn){grid-column:1/-1}
   #act>.btn:last-child:nth-child(even){grid-column:1/-1}
+  #act>.btn:first-child:last-child{grid-column:1/-1}
   #btn-side,#side-x{display:none}
   #side{display:block;grid-column:3;grid-row:1/5;align-self:start;position:sticky;top:0;max-height:100vh;max-height:100dvh;overflow-y:auto;padding:16px 2px 24px}
 }
@@ -434,10 +438,10 @@ svg.scene{max-width:520px;margin-left:auto;margin-right:auto}
 /* ================= v0.15 配色主題 =================
    classic = 原本的深藍紫(上面的樣式);soft 柔和夜賽、warm 暖灰夜間、day 日間淺色
    三個新主題共用 html.th 底下的平面化規則:降對比、去光暈、縮字距 */
-html[data-theme="soft"]{--bg:#14171f;--panel:#1b1f2a;--panel2:#232836;--edge:#2c3240;--line:#2c3240;--chalk:#d8dce5;--dim:#8a90a0;
-  --amber:#e3b85a;--clay:#d9895a;--good:#6cc79a;--bad:#e07a74;--blue:#86b4dc;--pri:#4d63c9;--pri-txt:#f2f4fa;--pri-soft:#2a3466;
-  --sub:#11141b;--btn:#20242f;--hd:#9aa1b2;--story:#8f86d6;--pitch1:#1c2130;--pitch2:#1a1f2d;--pline:#ffffff26;--on-amber:#14171f;
-  --gold-bg:#211f22;--red-bg:#25191d;--act:#171a23f7;--shadow:none}
+html[data-theme="soft"]{--bg:#0d1322;--panel:#151d31;--panel2:#1c2640;--edge:#2a3553;--line:#2a3553;--chalk:#e8ecf4;--dim:#8f99b2;
+  --amber:#f2c14e;--clay:#e8955a;--good:#5cd3a5;--bad:#ff6b5b;--blue:#7fa8ff;--pri:#f2c14e;--pri-txt:#1a1405;--pri-soft:#3a3218;
+  --sub:#0f1628;--btn:#1a2339;--hd:#a7b1c8;--story:#a99bff;--pitch1:#14304a;--pitch2:#163654;--pline:#ffffff42;--on-amber:#1a1405;
+  --gold-bg:#1d2032;--red-bg:#271a26;--act:#111a2df5;--shadow:0 8px 24px #0006;--glow:#f2c14e12} /* v0.23 夜賽轉播:照明燈金為唯一強調色 */
 html[data-theme="warm"]{--bg:#1a1816;--panel:#221f1c;--panel2:#2a2622;--edge:#383229;--line:#383229;--chalk:#e4ded3;--dim:#9a9286;
   --amber:#e0a94e;--clay:#d98a55;--good:#8fbf7f;--bad:#d97b6c;--blue:#9db8c9;--pri:#c98a3a;--pri-txt:#1a1816;--pri-soft:#4a3a24;
   --sub:#151311;--btn:#28241f;--hd:#a69d90;--story:#b39ad0;--pitch1:#24211d;--pitch2:#211e1a;--pline:#ffffff22;--on-amber:#1a1816;
@@ -548,6 +552,114 @@ html.th .seg button:hover{border-color:var(--pri)}
 .scr.cur{animation:scrin .28s ease}
 @keyframes scrin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 #log.review .scr{animation:none}
+/* ================= v0.23 夜賽轉播 =================
+   全主題共用:元件都只用 token,四套主題各自換色 */
+html.th body{font-size:15.5px}
+html[data-theme="soft"] body{background-image:radial-gradient(ellipse 60% 35% at 12% -6%,#f2c14e14,transparent 60%),radial-gradient(ellipse 60% 35% at 88% -6%,#3f7bff1c,transparent 60%)}
+html[data-theme="soft"] #start{background:radial-gradient(ellipse 60% 45% at 10% -10%,#f2c14e1f,transparent 60%),radial-gradient(ellipse 60% 45% at 90% -10%,#3f7bff26,transparent 60%),var(--bg)}
+#start h1 .en{font-family:var(--num);font-weight:800;letter-spacing:.02em}
+.feat b{font-family:var(--num)}
+/* 字級 */
+.card p{font-size:15px} .btn small{font-size:12.5px} #act .title{font-size:13px}
+.scr-head{font-size:12px}
+.card h4{font-size:12.5px}
+/* ---------- A. 記分條 ---------- */
+#bd-num{width:44px;height:44px;border-radius:8px 0 0 8px;font:800 24px var(--num);clip-path:polygon(0 0,100% 0,82% 100%,0 100%);padding-right:6px;margin-right:6px;box-shadow:none}
+#bd-name{font-size:18px}
+#bd-bug{height:30px;line-height:30px;border-radius:6px;font-size:13px}
+#bd-lg,html.th #bd-lg{background:var(--club,var(--pri));color:#fff;font-weight:700;padding:0 10px;text-shadow:0 1px 2px #0006}
+#bd-clock,html.th #bd-clock{background:var(--amber);color:var(--on-amber);font:700 16px/30px var(--num);min-width:52px}
+#bd-team,html.th #bd-team{background:var(--sub)}
+.bd-cell b,html.th .bd-cell b{font:700 24px/1.15 var(--num);letter-spacing:.01em;text-shadow:none}
+.bd-cell span{font-size:10.5px;letter-spacing:.12em}
+.bd-cell.ovrc b{width:42px;height:42px;margin:0 auto 2px;border-radius:50%;display:grid;place-items:center;font-size:20px;
+  background:radial-gradient(closest-side,var(--sub) 78%,transparent 80% 100%),conic-gradient(var(--amber) calc(var(--p,.5)*360deg),var(--edge) 0)}
+.mt{font-size:11.5px;letter-spacing:.04em}
+.mt em{font:700 15px var(--num);top:-3px}
+.mt i,html.th .mt i{height:9px;border:none;border-radius:2px;background:var(--sub);margin-top:4px;
+  -webkit-mask:repeating-linear-gradient(90deg,#000 0 calc(10% - 2px),transparent calc(10% - 2px) 10%);mask:repeating-linear-gradient(90deg,#000 0 calc(10% - 2px),transparent calc(10% - 2px) 10%)}
+.mt i b{border-radius:0}
+html.th .mt i b{background:var(--blue)} html.th #mt-fans i b{background:var(--amber)} html.th #mt-form i b{background:var(--good)}
+.mfloat{font:700 15px var(--num);right:30px;top:-8px}
+#bd-tick{margin-top:8px;border-top:1px solid var(--edge);padding-top:6px;overflow:hidden;white-space:nowrap;font-size:12px;color:var(--dim)}
+#bd-tick span{display:inline-block;padding-left:100%;animation:tick 26s linear infinite}
+#bd-tick em{font-style:normal;color:var(--amber);margin:0 6px}
+@keyframes tick{to{transform:translateX(-100%)}}
+/* 能力雷達 */
+#bd-ab .radar{grid-column:1/-1;width:100%;max-width:220px;margin:2px auto 4px;display:block}
+.radar .rg{fill:none;stroke:var(--edge);stroke-width:1}
+.radar .rp{fill:none;stroke:var(--chalk);stroke-opacity:.4;stroke-dasharray:3 3}
+.radar .rv{fill:color-mix(in srgb,var(--amber) 22%,transparent);stroke:var(--amber);stroke-width:2;stroke-linejoin:round}
+.radar text{font:500 10px var(--sans);text-anchor:middle;dominant-baseline:middle;fill:var(--dim)}
+.radar text.rk{fill:var(--amber);font-weight:700}
+.abc{font-size:12px} .abc .av{font:600 14px var(--num)}
+.abc .ab1{height:5px}
+/* ---------- B. 關鍵時刻 ---------- */
+svg.scene,html.th svg.scene{border:none;border-radius:10px;
+  background:radial-gradient(ellipse 45% 35% at 15% 0%,var(--glow),transparent 70%),radial-gradient(ellipse 45% 35% at 85% 0%,var(--glow),transparent 70%),repeating-linear-gradient(90deg,var(--pitch1) 0 30px,var(--pitch2) 30px 60px)}
+html.th .scene .mate{fill:var(--blue)} html.th .scene .opp{fill:var(--bad)} html.th .scene .ogk{fill:color-mix(in srgb,var(--bad) 55%,var(--chalk))}
+.mhead{gap:0;align-items:stretch;border-radius:6px;overflow:hidden;width:max-content;max-width:100%;box-shadow:0 4px 14px #0005}
+.mmin,html.th .mmin{border-radius:0;font:800 18px/28px var(--num);padding:0 10px;background:var(--amber);color:var(--on-amber)}
+.msc{display:flex;align-items:stretch;font:600 13px/28px var(--sans);min-width:0}
+.msc .tm{background:var(--sub);padding:0 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--chalk)}
+.msc .sc{background:var(--chalk);color:var(--bg);font:700 17px/28px var(--num);padding:0 10px;min-width:58px;text-align:center;font-variant-numeric:tabular-nums}
+.msc .sc.flip{animation:scflip .45s ease}
+@keyframes scflip{50%{transform:rotateX(90deg)}}
+.card.moment p{margin-top:10px!important}
+/* 戰術卡 */
+.btn.tac{display:grid;grid-template-columns:50px 1fr;gap:12px;align-items:center;position:relative;text-align:left;padding:11px 14px 11px 11px;
+  background:var(--btn);border-color:var(--edge);color:var(--chalk);box-shadow:none;--r:var(--amber)}
+html.th .btn.tac{background:var(--btn);color:var(--chalk);border-color:var(--edge)}
+.btn.tac.r-bold{--r:var(--bad)} .btn.tac.r-safe{--r:var(--good)} .btn.tac.r-norm{--r:var(--amber)}
+.btn.tac:hover,html.th .btn.tac:hover{transform:translateY(-2px);border-color:var(--r);box-shadow:0 8px 22px #0005;filter:none}
+.btn.tac.main,html.th .btn.tac.main{background:var(--btn);color:var(--chalk);border-color:color-mix(in srgb,var(--r) 55%,var(--edge));box-shadow:none}
+.btn.tac .ring{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(closest-side,var(--btn) 80%,transparent 82% 100%),conic-gradient(var(--r) calc(var(--p)*360deg),var(--edge) 0)}
+.btn.tac .ring b{font:700 18px var(--num);color:var(--chalk)} .btn.tac .ring i{font-style:normal;font-size:11px;color:var(--dim)}
+.btn.tac .tx{min-width:0;font-size:15px;padding-right:34px}
+.btn.tac small,html.th .btn.tac small,html.th .btn.tac.main small{color:var(--dim);opacity:1}
+.btn.tac .risk{position:absolute;top:9px;right:12px;font:700 11.5px var(--sans);letter-spacing:.1em;color:var(--r)}
+/* 結果橫幅與照明閃光 */
+.bigfx,html.th .bigfx{top:40%;font:800 clamp(44px,10vw,88px)/1 var(--num);letter-spacing:.06em;color:var(--on-amber);text-shadow:none;animation:none;transform:translate(-50%,-50%)}
+.bigfx span{display:block;background:var(--amber);padding:6px 46px;transform:skewX(-10deg) scaleX(0);transform-origin:left;animation:bsweep 1.6s cubic-bezier(.2,.8,.2,1) forwards;box-shadow:0 10px 40px #0008}
+.bigfx.cool span{background:var(--blue);color:var(--bg)}
+.bigfx.bad span{background:var(--bad);color:#2a0905}
+@keyframes bsweep{0%{transform:skewX(-10deg) scaleX(0)}22%{transform:skewX(-10deg) scaleX(1)}80%{opacity:1;transform:skewX(-10deg) scaleX(1)}100%{opacity:0;transform:skewX(-10deg) scaleX(1) translateX(30px)}}
+.floodfx{position:fixed;inset:0;z-index:78;pointer-events:none;background:radial-gradient(ellipse at 50% 30%,var(--amber),transparent 70%);opacity:0;animation:flood .7s ease-out}
+@keyframes flood{0%{opacity:.28}100%{opacity:0}}
+/* ---------- D. 季末 ---------- */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:2px 0 8px}
+.kpi{background:var(--sub);border:1px solid var(--edge);border-radius:10px;padding:6px 10px}
+.kpi small{display:block;font-size:11.5px;color:var(--dim)}
+.kpi b{font:700 26px/1.1 var(--num);font-variant-numeric:tabular-nums;color:var(--chalk)}
+@media(max-width:420px){.kpis{grid-template-columns:repeat(2,1fr)}}
+table.ltab tr{animation:rowIn .4s both}
+@keyframes rowIn{from{opacity:0;transform:translateX(-12px)}}
+table.ltab td{font-family:var(--num);font-size:15px} table.ltab td:nth-child(2){font-family:var(--sans);font-size:13.5px}
+table.ltab tr.me td:first-child{box-shadow:inset 3px 0 0 var(--amber)}
+table.ltab td:nth-child(2),table.ltab th:nth-child(2){text-align:left;padding-left:10px}
+html.th .abrow .bar i,html.th .abc .ab1 i{background:linear-gradient(90deg,var(--blue),var(--amber))}
+.medals{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 8px}
+.medal-b{display:inline-flex;align-items:center;gap:8px;padding:5px 14px 5px 6px;border-radius:999px;font-weight:700;font-size:14px;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--amber) 28%,transparent),color-mix(in srgb,var(--amber) 6%,transparent));border:1px solid color-mix(in srgb,var(--amber) 50%,transparent);animation:medal .6s cubic-bezier(.3,1.6,.5,1) both}
+.medal-b i{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:12px;color:#3d2c05;background:radial-gradient(circle at 35% 30%,#fff4c4,#f2c14e 55%,#a87a1c)}
+@keyframes medal{from{transform:scale(.4);opacity:0}}
+/* ---------- E. 章節時間軸 ---------- */
+.card.chap{margin-left:24px;position:relative;overflow:visible}
+.card.chap::before{content:'';position:absolute;left:-19px;top:18px;width:14px;height:14px;border-radius:50%;background:var(--c,var(--dim));box-shadow:0 0 0 3px var(--bg),0 0 14px var(--c,transparent);z-index:1}
+.card.chap::after{content:'';position:absolute;left:-13px;top:34px;bottom:-14px;width:2px;background:var(--edge)}
+.card.chap h4::before{display:none}
+.card.chap .ch-meta{font:600 13px var(--num);letter-spacing:.04em}
+.tile b{font-family:var(--num);font-size:24px}
+/* 大事記節點 */
+.sd.gold::before{box-shadow:0 0 0 3px var(--bg),0 0 10px var(--amber)}
+/* ---------- F. 轉場 ---------- */
+#log{position:relative;overflow-x:clip}
+.wipe{position:absolute;top:0;bottom:0;left:-40%;width:34%;z-index:5;pointer-events:none;transform:skewX(-14deg);
+  background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--club,var(--amber)) 30%,transparent),transparent);animation:wipe .5s ease-out forwards}
+@keyframes wipe{to{left:120%}}
+html.calm .wipe,html.calm .floodfx{display:none}
+@media (prefers-reduced-motion:reduce){#bd-tick span{animation:none;padding-left:0}.wipe,.floodfx{display:none}}
 html.calm *,html.calm *::before,html.calm *::after{animation:none!important;transition:none!important}
 html.calm .var{display:none}
 </style>
@@ -619,6 +731,7 @@ html.calm .var{display:none}
       <div class="mt" id="mt-form">狀態<em>50</em><i><b></b></i></div>
     </div>
     <button id="bd-abt">收起能力 ▴</button><div id="bd-ab" class="open"></div>
+    <div id="bd-tick"><span></span></div>
     <div id="bd-time" data-ph="0"><span id="lp0">熱身・季前</span><span id="lp1">上半場・賽季中</span><span id="lp2">下半場・季末</span><div id="bd-track"><i id="bd-fill"></i><b id="bd-ball"></b></div></div>
   </header>
   <main id="log"></main>
@@ -646,7 +759,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.22.0';
+const APP_VER='v0.23.0';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -953,11 +1066,14 @@ function scrHead(){ if(typeof S==='undefined'||!S)return '';
   const dots=pg?`<span class="dots">${Array.from({length:pg.n},(_,i)=>`<i class="${i<pg.i-1?'d':i===pg.i-1?'c':''}"></i>`).join('')}</span>`:'';
   return `<span>${HDR||`${seasonLabel(S.year)} 賽季・${S.age} 歲・${stageLabel()}`}</span><b>${ph}${pg?` ${pg.i}/${pg.n}`:''}</b>${dots}`; }
 function showScreen(sc){
-  if(SCR&&SCR!==sc)SCR.classList.remove('cur');
+  if(SCR&&SCR!==sc){ SCR.classList.remove('cur'); wipeFx(); }
   SCR=sc; sc.classList.add('cur'); $('log').classList.remove('review'); syncRev();
   sc.classList.toggle('dec',!!sc.querySelector('.card.moment,.card.talk'));
   let h=sc.querySelector(':scope>.scr-head'); if(!h){ h=document.createElement('div'); h.className='scr-head'; sc.prepend(h); }
   h.innerHTML=scrHead(); scrollBottom(); }
+/* v0.23 換畫面:球隊色斜條掃過(純裝飾) */
+function wipeFx(){ if(typeof calmFx==='function'&&calmFx())return; const L=$('log'); if(!L||L.classList.contains('review'))return;
+  const w=document.createElement('i'); w.className='wipe'; L.appendChild(w); setTimeout(()=>w.remove(),600); }
 /* 玩家操作:fn 期間產生的卡片進新畫面 */
 let STEPPING=false;
 function step(fn){
@@ -994,6 +1110,7 @@ function sideAdd(title,cls,el,txt){
     const sc=el.closest('.scr'); if(sc&&!sc.classList.contains('cur')){ $('log').classList.add('review'); syncRev(); }
     el.scrollIntoView({block:'center'}); el.classList.add('ping'); setTimeout(()=>el.classList.remove('ping'),1400); };
   L.prepend(b); $('side-n').textContent=++SIDE_N;
+  if(cls==='gold'&&typeof tickPush==='function')tickPush(`${S.year}・${title}`);
 }
 function divider(t){ /* 新賽季:畫面裡加一條年度標記(回顧模式才顯示),並清掉太舊的畫面 */
   const h=document.createElement('div'); h.className='yr-head'; h.textContent=t; logTarget().appendChild(h);
@@ -1008,11 +1125,13 @@ function setNum(id,v){ const el=$(id), t=String(v); if(el.textContent===t)return
   el.textContent=t; if(!first){ el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); } }
 function board(phase){ if(phase!==undefined)S.ph=phase; /* 不帶參數時沿用目前階段 */
   $('bd-name').innerHTML=`${S.name}<small>${NATS[S.nat].n}·${DPN[S.dpos]}·${playerType()}${S.traits.genius?' ★':''}</small>`;
-  const nb=$('bd-num'); nb.textContent=jersey(); nb.style.background=clubColor(); $('board').style.setProperty('--club',clubColor());
+  const nb=$('bd-num'); nb.textContent=jersey(); nb.style.background=clubColor(); $('board').style.setProperty('--club',clubColor()); document.documentElement.style.setProperty('--club',clubColor());
   $('bd-lg').textContent=S.stage==='PRO'?LV[S.lv].n:S.stage==='UNI'?'大學':'青訓';
   $('bd-team').textContent=teamLabel();
   $('bd-clock').textContent=["0'","45'","90'"][S.ph||0];
-  setNum('bd-age',S.age); setNum('bd-year',S.year); setNum('bd-ovr',ovr()); setNum('bd-sal',Math.round(S.salary).toLocaleString());
+  setNum('bd-age',S.age); setNum('bd-year',S.year); setNum('bd-ovr',ovr());
+  { const oc=$('bd-ovr').parentElement; oc.classList.add('ovrc'); oc.style.setProperty('--p',Math.min(1,ovr()/80)); }
+  { const tk=$('bd-tick'), T=S.tick||[]; if(tk){ const t=T.slice(-3).reverse().join('<em>｜</em>'); tk.style.display=t?'':'none'; const sp=tk.firstElementChild; if(sp.dataset.t!==t){ sp.dataset.t=t; sp.innerHTML=t; } } } setNum('bd-sal',Math.round(S.salary).toLocaleString());
   ['trust','fans','form'].forEach(k=>{ const el=$('mt-'+k); el.querySelector('b').style.width=S[k]+'%'; el.querySelector('em').textContent=S[k];
     el.classList.toggle('lo',S[k]<30); el.classList.toggle('hi',S[k]>=70); });
   $('bd-time').dataset.ph=S.ph||0; [0,1,2].forEach(i=>$('lp'+i).classList.toggle('on',i===(S.ph||0)));
@@ -1020,9 +1139,15 @@ function board(phase){ if(phase!==undefined)S.ph=phase; /* 不帶參數時沿用
 }
 /* 記分板能力面板:數值/潛力、能力條(白線＝潛力)、下方細條＝升下一級的累積進度;黃字＝計入目前位置綜合 */
 let AB_PREV=null;
+function radarSVG(keys,w){ /* v0.23 能力雷達:實線＝目前、虛線＝潛力,金色標籤＝計入目前位置 */
+  const n=keys.length, R=58, pt=(i,v)=>{ const a=-Math.PI/2+i*2*Math.PI/n, r=R*Math.max(0,v)/80; return (Math.cos(a)*r).toFixed(1)+','+(Math.sin(a)*r).toFixed(1); };
+  let g=[20,40,60,80].map(v=>`<polygon points="${keys.map((_,i)=>pt(i,v)).join(' ')}" class="rg"/>`).join('');
+  keys.forEach((k,i)=>{ const [x,y]=pt(i,96).split(','); g+=`<text x="${x}" y="${y}" class="${w[k]?'rk':'rl'}">${ABL[k]}</text>`; });
+  g+=`<polygon points="${keys.map((k,i)=>pt(i,(S.pot&&S.pot[k])||62)).join(' ')}" class="rp"/><polygon points="${keys.map((k,i)=>pt(i,S.ab[k])).join(' ')}" class="rv"/>`;
+  return `<svg class="radar" viewBox="-84 -76 168 152" aria-label="能力雷達">${g}</svg>`; }
 function abPanel(){
   const p=$('bd-ab'), keys=GRP_AB[S.grp], w=DP_W[S.dpos], prev=AB_PREV||{};
-  p.innerHTML=keys.map(k=>{ const v=S.ab[k], pk=(S.pot&&S.pot[k])||62, c=lvCost(k,v), cr=(S.carry&&S.carry[k])||0;
+  p.innerHTML=radarSVG(keys,w)+keys.map(k=>{ const v=S.ab[k], pk=(S.pot&&S.pot[k])||62, c=lvCost(k,v), cr=(S.carry&&S.carry[k])||0;
     const cls='abc'+(w[k]?' key':'')+(v>=pk?' cap':'')+(prev[k]!=null&&v>prev[k]?' up':'');
     return `<div class="${cls}" title="${v>=80?'已達頂':`升下一級需 ${c} 點，已累積 ${cr}`}${v>=pk?'（已過潛力，成本加倍）':''}"><span class="an">${ABL[k]}</span><span class="av">${v}<small>/${pk}</small></span>`+
       `<div class="ab1"><i style="width:${v/80*100}%"></i><em style="left:${pk/80*100}%"></em></div><div class="ab2"><i style="width:${v>=80?100:cr/c*100}%"></i></div></div>`; }).join('');
@@ -1042,7 +1167,12 @@ function choose(title,opts){
   if(title)a.innerHTML=`<div class="title">${title}</div>`;
   opts.forEach(o=>{ const b=document.createElement('button');
     b.className='btn'+(o.main?' main':'')+(o.warn?' warn':'');
-    b.innerHTML=o.t+(o.s?`<small>${o.s}</small>`:'');
+    const pm=o.s&&String(o.s).match(/成功率 (\d+)%/);
+    if(pm){ /* v0.23 戰術卡:成功率圓環＋風險標籤 */
+      const md=String(o.s).match(/^(穩健|標準|冒險)｜/), rest=String(o.s).replace(/^(穩健|標準|冒險)｜/,'').replace(/成功率 \d+%｜?/,'');
+      b.className+=' tac'+(md?' r-'+{穩健:'safe',標準:'norm',冒險:'bold'}[md[1]]:'');
+      b.innerHTML=`<span class="ring" style="--p:${pm[1]/100}"><b>${pm[1]}<i>%</i></b></span><span class="tx">${o.t}${rest?`<small>${rest}</small>`:''}</span>${md?`<span class="risk">${md[1]}</span>`:''}`; }
+    else b.innerHTML=o.t+(o.s?`<small>${o.s}</small>`:'');
     b.onclick=()=>{ actClear(); CUR_OPT=o; step(o.f); }; a.appendChild(b); });
   actToggleSync(); scrollBottom();
 }
@@ -1445,7 +1575,7 @@ function momentCtx(min,a,b){ const mn=typeof min==='number'?min:parseInt(String(
   return {txt:'',clutch:null}; }
 function momentCard(tag,sc,tell,see,min,me,a,b,opp){
   MCTX=momentCtx(min,a,b);
-  return card('moment',tag+'｜'+sc.t,`<div class="mhead"><span class="mmin">${min}'</span><span class="msc">${me} ${a}–${b} ${opp}</span></div>
+  return card('moment',tag+'｜'+sc.t,`<div class="mhead"><span class="mmin">${min}'</span><span class="msc"><span class="tm">${me}</span><b class="sc" data-a="${a}" data-b="${b}">${a} – ${b}</b><span class="tm">${opp}</span></span></div>
     <p style="margin-top:6px">${MCTX.txt?`<b class="hl">${MCTX.txt}</b>`:''}${sc.d}</p>${pitchSVG(sc)}
     <div class="mtell">${see?'🔍 球探情報：'+tell.h:'🔍 看不出對手的意圖'}</div><div class="mres"></div>`); }
 let MTAG=null; /* 大賽/盃賽關鍵時刻的標籤,寫進生涯精華 */
@@ -1523,6 +1653,10 @@ function resolveMoment(sc,o,read,p,el,next){
   el.classList.add(ok?'won':'lost');
   sideAdd((MTAG||(STK?'關鍵時刻・'+STK:'關鍵時刻'))+'｜'+sc.t,ok?'won':'lost',el,(ok?'✔ ':'✘ ')+(ok?o.ok:o.ng));
   if(ok&&BIGFX[o.k])bigText(BIGFX[o.k],o.k==='G'?'':'cool');
+  else if(!ok&&m!=='safe')bigText(o.k==='G'?'MISSED':def?'CONCEDED':'LOST IT','bad');
+  /* 比分翻牌:自己進球 +1、防守失敗失球 +1 */
+  const scEl=el.querySelector('.msc .sc'); if(scEl&&((ok&&o.k==='G'&&!isGK())||(!ok&&def&&o.k!=='K'))){ let A=+scEl.dataset.a, B=+scEl.dataset.b; if(ok)A++; else B++;
+    setTimeout(()=>{ scEl.classList.add('flip'); setTimeout(()=>{ scEl.textContent=`${A} – ${B}`; },220); },calmFx()?0:700); }
   if(S.pendTrait==='setpiece'){ S.pendTrait=null;
     traitCard('setpiece','角球、自由球，只要球停在地上，就是你的時間——<b class="hl">每季額外貢獻定位球進球與助攻</b>。'); }
   checkTraitsMid(); next(ok);
@@ -2332,8 +2466,15 @@ function negotiate(of,onSign){
 
 /* ================= 視覺效果(只用 Math.random,不影響種子) ================= */
 const calmFx=()=>document.documentElement.classList.contains('calm')||!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-function bigText(t,cls){ if(calmFx())return; const d=document.createElement('div'); d.className='bigfx '+(cls||''); d.textContent=t;
-  document.body.appendChild(d); setTimeout(()=>d.remove(),1400); }
+function bigText(t,cls){ if(calmFx())return; const d=document.createElement('div'); d.className='bigfx '+(cls||''); d.innerHTML=`<span>${t}</span>`;
+  document.body.appendChild(d); setTimeout(()=>d.remove(),1700);
+  if(!cls){ const f=document.createElement('i'); f.className='floodfx'; document.body.appendChild(f); setTimeout(()=>f.remove(),800); } }
+/* 記分板跑馬燈:媒體標題與大事(最多留 6 則) */
+function tickPush(t){ if(typeof S==='undefined'||!S||!t)return; S.tick=S.tick||[]; S.tick.push(String(t).replace(/<[^>]+>/g,'')); if(S.tick.length>6)S.tick.shift(); }
+/* 數字滾動:data-to 的元素從 0 滾到目標值 */
+function rollNums(root){ if(!root)return; root.querySelectorAll('[data-to]').forEach(el=>{ const to=+el.dataset.to, dec=+(el.dataset.dec||0);
+  if(calmFx()||!isFinite(to)){ el.textContent=isFinite(to)?to.toFixed(dec):el.dataset.to; return; } const t0=performance.now();
+  (function f(n){ const k=Math.min(1,(n-t0)/800), e=1-Math.pow(1-k,3); el.textContent=(to*e).toFixed(dec); if(k<1)requestAnimationFrame(f); })(t0); }); }
 function confetti(){ if(calmFx())return; const cs=['#ffcf4a','#7a6cff','#6cc6ff','#ff8a4c','#ffffff'];
   for(let i=0;i<36;i++){ const c=document.createElement('i'); c.className='conf';
     c.style.left=Math.random()*100+'vw'; c.style.background=cs[i%cs.length]; c.style.animationDuration=(1.6+Math.random()*1.4)+'s';
@@ -2771,7 +2912,9 @@ function seasonResult(){
   if(!youth){ if(S.seasonFactor>=0.95&&st.App>=LV[S.lv].g*0.8){ if(++S.ironStreak>=10&&!S.traits.iron)traitCard('iron','連續十年全勤級出賽！鋼鐵般的身體，未來每季受傷機率<b class="hl">不高於 10%</b>。'); }
     else if(S.seasonFactor<0.95)S.ironStreak=0; }
   if(!youth&&st.App)cardTraits(st);
-  card('info',uni?'大學聯賽成績':youth?'青年聯賽成績':`${LV[S.lv].n}成績`,`<div class="statline">${statLine(st)}</div><p class="press">📰 ${pressLine(st)}</p>`);
+  const gk=isGK(), pl=pressLine(st), kp=[['出場',st.App],gk?['零封',st.CS]:['進球',st.G],gk?['失球',st.GA]:['助攻',st.A],['評分',st.Rt||0,2]];
+  const sc=card('info',uni?'大學聯賽成績':youth?'青年聯賽成績':`${LV[S.lv].n}成績`,`<div class="kpis">${kp.map(([n,v,d])=>`<div class="kpi"><small>${n}</small><b data-to="${v}" data-dec="${d||0}">${d?(+v).toFixed(d):v}</b></div>`).join('')}</div><div class="statline">${statLine(st)}</div><p class="press">📰 ${pl}</p>`);
+  rollNums(sc); tickPush(pl);
   leagueAwards(st);
   board(1); nextStep();
 }
@@ -2800,7 +2943,7 @@ function awardList(st,got){
   row('最佳年輕球員',got.includes('最佳年輕球員')?me:oth(true));
   if(got.includes('年度最佳陣容'))row('年度最佳陣容',me);
   card(got.length?'gold':'info',got.length?'個人獎項':`${L.n}個人獎項`,
-    (got.length?`你拿下 ${got.map(x=>`<b class="hl">${x}</b>`).join('、')}！`:`${seasonLabel(S.year)} 球季${L.n}獎項揭曉。`)+
+    (got.length?`<div class="medals">${got.map((x,i)=>`<span class="medal-b" style="animation-delay:${200+i*160}ms"><i>★</i>${x}</span>`).join('')}</div>`:`${seasonLabel(S.year)} 球季${L.n}獎項揭曉。`)+
     `<div class="tblwrap"><table class="fin awd">${rows.join('')}</table></div>`);
 }
 function leagueAwards(st){
@@ -2937,8 +3080,9 @@ function leagueTable(res,rank,note){
     const [w,d,l]=wdl(pts[r]), tag=r===1?' 🏆':r>n-zone&&L.rel?' ↓':(res==='up'&&used[r]===me)||(L.up&&r<=2&&r>1)?' ↑':'';
     rows+=`<tr class="${used[r]===me?'me':''}"><td>${r}</td><td>${used[r]}${tag}</td><td>${w}</td><td>${d}</td><td>${l}</td><td><b>${pts[r]}</b></td></tr>`; last=r; });
   if(last<n)rows+=`<tr class="gap"><td colspan="6">⋯</td></tr>`;
-  card('info',`${seasonLabel(S.year)} ${L.n}積分榜`,`${me}最終排名 <b class="hl">第 ${mine} 名</b>（共 ${n} 隊）${note||''}`+
+  const lt=card('info',`${seasonLabel(S.year)} ${L.n}積分榜`,`${me}最終排名 <b class="hl">第 ${mine} 名</b>（共 ${n} 隊）${note||''}`+
     `<div class="tblwrap"><table class="fin ltab"><tr><th>#</th><th>球隊</th><th>勝</th><th>和</th><th>敗</th><th>積分</th></tr>${rows}</table></div>`);
+  lt.querySelectorAll('table.ltab tr').forEach((r,i)=>r.style.animationDelay=(i*55)+'ms'); /* v0.23 逐列滑入 */
 }
 function promote(){
   S.lv=LV[S.lv].up; S.clubTier=3; S.tierHist=null;
@@ -3852,9 +3996,10 @@ function endGameFinal(reason){
     const hon=c.honors.length?`<div class="ch-hon">🏆 ${Object.keys(hm).map(n=>hm[n]>1?`${n} ×${hm[n]}`:n).join('、')}</div>`:'';
     const loan=c.loans.length?`<div class="ch-stat">租借：${c.loans.map(r=>`${baseTm(r.tm)}（${seasonLabel(r.y)}・出場 ${r.st.App}）`).join('、')}</div>`:'';
     const hl=[...c.hl.filter(h=>h.big),...c.hl.filter(h=>!h.big)].slice(0,2).map(h=>`<div class="hlrow"><b>${seasonLabel(h.y)}</b>｜${h.t}</div>`).join('');
+    const cc=c.kind==='pro'||c.kind==='loan'?`hsl(${hashStr(c.club)%360} 62% 55%)`:'var(--dim)';
     card(c.honors.some(h=>/冠軍（/.test(h))?'gold chap':'info chap',`第${cn(i+1)}章　${c.club}${kn?`（${kn}）`:''}`,
       `<div class="ch-meta">${yrs}・${c.a0}${c.a1!==c.a0?`–${c.a1}`:''} 歲${c.lvs.length?`・${c.lvs.map(k=>LV[k].n).join('、')}`:''}${c.no?`・${c.no} 號`:''}</div>`+
-      `<div class="ch-story">${chStory(c,chs)}</div><div class="ch-stat">${chStat(c.t,gk)}${c.best&&c.best.st.Rt?`・最佳評分 ${c.best.st.Rt}`:''}</div>${loan}${hon}${hl}`); });
+      `<div class="ch-story">${chStory(c,chs)}</div><div class="ch-stat">${chStat(c.t,gk)}${c.best&&c.best.st.Rt?`・最佳評分 ${c.best.st.Rt}`:''}</div>${loan}${hon}${hl}`).style.setProperty('--c',cc); });
   nextPage('生涯數據',()=>{
     /* 第二頁:位置數據、榮譽櫃、完整年表 */
     const P=posStats();
