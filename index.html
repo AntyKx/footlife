@@ -806,7 +806,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.25.1';
+const APP_VER='v0.25.2';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -948,16 +948,16 @@ const NATS={
   VN:{cf:'AFC',n:'越南',tier:4,wc:4,cap:12,nt:38,home:['VIE'],scout:2,wp:1},
   TH:{cf:'AFC',n:'泰國',tier:4,wc:4,cap:12,nt:38,home:['THA'],scout:2,wp:1},
   /* ---- v0.19 新國籍:cf 洲別、alt 本土太弱時 18 歲的海外去處、trial 赴外青訓試訓的聯賽 ---- */
-  EN:{n:'英格蘭',cf:'UEFA',tier:0,wc:97,cap:3,nt:55,home:['ENG','EFL','ENG3'],scout:0,wp:0},
-  ES:{n:'西班牙',cf:'UEFA',tier:0,wc:97,cap:3,nt:55,home:['ESP','ESP2','ESP3'],scout:0,wp:0},
-  FR:{n:'法國',cf:'UEFA',tier:0,wc:97,cap:3,nt:56,home:['FRA','FRA2','FRA3'],scout:0,wp:0},
-  DE:{n:'德國',cf:'UEFA',tier:0,wc:96,cap:3,nt:55,home:['GER','GER2','GER3'],scout:0,wp:0},
-  IT:{n:'義大利',cf:'UEFA',tier:1,wc:85,cap:8,nt:53,home:['ITA','ITA2','ITA3'],scout:0,wp:0},
-  PT:{n:'葡萄牙',cf:'UEFA',tier:0,wc:95,cap:4,nt:54,home:['POR','POR2'],scout:0,wp:0},
-  NL:{n:'荷蘭',cf:'UEFA',tier:1,wc:90,cap:6,nt:53,home:['NED','NED2'],scout:0,wp:0},
-  HR:{n:'克羅埃西亞',cf:'UEFA',tier:1,wc:85,cap:8,nt:51,home:['CRO','CRO2'],scout:0,wp:0},
-  BR:{n:'巴西',cf:'CONMEBOL',tier:0,wc:97,cap:3,nt:55,home:['BRA','BRA2'],scout:0,wp:0,trial:['POR','ESP2','NED']},
-  AR:{n:'阿根廷',cf:'CONMEBOL',tier:0,wc:97,cap:3,nt:55,home:['ARG','ARG2'],scout:0,wp:0,trial:['ESP2','ITA2','POR']},
+  EN:{n:'英格蘭',cf:'UEFA',tier:0,wc:97,cap:3,nt:51,home:['ENG','EFL','ENG3'],scout:0,wp:0},
+  ES:{n:'西班牙',cf:'UEFA',tier:0,wc:97,cap:3,nt:51,home:['ESP','ESP2','ESP3'],scout:0,wp:0},
+  FR:{n:'法國',cf:'UEFA',tier:0,wc:97,cap:3,nt:52,home:['FRA','FRA2','FRA3'],scout:0,wp:0},
+  DE:{n:'德國',cf:'UEFA',tier:0,wc:96,cap:3,nt:51,home:['GER','GER2','GER3'],scout:0,wp:0},
+  IT:{n:'義大利',cf:'UEFA',tier:1,wc:85,cap:8,nt:50,home:['ITA','ITA2','ITA3'],scout:0,wp:0},
+  PT:{n:'葡萄牙',cf:'UEFA',tier:0,wc:95,cap:4,nt:51,home:['POR','POR2'],scout:0,wp:0},
+  NL:{n:'荷蘭',cf:'UEFA',tier:1,wc:90,cap:6,nt:50,home:['NED','NED2'],scout:0,wp:0},
+  HR:{n:'克羅埃西亞',cf:'UEFA',tier:1,wc:85,cap:8,nt:49,home:['CRO','CRO2'],scout:0,wp:0},
+  BR:{n:'巴西',cf:'CONMEBOL',tier:0,wc:97,cap:3,nt:51,home:['BRA','BRA2'],scout:0,wp:0,trial:['POR','ESP2','NED']},
+  AR:{n:'阿根廷',cf:'CONMEBOL',tier:0,wc:97,cap:3,nt:51,home:['ARG','ARG2'],scout:0,wp:0,trial:['ESP2','ITA2','POR']},
   UY:{n:'烏拉圭',cf:'CONMEBOL',tier:1,wc:85,cap:10,nt:50,home:['URU'],scout:0,wp:0,trial:['ESP2','ITA2','POR']},
   CO:{n:'哥倫比亞',cf:'CONMEBOL',tier:2,wc:80,cap:12,nt:49,home:['COL'],scout:1,wp:1,trial:['POR','BEL','NED']},
   US:{n:'美國',cf:'CONCACAF',tier:2,wc:93,cap:5,nt:48,home:['MLS','USL'],scout:1,wp:0,trial:['NED','GER2','BEL']},
