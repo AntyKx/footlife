@@ -359,6 +359,8 @@ svg.scene{display:block;width:100%;height:auto;margin-top:8px;border-radius:8px;
 .seg button:hover{border-color:#7a6cff88;color:var(--chalk)}
 .seg button.on{background:linear-gradient(180deg,#2a2470,#1d1a52);color:var(--amber);border-color:var(--amber);box-shadow:0 0 0 1px #ffcf4a33,0 6px 16px #0007}
 #nat-desc{color:var(--dim);font-size:12px;margin-top:8px;line-height:1.6}
+.natl{font-size:11px;color:var(--dim);letter-spacing:.12em;margin:10px 0 6px} #seg-nat .natl:first-child{margin-top:0}
+#seg-nat .seg button{padding:9px 2px;font-size:13.5px}
 #btn-start{margin-top:22px;padding:15px;font-size:16px;letter-spacing:.06em}
 #start .seedline{margin-top:16px;line-height:1.8}
 @media (min-width:900px){ #start .wrap{grid-template-columns:1.1fr 1fr;align-items:center;min-height:100vh;min-height:100dvh;gap:48px} #start .panel{align-self:center} }
@@ -549,7 +551,7 @@ html.calm .var{display:none}
         <g class="hb"><circle cx="262" cy="50" r="7" fill="#fff" stroke="#141a33" stroke-width="1.2"/><path d="M262 45.5 l3.6 2.6 -1.4 4.2 h-4.4 l-1.4 -4.2z" fill="#141a33"/></g>
         <rect x="160" y="30" width="40" height="10" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1.4"/>
       </svg>
-      <ul class="feat"><li><b>7</b>國籍可選</li><li><b>23</b>個聯賽</li><li><b>402</b>支真實球隊</li><li><b>∞</b>種人生</li></ul>
+      <ul class="feat"><li><b>27</b>國籍可選</li><li><b>48</b>個聯賽</li><li><b>850</b>支真實球隊</li><li><b>∞</b>種人生</li></ul>
     </section>
     <section class="panel">
       <div class="ptitle">建立你的球員</div>
@@ -560,9 +562,15 @@ html.calm .var{display:none}
         <button data-v="MF">中場</button><button data-v="FW" class="on">前鋒</button>
       </div></div>
       <div class="field"><label>國籍</label>
-      <div class="seg" id="seg-nat">
-        <button data-v="TW" class="on">台灣</button><button data-v="JP">日本</button><button data-v="KR">韓國</button><button data-v="AU">澳洲</button>
-        <button data-v="CN">中國</button><button data-v="VN">越南</button><button data-v="TH">泰國</button>
+      <div id="seg-nat">
+        <p class="natl">亞洲・大洋洲</p><div class="seg"><button data-v="TW" class="on">台灣</button><button data-v="JP">日本</button><button data-v="KR">韓國</button><button data-v="AU">澳洲</button>
+        <button data-v="CN">中國</button><button data-v="VN">越南</button><button data-v="TH">泰國</button></div>
+        <p class="natl">歐洲</p><div class="seg"><button data-v="EN">英格蘭</button><button data-v="ES">西班牙</button><button data-v="FR">法國</button><button data-v="DE">德國</button>
+        <button data-v="IT">義大利</button><button data-v="PT">葡萄牙</button><button data-v="NL">荷蘭</button><button data-v="HR">克羅埃西亞</button></div>
+        <p class="natl">南美洲</p><div class="seg"><button data-v="BR">巴西</button><button data-v="AR">阿根廷</button><button data-v="UY">烏拉圭</button><button data-v="CO">哥倫比亞</button></div>
+        <p class="natl">中北美洲</p><div class="seg"><button data-v="US">美國</button><button data-v="MX">墨西哥</button><button data-v="CA">加拿大</button></div>
+        <p class="natl">非洲</p><div class="seg"><button data-v="MA">摩洛哥</button><button data-v="SN">塞內加爾</button><button data-v="NG">奈及利亞</button><button data-v="EG">埃及</button>
+        <button data-v="CV">維德角</button></div>
       </div><p id="nat-desc"></p></div>
       <button class="btn main" id="btn-start">開始生涯 ▸ 15 歲・青訓第一年</button>
       <p class="seedline">世界種子
@@ -615,7 +623,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.18.0';
+const APP_VER='v0.19.0';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -642,31 +650,53 @@ const YOUTH={ /* 依國籍,隊名全虛構 */
   AU:{'海港FC 青年隊':1,'南灣FC 青年隊':1,'藍嶺體育學院':2,'紅土中學':2,'郊區業餘俱樂部':3,'內陸小鎮足球隊':3},
   CN:{'燕北足球學校':1,'申江足球學校':1,'嶺海體校':2,'蜀川體校':2,'縣城業餘隊':3,'山區中學足球隊':3},
   VN:{'紅河足球學院':1,'南圻青訓中心':1,'香江體育中學':2,'長山體育中學':2,'鄉村業餘隊':3,'海島足球隊':3},
-  TH:{'湄南足球學院':1,'安達曼青訓中心':1,'北嶺體育學校':2,'碧武里體育學校':2,'社區業餘隊':3,'山區足球隊':3}};
+  TH:{'湄南足球學院':1,'安達曼青訓中心':1,'北嶺體育學校':2,'碧武里體育學校':2,'社區業餘隊':3,'山區足球隊':3},
+  EN:{'倫敦北區足球學院':1,'曼徹斯特青訓中心':1,'約克郡足球學院':2,'中部地區青訓營':2,'週日聯賽業餘隊':3,'海邊小鎮足球會':3},
+  ES:{'馬德里青年學院':1,'加泰隆尼亞足球學校':1,'安達魯西亞青訓中心':2,'巴斯克足球學院':2,'社區業餘隊':3,'卡斯提亞小鎮足球隊':3},
+  FR:{'巴黎郊區足球學院':1,'里昂青訓中心':1,'馬賽足球學校':2,'布列塔尼足球學院':2,'社區業餘隊':3,'鄉村足球俱樂部':3},
+  DE:{'魯爾區足球學院':1,'巴伐利亞青訓中心':1,'漢堡足球學校':2,'萊比錫青年學院':2,'社區業餘俱樂部':3,'黑森林小鎮足球隊':3},
+  IT:{'米蘭青年學院':1,'羅馬足球學校':1,'杜林青訓中心':2,'拿坡里足球學院':2,'教區業餘隊':3,'托斯卡尼小鎮足球隊':3},
+  PT:{'里斯本足球學院':1,'波爾圖青訓中心':1,'布拉加足球學校':2,'阿爾加維青年學院':2,'社區業餘隊':3,'馬德拉島足球隊':3},
+  NL:{'阿姆斯特丹足球學院':1,'鹿特丹青訓中心':1,'恩荷芬足球學校':2,'烏特勒支青年學院':2,'社區業餘俱樂部':3,'鄉村足球會':3},
+  HR:{'札格雷布足球學院':1,'斯普利特青訓中心':1,'里耶卡足球學校':2,'奧西耶克青年學院':2,'社區業餘隊':3,'達爾馬提亞小鎮足球隊':3},
+  BR:{'聖保羅州青年學院':1,'里約海岸足球學院':1,'米納斯青訓中心':2,'南大河州足球學校':2,'街頭足球隊':3,'東北部小鎮足球隊':3},
+  AR:{'布宜諾斯艾利斯青年學院':1,'科爾多瓦足球學院':1,'羅薩里奧青訓中心':2,'門多薩足球學校':2,'街坊業餘隊':3,'潘帕草原小鎮隊':3},
+  UY:{'蒙特維多青年學院':1,'東岸足球學院':1,'科洛尼亞青訓中心':2,'薩爾托足球學校':2,'海濱社區業餘隊':3,'內陸牧場足球隊':3},
+  CO:{'麥德林足球學院':1,'波哥大青年學院':1,'卡利青訓中心':2,'巴蘭基亞足球學校':2,'山城業餘隊':3,'加勒比海岸足球隊':3},
+  US:{'加州足球學院':1,'東岸精英青訓':1,'德州高中足球隊':2,'中西部足球學院':2,'社區聯盟俱樂部':3,'小鎮高中足球隊':3},
+  MX:{'瓜達拉哈拉青年學院':1,'墨西哥城足球學院':1,'蒙特雷青訓中心':2,'普埃布拉足球學校':2,'街坊業餘隊':3,'沙漠小鎮足球隊':3},
+  CA:{'多倫多足球學院':1,'溫哥華青年學院':1,'蒙特婁青訓中心':2,'卡加利足球學校':2,'社區冰原俱樂部':3,'草原小鎮足球隊':3},
+  MA:{'卡薩布蘭卡足球學院':1,'拉巴特國家青訓中心':1,'馬拉喀什青年學院':2,'丹吉爾足球學校':2,'舊城街頭足球隊':3,'阿特拉斯山區足球隊':3},
+  SN:{'達卡足球學院':1,'海角青年學院':1,'捷斯青訓中心':2,'聖路易足球學校':2,'海灘足球隊':3,'薩赫勒村莊足球隊':3},
+  NG:{'拉哥斯足球學院':1,'阿布加青年學院':1,'卡諾青訓中心':2,'伊巴丹足球學校':2,'街區足球隊':3,'河港小鎮足球隊':3},
+  EG:{'開羅足球學院':1,'亞歷山大青年學院':1,'尼羅河三角洲青訓中心':2,'塞得港足球學校':2,'舊城區業餘隊':3,'上埃及小鎮足球隊':3},
+  CV:{'普拉亞足球學院':1,'明德盧青年學院':1,'薩爾島青訓中心':2,'聖安唐足球學校':2,'海灘業餘隊':3,'火山島足球隊':3},
+};
 const YOUTH_PAR={1:30,2:27,3:24};
 /* 大學:校名全虛構;分級依入學時綜合決定(強校競爭較激烈) */
 const UNIS={TW:['北嶺體育大學','鳳林大學','海昇大學','雲嵐大學'],JP:['東都体育大学','青嶺大学','浪華経済大学','北辰学院大学'],
   KR:['漢江體育大學','清嵐大學','釜海大學','月城大學'],AU:['海港大學','藍嶺理工大學','南灣大學','紅土大學'],
   CN:['燕北體育大學','申江理工大學','嶺海大學','蜀川體育學院'],VN:['紅河體育大學','南圻大學','香江學院','長山大學'],
-  TH:['湄南大學','北嶺體育學院','安達曼大學','碧武里大學']};
+  TH:['湄南大學','北嶺體育學院','安達曼大學','碧武里大學'],
+  US:['海灣州立大學','東岸學院','大湖州立大學','西南理工大學'],CA:['楓葉大學','安大略學院','西岸大學','魁北克理工學院']};
 const UNI_PAR={1:36,2:32,3:28};
 const UNI_YR=['一','二','三','四'];
 /* 聯賽:par 基準、min 簽約門檻、g 輪數、sal 年薪基準(萬台幣)、cty 隊友姓名來源
    rel 降級去處、up 升級去處、wp 需工作證(弱國球員 OVR ≥ par+3)、eu 歐洲聯賽、top5 五大聯賽、local 只簽本國球員 */
 const LV={
-  ENG:{n:'英超',par:60,min:57,g:38,sal:15000,cty:'EU',rel:'EFL',wp:1,eu:1,top5:1},
-  ESP:{n:'西甲',par:59,min:56,g:38,sal:12000,cty:'EU',rel:'ESP2',eu:1,top5:1},
-  GER:{n:'德甲',par:58,min:55,g:34,sal:10000,cty:'EU',rel:'GER2',eu:1,top5:1},
-  ITA:{n:'義甲',par:58,min:55,g:38,sal:10000,cty:'EU',rel:'ITA2',eu:1,top5:1},
-  FRA:{n:'法甲',par:56,min:53,g:34,sal:7000,cty:'EU',rel:'FRA2',eu:1,top5:1},
-  EFL:{n:'英冠',par:52,min:49,g:46,sal:3000,cty:'EU',up:'ENG',wp:1,eu:1},
-  NED:{n:'荷甲',par:51,min:48,g:34,sal:2500,cty:'EU',eu:1},
-  POR:{n:'葡超',par:51,min:48,g:34,sal:2500,cty:'EU',eu:1},
-  BEL:{n:'比甲',par:51,min:48,g:34,sal:2500,cty:'EU',eu:1},
-  ESP2:{n:'西乙',par:50,min:47,g:42,sal:2000,cty:'EU',up:'ESP',eu:1},
-  GER2:{n:'德乙',par:50,min:47,g:34,sal:2000,cty:'EU',up:'GER',eu:1},
-  ITA2:{n:'義乙',par:49,min:46,g:38,sal:1500,cty:'EU',up:'ITA',eu:1},
-  FRA2:{n:'法乙',par:48,min:45,g:38,sal:1500,cty:'EU',up:'FRA',eu:1},
+  ENG:{n:'英超',par:60,min:57,g:38,sal:15000,cty:'EN',rel:'EFL',wp:1,eu:1,top5:1},
+  ESP:{n:'西甲',par:59,min:56,g:38,sal:12000,cty:'ES',rel:'ESP2',eu:1,top5:1},
+  GER:{n:'德甲',par:58,min:55,g:34,sal:10000,cty:'DE',rel:'GER2',eu:1,top5:1},
+  ITA:{n:'義甲',par:58,min:55,g:38,sal:10000,cty:'IT',rel:'ITA2',eu:1,top5:1},
+  FRA:{n:'法甲',par:56,min:53,g:34,sal:7000,cty:'FR',rel:'FRA2',eu:1,top5:1},
+  EFL:{n:'英冠',par:52,min:49,g:46,sal:3000,cty:'EN',up:'ENG',rel:'ENG3',wp:1,eu:1},
+  NED:{n:'荷甲',par:51,min:48,g:34,sal:2500,cty:'NL',rel:'NED2',eu:1},
+  POR:{n:'葡超',par:51,min:48,g:34,sal:2500,cty:'PT',rel:'POR2',eu:1},
+  BEL:{n:'比甲',par:51,min:48,g:34,sal:2500,cty:'BE',eu:1},
+  ESP2:{n:'西乙',par:50,min:47,g:42,sal:2000,cty:'ES',up:'ESP',rel:'ESP3',eu:1},
+  GER2:{n:'德乙',par:50,min:47,g:34,sal:2000,cty:'DE',up:'GER',rel:'GER3',eu:1},
+  ITA2:{n:'義乙',par:49,min:46,g:38,sal:1500,cty:'IT',up:'ITA',rel:'ITA3',eu:1},
+  FRA2:{n:'法乙',par:48,min:45,g:38,sal:1500,cty:'FR',up:'FRA',rel:'FRA3',eu:1},
   J1:{n:'日 J1',par:47,min:44,g:38,sal:1500,cty:'JP',rel:'J2'},
   K1:{n:'韓 K1',par:45,min:42,g:38,sal:1000,cty:'KR',rel:'K2'},
   J2:{n:'日 J2',par:40,min:36,g:42,sal:400,cty:'JP',up:'J1'},
@@ -677,19 +707,68 @@ const LV={
   THA:{n:'泰超',par:36,min:32,g:30,sal:250,cty:'TH',local:1},
   VIE:{n:'越南 V 聯賽',par:34,min:30,g:26,sal:120,cty:'VN',local:1},
   TW1:{n:'台灣企甲',par:33,min:28,g:21,sal:80,cty:'TW',local:1},
+  /* ---- v0.19 新聯賽:cfs = 只簽這些洲別的球員 ---- */
+  ENG3:{n:'英甲',par:42,min:36,g:46,sal:600,cty:'EN',up:'EFL',eu:1,local:1},
+  ESP3:{n:'西班牙第三級聯賽',par:40,min:34,g:38,sal:300,cty:'ES',up:'ESP2',eu:1,local:1},
+  GER3:{n:'德丙',par:41,min:35,g:38,sal:400,cty:'DE',up:'GER2',eu:1,local:1},
+  ITA3:{n:'義丙',par:39,min:33,g:38,sal:250,cty:'IT',up:'ITA2',eu:1,local:1},
+  FRA3:{n:'法國全國聯賽',par:39,min:33,g:34,sal:250,cty:'FR',up:'FRA2',eu:1,cfs:['UEFA','CAF']},
+  POR2:{n:'葡乙',par:40,min:34,g:34,sal:200,cty:'PT',up:'POR',eu:1,cfs:['UEFA','CAF','CONMEBOL']},
+  NED2:{n:'荷乙',par:40,min:34,g:38,sal:250,cty:'NL',up:'NED',eu:1,local:1},
+  CRO:{n:'克羅埃西亞甲',par:45,min:42,g:36,sal:400,cty:'HR',rel:'CRO2',eu:1},
+  CRO2:{n:'克羅埃西亞乙',par:35,min:28,g:30,sal:80,cty:'HR',up:'CRO',eu:1,local:1},
+  BRA:{n:'巴西甲',par:50,min:47,g:38,sal:2000,cty:'BR',rel:'BRA2',cfs:['CONMEBOL']},
+  BRA2:{n:'巴西乙',par:41,min:34,g:38,sal:400,cty:'BR',up:'BRA',cfs:['CONMEBOL']},
+  ARG:{n:'阿根廷甲',par:48,min:45,g:32,sal:800,cty:'AR',rel:'ARG2',cfs:['CONMEBOL']},
+  ARG2:{n:'阿根廷乙',par:38,min:32,g:34,sal:150,cty:'AR',up:'ARG',cfs:['CONMEBOL']},
+  URU:{n:'烏拉圭甲',par:41,min:33,g:30,sal:200,cty:'UY',cfs:['CONMEBOL']},
+  COL:{n:'哥倫比亞甲',par:42,min:34,g:38,sal:300,cty:'CO',cfs:['CONMEBOL']},
+  MLS:{n:'美國職業足球大聯盟',par:47,min:44,g:34,sal:2500,cty:'US'},
+  USL:{n:'美國聯賽冠軍賽',par:39,min:33,g:34,sal:300,cty:'US',cfs:['CONCACAF']},
+  CPL:{n:'加拿大超級聯賽',par:35,min:31,g:28,sal:120,cty:'CA',local:1},
+  MEX:{n:'墨西哥超級聯賽',par:48,min:45,g:34,sal:2500,cty:'MX',cfs:['CONCACAF','CONMEBOL']},
+  MEX2:{n:'墨西哥擴展聯賽',par:38,min:32,g:30,sal:300,cty:'MX',cfs:['CONCACAF','CONMEBOL']},
+  MAR:{n:'摩洛哥甲',par:40,min:33,g:30,sal:350,cty:'MA',cfs:['CAF']},
+  EGY:{n:'埃及超',par:40,min:33,g:34,sal:400,cty:'EG',cfs:['CAF']},
+  SEN:{n:'塞內加爾甲',par:32,min:28,g:26,sal:50,cty:'SN',local:1},
+  NGA:{n:'奈及利亞超',par:33,min:29,g:38,sal:60,cty:'NG',local:1},
+  CPV:{n:'維德角全國錦標賽',par:28,min:24,g:18,sal:30,cty:'CV',local:1},
 };
 /* 國籍:tier 1 強～5 弱、wc 世界盃基準出線率、cap 個人加成上限、nt 國家隊徵召門檻、
    home 本土聯賽(高→低)、scout 首次進歐洲／五大的球探打折、wp 英格蘭工作證、mil 兵役制度 */
 const NATS={
-  TW:{n:'台灣',tier:5,wc:1,cap:20,nt:34,home:['TW1'],scout:2,wp:1,mil:'TW'},
-  JP:{n:'日本',tier:1,wc:90,cap:10,nt:50,home:['J1','J2'],scout:0,wp:0},
-  KR:{n:'韓國',tier:1,wc:85,cap:10,nt:49,home:['K1','K2'],scout:0,wp:0,mil:'KR'},
-  AU:{n:'澳洲',tier:2,wc:70,cap:25,nt:46,home:['AUS'],scout:0,wp:0},
-  CN:{n:'中國',tier:3,wc:30,cap:30,nt:42,home:['CSL','CHN2'],scout:1,wp:1},
-  VN:{n:'越南',tier:4,wc:4,cap:12,nt:38,home:['VIE'],scout:2,wp:1},
-  TH:{n:'泰國',tier:4,wc:4,cap:12,nt:38,home:['THA'],scout:2,wp:1},
+  TW:{cf:'AFC',n:'台灣',tier:5,wc:1,cap:20,nt:34,home:['TW1'],scout:2,wp:1,mil:'TW'},
+  JP:{cf:'AFC',n:'日本',tier:1,wc:90,cap:10,nt:50,home:['J1','J2'],scout:0,wp:0},
+  KR:{cf:'AFC',n:'韓國',tier:1,wc:85,cap:10,nt:49,home:['K1','K2'],scout:0,wp:0,mil:'KR'},
+  AU:{cf:'AFC',n:'澳洲',tier:2,wc:70,cap:25,nt:46,home:['AUS'],scout:0,wp:0},
+  CN:{cf:'AFC',n:'中國',tier:3,wc:30,cap:30,nt:42,home:['CSL','CHN2'],scout:1,wp:1},
+  VN:{cf:'AFC',n:'越南',tier:4,wc:4,cap:12,nt:38,home:['VIE'],scout:2,wp:1},
+  TH:{cf:'AFC',n:'泰國',tier:4,wc:4,cap:12,nt:38,home:['THA'],scout:2,wp:1},
+  /* ---- v0.19 新國籍:cf 洲別、alt 本土太弱時 18 歲的海外去處、trial 赴外青訓試訓的聯賽 ---- */
+  EN:{n:'英格蘭',cf:'UEFA',tier:0,wc:97,cap:3,nt:55,home:['ENG','EFL','ENG3'],scout:0,wp:0},
+  ES:{n:'西班牙',cf:'UEFA',tier:0,wc:97,cap:3,nt:55,home:['ESP','ESP2','ESP3'],scout:0,wp:0},
+  FR:{n:'法國',cf:'UEFA',tier:0,wc:97,cap:3,nt:56,home:['FRA','FRA2','FRA3'],scout:0,wp:0},
+  DE:{n:'德國',cf:'UEFA',tier:0,wc:96,cap:3,nt:55,home:['GER','GER2','GER3'],scout:0,wp:0},
+  IT:{n:'義大利',cf:'UEFA',tier:1,wc:85,cap:8,nt:53,home:['ITA','ITA2','ITA3'],scout:0,wp:0},
+  PT:{n:'葡萄牙',cf:'UEFA',tier:0,wc:95,cap:4,nt:54,home:['POR','POR2'],scout:0,wp:0},
+  NL:{n:'荷蘭',cf:'UEFA',tier:1,wc:90,cap:6,nt:53,home:['NED','NED2'],scout:0,wp:0},
+  HR:{n:'克羅埃西亞',cf:'UEFA',tier:1,wc:85,cap:8,nt:51,home:['CRO','CRO2'],scout:0,wp:0},
+  BR:{n:'巴西',cf:'CONMEBOL',tier:0,wc:97,cap:3,nt:55,home:['BRA','BRA2'],scout:0,wp:0,trial:['POR','ESP2','NED']},
+  AR:{n:'阿根廷',cf:'CONMEBOL',tier:0,wc:97,cap:3,nt:55,home:['ARG','ARG2'],scout:0,wp:0,trial:['ESP2','ITA2','POR']},
+  UY:{n:'烏拉圭',cf:'CONMEBOL',tier:1,wc:85,cap:10,nt:50,home:['URU'],scout:0,wp:0,trial:['ESP2','ITA2','POR']},
+  CO:{n:'哥倫比亞',cf:'CONMEBOL',tier:2,wc:80,cap:12,nt:49,home:['COL'],scout:1,wp:1,trial:['POR','BEL','NED']},
+  US:{n:'美國',cf:'CONCACAF',tier:2,wc:93,cap:5,nt:48,home:['MLS','USL'],scout:1,wp:0,trial:['NED','GER2','BEL']},
+  MX:{n:'墨西哥',cf:'CONCACAF',tier:2,wc:92,cap:6,nt:48,home:['MEX','MEX2'],scout:1,wp:1,trial:['NED','ESP2','POR']},
+  CA:{n:'加拿大',cf:'CONCACAF',tier:3,wc:75,cap:18,nt:45,home:['MLS','CPL'],scout:1,wp:1,alt:['USL'],trial:['BEL','GER2','FRA2']},
+  MA:{n:'摩洛哥',cf:'CAF',tier:1,wc:90,cap:8,nt:51,home:['MAR'],scout:1,wp:1,trial:['FRA2','BEL','ESP2']},
+  SN:{n:'塞內加爾',cf:'CAF',tier:2,wc:80,cap:12,nt:49,home:['SEN'],scout:1,wp:1,alt:['FRA3','BEL'],trial:['FRA2','BEL','FRA3']},
+  NG:{n:'奈及利亞',cf:'CAF',tier:2,wc:60,cap:22,nt:48,home:['NGA'],scout:1,wp:1,alt:['POR2','BEL'],trial:['BEL','POR','NED']},
+  EG:{n:'埃及',cf:'CAF',tier:3,wc:65,cap:20,nt:45,home:['EGY'],scout:2,wp:1,trial:['BEL','POR','FRA2']},
+  CV:{n:'維德角',cf:'CAF',tier:4,wc:35,cap:25,nt:40,home:['CPV'],scout:2,wp:1,alt:['POR2'],trial:['POR','POR2','NED2']},
 };
-const NAT_TIERN={1:'強',2:'中強',3:'中',4:'中弱',5:'弱'};
+const NAT_CODE=Object.fromEntries(Object.entries(NATS).map(([k,v])=>[v.n,k])); /* 國名 → 代碼 */
+const NAT_TIERN={0:'世界強權',1:'強',2:'中強',3:'中',4:'中弱',5:'弱'};
+const ti=t=>Math.max(0,t-1); /* 檔次 → 陣列索引(世界強權沿用「強」的數值,另外加成) */
 const homeLow=()=>NATS[S.nat].home.at(-1), homeTop=()=>NATS[S.nat].home[0];
 /* 球隊三檔:競爭者 par 偏移、薪資倍率;TEAMS 每個聯賽前 1/4 為豪門、後 1/4 為保級 */
 const TIERN={1:'豪門',2:'中游',3:'保級'};
@@ -705,6 +784,31 @@ const NAME_CN=[['王','李','張','劉','陳','楊','趙','黃','周','吳','徐
 const NAME_VN=[['阮','陳','黎','范','黃','武','潘','鄧'],['文雄','光海','進靈','德輝','春長','功勳','文清','輝煌']];
 const NAME_TH=[['頌猜','阿南','披拉','差猜','塔納','素帕','維拉','乍侖'],['・頌崩','・猜亞','・威拉蓬','・蓬帕','・西里','・通沙','・甘差','・本瑪']];
 const NAMES={TW:NAME_TW,JP:NAME_JP,KR:NAME_KR,EU:NAME_EU,AU:NAME_AU,CN:NAME_CN,VN:NAME_VN,TH:NAME_TH};
+/* v0.19 新國籍姓名(虛構組合) */
+const NAME_EN=[['哈利','傑克','詹姆斯','湯瑪斯','喬治','奧利佛','查理','亞歷克斯','丹尼爾','山姆'],['・史密斯','・瓊斯','・泰勒','・布朗','・威廉斯','・懷特','・霍爾','・格林','・伍德','・艾倫']];
+const NAME_ES=[['哈維爾','巴勃羅','亞歷杭德羅','塞爾吉奧','丹尼爾','馬可斯','阿爾瓦羅','伊克爾','勞爾','米格爾'],['・加西亞','・馬丁','・洛佩斯','・桑切斯','・佩雷斯','・戈麥斯','・魯伊斯','・納瓦羅','・莫雷諾','・希門尼斯']];
+const NAME_FR=[['盧卡斯','雨果','路易','朱爾','亞瑟','馬修','安托萬','泰歐','克萊蒙','巴蒂斯特'],['・馬丁','・貝爾納','・杜布瓦','・托馬','・羅貝爾','・理查','・佩蒂','・杜蘭','・勒魯','・莫羅']];
+const NAME_DE=[['盧卡斯','萊昂','菲利克斯','馬克西米利安','保羅','約納斯','提姆','揚','尼可','法比安'],['・施密特','・施奈德','・費雪','・韋伯','・邁爾','・瓦格納','・貝克爾','・舒爾茨','・霍夫曼','・柯赫']];
+const NAME_IT=[['羅倫佐','亞歷山德羅','費德里科','安德烈亞','馬可','法蘭切斯科','李奧納多','喬瓦尼','里卡多','達維德'],['・羅西','・魯索','・費拉里','・埃斯波西托','・比安奇','・羅馬諾','・科隆博','・里奇','・馬里諾','・格雷科']];
+const NAME_PT=[['若昂','迪奧戈','羅德里戈','貢薩洛','杜阿爾特','蒂亞戈','安德烈','米格爾','佩德羅','努諾'],['・席爾瓦','・桑托斯','・費雷拉','・佩雷拉','・奧利維拉','・皮涅羅','・羅德里格斯','・馬丁斯','・蘇薩','・洛佩斯']];
+const NAME_NL=[['揚','德克','西姆','提斯','魯本','凡斯','尤斯特','丹','瓦特','科恩'],['・德揚','・揚森','・德弗里斯','・范登堡','・巴克','・菲瑟','・斯密特','・梅耶爾','・德波爾','・莫爾']];
+const NAME_HR=[['盧卡','伊萬','馬特奧','約西普','安特','馬可','尼古拉','多米尼克','菲利普','布魯諾'],['・霍瓦特','・巴比奇','・馬里奇','・尤里奇','・諾瓦克','・克尼熱維奇','・維多維奇','・帕夫利奇','・托米奇','・格爾吉奇']];
+const NAME_BR=[['加布里埃爾','路卡斯','馬修斯','拉斐爾','吉列爾梅','佩德羅','若昂','卡約','達尼洛','布魯諾'],['・席爾瓦','・桑托斯','・奧利維拉','・蘇薩','・佩雷拉','・科斯塔','・羅德里格斯','・阿爾梅達','・卡瓦略','・費雷拉']];
+const NAME_AR=[['馬蒂亞斯','聖地牙哥','尼可拉斯','法昆多','湯瑪斯','華金','艾瑟奎爾','魯道夫','岡薩羅','法蘭哥'],['・岡薩雷斯','・羅德里格斯','・費南德斯','・洛佩斯','・高梅茲','・迪亞斯','・佩雷斯','・羅梅洛','・阿科斯塔','・索薩']];
+const NAME_UY=[['費德里科','聖地牙哥','路易斯','羅德里戈','馬希米利亞諾','尼可拉斯','阿古斯丁','法昆多','迪亞哥','馬汀'],['・佩雷拉','・席爾瓦','・阿科斯塔','・貝坦庫爾','・奧利維拉','・卡布雷拉','・莫拉萊斯','・索薩','・維加','・魯伊斯']];
+const NAME_CO=[['胡安','卡洛斯','安德烈斯','聖地牙哥','丹尼爾','塞巴斯蒂安','哈米爾頓','路易斯','傑佛遜','威爾瑪'],['・岡薩雷斯','・羅德里格斯','・加西亞','・穆尼奧斯','・薩帕塔','・卡斯蒂略','・莫雷諾','・巴爾加斯','・巴倫西亞','・奧坎波']];
+const NAME_US=[['泰勒','克里斯汀','韋斯頓','布蘭登','喬丹','麥特','傑登','柯爾','萊恩','布萊克'],['・強森','・史密斯','・米勒','・戴維斯','・安德森','・湯瑪斯','・摩爾','・傑克森','・懷特','・羅賓森']];
+const NAME_MX=[['何塞','路易斯','卡洛斯','赫蘇斯','米格爾','安東尼奧','赫拉多','愛德華多','聖地牙哥','亞歷杭德羅'],['・埃爾南德斯','・加西亞','・羅德里格斯','・洛佩斯','・岡薩雷斯','・桑切斯','・拉米雷斯','・托雷斯','・弗洛雷斯','・瓦斯克斯']];
+const NAME_CA=[['利亞姆','諾亞','伊森','歐文','卡特','班傑明','傑克','盧卡','艾登','馬克斯'],['・麥克唐納','・坎貝爾','・史都華','・特朗布萊','・高提耶','・鮑爾','・威爾森','・布朗','・羅伊','・拉克洛瓦']];
+const NAME_MA=[['阿什拉夫','優素福','阿明','哈基姆','易卜拉欣','阿尤布','伊利亞斯','薩菲安','納伊夫','阿卜杜'],['・本薩伊德','・埃爾阿明','・阿伯德','・塔希里','・本哈迪','・拉希迪','・哈米迪','・卡里米','・薩利米','・烏阿利']];
+const NAME_SN=[['謝赫','易卜拉希馬','馬馬杜','烏斯曼','阿馬杜','巴巴','帕佩','伊德里薩','阿利烏','班巴'],['・迪亞洛','・恩迪亞耶','・迪烏夫','・塞克','・法耶','・西塞','・巴','・恩唐','・迪亞塔','・薩爾']];
+const NAME_NG=[['奇迪','埃梅卡','奧盧瓦','塔約','阿德莫拉','楚克武','伊肯納','歐比','桑達','維克多'],['・奧孔克沃','・阿德耶米','・伊戈','・奧薩','・恩瓦科','・巴洛貢','・奧卡福','・阿尼','・伊瓦拉','・烏祖']];
+const NAME_EG=[['穆罕默德','艾哈邁德','馬哈茂德','奧馬爾','卡里姆','穆斯塔法','優素福','哈桑','塔里克','阿姆爾'],['・阿卜杜拉','・哈米德','・埃爾薩伊德','・法特希','・薩米爾','・卡邁勒','・納賽爾','・夏班','・祖赫里','・拉馬丹']];
+const NAME_CV=[['里卡多','若澤','卡洛斯','布魯諾','迪尼斯','萊尼','加里','蒂亞戈','凱文','瑞恩'],['・羅查','・蒙泰羅','・塔瓦雷斯','・費爾南德斯','・洛佩斯','・貢薩爾維斯','・蒙德斯','・皮雷斯','・西爾瓦','・達科斯塔']];
+Object.assign(NAMES,{EN:NAME_EN,ES:NAME_ES,FR:NAME_FR,DE:NAME_DE,IT:NAME_IT,PT:NAME_PT,NL:NAME_NL,HR:NAME_HR,BE:NAME_EU,
+  BR:NAME_BR,AR:NAME_AR,UY:NAME_UY,CO:NAME_CO,US:NAME_US,MX:NAME_MX,CA:NAME_CA,MA:NAME_MA,SN:NAME_SN,NG:NAME_NG,EG:NAME_EG,CV:NAME_CV});
+const nameSet=k=>NAMES[k]||NAMES.EU;
+
 /* 真實球隊名稱(不使用隊徽),各聯賽完整名單;順序依強弱,每個聯賽前 1/4 為豪門、後 1/4 為保級 */
 const TEAMS={
   ENG:['兵工廠','曼城','利物浦','切爾西','曼聯','熱刺','紐卡索聯','阿斯頓維拉','布萊頓','諾丁漢森林','伯恩茅斯','富勒姆','水晶宮','布倫特福德','艾佛頓','西漢姆聯','狼隊','里茲聯','伯恩利','桑德蘭'],
@@ -729,7 +833,33 @@ const TEAMS={
   CHN2:['遼寧鐵人','長春亞泰','重慶銅梁龍','廣州豹','南京城市','廣西平果','石家莊功夫','大連鯤城','上海嘉定匯龍','蘇州東吳','無錫吳鉤','延邊龍鼎','陝西聯合','湖南湘濤','黑龍江冰城','深圳青年人'],
   THA:['武里南聯','曼谷聯','港口FC','清萊聯','巴吞聯','警察泰拉','叻丕','春武里','呵叻沙瓦','素攀武里','南奔聯','素可泰','北碧府','烏隆他尼','那空巴統聯','大城聯'],
   VIE:['河內FC','河內公安','軍隊體工','南定','胡志明市FC','平定','清化','海防','平陽','河靜','義安','黃安嘉萊','峴港','廣寧煤炭'],
-  TW1:['台中未來','台南市台鋼','台北大同','台電','航源','高雄陽信','銘傳大學','台北市大']
+  TW1:['台中未來','台南市台鋼','台北大同','台電','航源','高雄陽信','銘傳大學','台北市大'],
+  /* ---- v0.19 新聯賽(順序＝強弱) ---- */
+  ENG3:['劍橋聯','克勞利','舒茲伯利','哈德斯菲爾德','博爾頓','維根競技','雷丁','邦士利','斯托克港','布萊克浦','彼得堡聯','林肯城','韋康比流浪者','萊頓東方','布拉德福德','唐卡斯特流浪','曼斯菲爾德','羅瑟勒姆聯','史蒂文納吉','埃克塞特城','溫布頓','伯頓','北安普頓','維爾港'],
+  ESP3:['阿雷納斯蓋喬','卡塔赫納','費羅爾競技','埃爾登塞','皇家穆爾西亞','塔拉戈納競技','蓬費拉迪納','盧戈','阿爾科孔','薩巴德爾','伊比薩','赫庫萊斯','阿爾赫西拉斯','阿爾科亞諾','梅里達','薩莫拉','安特克拉','皇家聯合','巴拉卡爾多','塔拉韋拉'],
+  GER3:['1860 慕尼黑','薩爾布呂肯','雷根斯堡','烏爾姆','奧斯納布呂克','科特布斯','英戈爾施塔特','曼海姆','羅斯托克漢莎','艾爾茲堡奧厄','埃森','維斯巴登','阿勒曼尼亞亞琛','杜伊斯堡','維爾茨堡踢球者','維爾','哈維爾瑟','施韋因富特'],
+  ITA3:['盧切塞','維琴察','貝內文托','卡塔尼亞','克羅托內','佩魯賈','特爾納納','阿雷佐','特里埃斯蒂納','里米尼','福賈','莫諾波利','托雷斯','坎波巴索','盧梅扎內','諾瓦拉','普羅維切利','阿爾比諾萊弗','雷納泰','特拉帕尼'],
+  FRA3:['尼姆','布洛涅','馬蒂格','索肖','第戎','瓦朗謝訥','魯昂','凡爾賽','康卡爾諾','克維利魯昂','沙托魯','奧爾良','布爾格佩羅納','維勒弗朗什','勒皮','聖布里厄','弗勒里','歐巴涅'],
+  POR2:['法倫斯','馬里蒂莫','帕科斯費雷拉','波爾蒂芒人','維澤拉','查韋斯','學術維塞烏','托倫斯','萊里亞聯合','費爾蓋拉斯','雷克索斯','佩納菲耶爾','奧利維倫斯','費倫斯','貝倫人','盧西塔尼亞','塞圖巴爾勝利'],
+  NED2:['威廉二世','阿爾梅勒城','坎布爾','海牙ADO','羅達JC','德格拉夫斯哈普','多德勒支','登博斯','埃因霍溫FC','埃門','芬洛','赫爾蒙德體育','馬斯垂克','奧斯'],
+  CRO:['札格雷布迪納摩','里耶卡','哈伊杜克斯普利特','奧西耶克','戈里察','洛科莫蒂瓦','瓦拉日丁','斯拉文貝盧波','伊斯特拉 1961','武科瓦爾 1991'],
+  CRO2:['希貝尼克','魯德什','杜布拉瓦','奧里揚特 1919','濟林斯基','齊巴利亞','茲米亞夫奇','杜戈波列','索林','庫斯托希亞','亞倫','比耶洛布爾多','卡爾洛瓦茨 1919'],
+  BRA:['弗拉門哥','帕梅拉斯','博塔弗戈','克魯塞羅','弗魯米嫩塞','米內羅競技','國際體育會','聖保羅','科林蒂安','格雷米奧','巴伊亞','達伽馬','布拉干蒂諾紅牛','福塔雷薩','桑托斯','米拉索爾','塞阿拉','維多利亞','尤文圖德','累西腓體育'],
+  BRA2:['科里蒂巴','巴拉納競技','戈亞斯','沙佩科恩斯','雷莫','克里修馬','阿瓦伊','新地平線','CRB','庫亞巴','戈亞尼恩斯競技','奧佩拉里奧','維拉諾瓦','米內羅美洲','派桑杜','費羅維亞里亞','亞馬遜FC','阿斯萊蒂克','博塔弗戈SP','沃爾塔雷東達'],
+  ARG:['河床','博卡青年','競賽會','拉普拉塔大學生','獨立','薩斯菲爾德','塔勒瑞斯','拉努斯','聖羅倫索','羅薩里奧中央','阿根廷青年人','防衛與正義','颶風','貝爾格拉諾','紐維爾老男孩','拉普拉塔體操擊劍','蒂格雷','普拉騰斯','聖塔菲聯合','戈多伊克魯斯','班菲爾德','巴拉卡斯中央','科爾多瓦學院','里瓦達維亞獨立','薩米恩托','圖庫曼競技','中央科爾多瓦','列斯特拉','阿爾多斯維','聖胡安聖馬丁'],
+  ARG2:['查卡里塔青年','西部鐵路','基爾梅斯','布朗上將','亞特蘭大競技','聖塔菲科隆','薩蘭迪兵工廠','全男孩','新芝加哥','坦珀利','莫龍體育','圖庫曼聖馬丁','胡胡伊體操','帕特羅納托','貝爾格拉諾防衛者','布宜諾斯艾利斯大學生','阿格羅佩庫亞里奧','特里斯坦蘇亞雷斯','米特雷','科爾多瓦競賽'],
+  URU:['佩納羅爾','國民','防衛者體育','蒙特維多利物浦','波士頓河','多瑙河','蒙特維多流浪者','蒙特維多城托克','蒙特維多競賽','蒙特維多河床','塞羅','進步','科洛尼亞廣場','塞羅拉戈','拉斯彼德拉斯青年','米拉瑪米西翁'],
+  COL:['國民競技','百萬富翁','卡利美洲','青年人','聖菲獨立','麥德林獨立','托利馬','布卡拉曼加競技','卡利體育','卡爾達斯','佩雷拉體育','金鷹','公平','恩維加多','福塔雷薩CEIF','阿連薩','博亞卡奇科','平原人','帕斯托體育','馬格達萊納聯合'],
+  MLS:['邁阿密國際','洛杉磯FC','哥倫布機員','辛辛那提FC','費城聯合','洛杉磯銀河','西雅圖海灣人','紐約城','奧蘭多城','溫哥華白浪','明尼蘇達聯','皇家鹽湖城','休士頓迪納摩','亞特蘭大聯','納許維爾SC','紐約紅牛','奧斯汀FC','夏洛特FC','波特蘭伐木者','聖地牙哥FC','堪薩斯城體育','科羅拉多急流','達拉斯FC','芝加哥火焰','新英格蘭革命','華盛頓聯','多倫多FC','蒙特婁CF','聖荷西地震','聖路易城'],
+  USL:['路易斯維爾城','沙加緬度共和','坦帕灣暴徒','鳳凰城崛起','科羅拉多泉轉轍器','查爾斯頓砲台','新墨西哥聯','匹茲堡河犬','橙縣SC','聖安東尼奧FC','艾爾帕索機車','印第安納十一人','伯明罕軍團','底特律城','奧克蘭根','蒙特雷灣','拉斯維加斯燈光','北卡羅萊納FC','哈特福德競技','羅德島FC'],
+  CPL:['福吉FC','卡加利騎兵','太平洋FC','約克聯','渥太華競技','哈利法克斯流浪者','溫尼伯勇氣','溫哥華FC'],
+  MEX:['美洲','蒙特雷','新萊昂老虎大學','藍十字','托盧卡','瓜達拉哈拉','帕丘卡','美洲獅','萊昂','亞特拉斯','拉古納桑托斯','提華納','克雷塔羅','內卡沙','聖路易斯競技','普埃布拉','華雷斯','馬薩特蘭'],
+  MEX2:['亞特蘭特','莫雷利亞競技','瓜達拉哈拉黑獅','薩卡特卡斯礦工','坎昆FC','錫那羅亞金色','塞拉亞','特帕蒂特蘭','坦皮科馬德羅','瓦哈卡','特拉斯卡拉','韋納多斯','伊拉普阿托','拉巴斯競技','塔帕蒂奧','科雷卡米諾斯'],
+  MAR:['卡薩布蘭卡維達德','卡薩布蘭卡拉賈','皇家武裝部隊','柏坎復興','拉巴特FUS','費斯馬格里布','阿加迪爾哈薩尼亞','丹吉爾聯','傑迪代防衛','薩菲奧林匹克','烏季達穆盧迪亞','得土安馬格里布','蘇阿萊姆','圖阿爾加聯','馬拉喀什卡瓦卡布','梅克內斯CODM'],
+  EGY:['阿赫利','扎馬雷克','金字塔','埃及馬斯里','未來FC','伊斯梅利','亞歷山大聯合','斯莫哈','恩比石油','克利奧帕特拉陶瓷','古納','ZED FC','國家銀行','法爾科','軍隊先鋒','馬哈拉紡織','石油噴射','阿拉伯承包商'],
+  SEN:['世代足球學院','騰圭特FC','皮金','賈拉夫','卡薩體育','戈雷聯','達卡聖心','海關隊','姆布爾體育場','蓋迪亞瓦耶FC','林蓋爾','賈莫諾法蒂克','達卡HLM','魯菲斯克'],
+  NGA:['恩伊姆巴','河流聯','雷莫之星','埃努古遊騎兵','卡諾柱子','射星','高原聯','洛比之星','夸拉聯','陽光之星','阿夸聯','本德爾保險','心臟地帶','卡齊納聯','尼日龍捲風','阿比亞勇士','巴耶爾薩聯','伊科羅杜城'],
+  CPV:['明德盧體育會','德比FC','巴圖克','明德盧學術','普拉亞體育','普拉亞博阿維斯塔','普拉亞學術','薩爾雷','普拉亞競技','普拉亞塞爾提克']
 };
 /* ================= 遊戲狀態 ================= */
 let S=null, stepQ=[];
@@ -1302,7 +1432,11 @@ const DERBY=[['曼城','曼聯','曼徹斯特德比'],['兵工廠','熱刺','北
   ['拜仁慕尼黑','多特蒙德','德國國家德比'],['國際米蘭','AC米蘭','米蘭德比'],['尤文圖斯','國際米蘭','義大利國家德比'],['羅馬','拉齊奧','羅馬德比'],['尤文圖斯','杜林','杜林德比'],
   ['巴黎聖日耳曼','馬賽','法國國家德比'],['里爾','朗斯','北部德比'],['阿賈克斯','費耶諾德','荷蘭國家德比'],['本菲卡','葡萄牙體育','里斯本德比'],['本菲卡','波圖','葡萄牙國家德比'],
   ['布魯日','安德萊赫特','比利時國家德比'],['川崎前鋒','FC東京','多摩川克拉西科'],['首爾FC','水原三星','超級比賽'],['蔚山HD','浦項鐵人','東海岸德比'],['上海海港','上海申花','上海德比'],
-  ['墨爾本城','墨爾本勝利','墨爾本德比'],['雪梨FC','西雪梨流浪者','雪梨德比'],['河內FC','河內公安','河內德比'],['清水心跳','磐田喜悅','靜岡德比'],['漢堡','沙爾克04','北部對決']];
+  ['墨爾本城','墨爾本勝利','墨爾本德比'],['雪梨FC','西雪梨流浪者','雪梨德比'],['河內FC','河內公安','河內德比'],['清水心跳','磐田喜悅','靜岡德比'],['漢堡','沙爾克04','北部對決'],
+  ['博卡青年','河床','超級德比'],['弗拉門哥','弗魯米嫩塞','Fla-Flu 德比'],['科林蒂安','帕梅拉斯','聖保羅德比'],['格雷米奧','國際體育會','Gre-Nal 德比'],['米內羅競技','克魯塞羅','米內羅德比'],
+  ['競賽會','獨立','阿韋亞內達德比'],['羅薩里奧中央','紐維爾老男孩','羅薩里奧德比'],['佩納羅爾','國民','烏拉圭國家德比'],['國民競技','麥德林獨立','麥德林德比'],['百萬富翁','聖菲獨立','波哥大德比'],
+  ['美洲','瓜達拉哈拉','墨西哥國家德比'],['蒙特雷','新萊昂老虎大學','雷吉歐德比'],['洛杉磯銀河','洛杉磯FC','洛杉磯德比'],['波特蘭伐木者','西雅圖海灣人','卡斯卡迪亞德比'],
+  ['卡薩布蘭卡維達德','卡薩布蘭卡拉賈','卡薩布蘭卡德比'],['阿赫利','扎馬雷克','開羅德比'],['恩伊姆巴','埃努古遊騎兵','東方德比'],['札格雷布迪納摩','哈伊杜克斯普利特','永恆德比']];
 /* 目前球隊在同聯賽的德比對手:[對手, 名稱] 之一,沒有就 null */
 function derbyOf(){ if(S.stage!=='PRO')return null; const L=TEAMS[S.lv]||[];
   const a=DERBY.filter(d=>(d[0]===S.club&&L.includes(d[1]))||(d[1]===S.club&&L.includes(d[0]))).map(d=>[d[0]===S.club?d[1]:d[0],d[2]]);
@@ -1687,8 +1821,9 @@ const firstYr=()=>S.stage==='PRO'&&!!S.club&&!S.loan&&!(S.clubYrs[S.club]);
 const sameClubLast=()=>{ const l=lastSeason(); return S.stage==='PRO'&&!!l&&l.tm===S.club; };
 const prevClubSameLv=()=>{ if(S.stage!=='PRO')return null; const L=TEAMS[S.lv]||[];
   const a=S.log.filter(l=>l.lv===S.lv&&!l.loan&&l.tm!==S.club&&L.includes(l.tm)); return a.length?a[a.length-1].tm:null; };
-const locName=()=>{ const K=S.stage==='PRO'&&LV[S.lv]?(LV[S.lv].eu?'EU':LV[S.lv].cty):S.nat, N=NAMES[K]||NAMES[S.nat]; return pick(N[0])+pick(N[1]); };
-const HOLI={TW:'農曆新年',CN:'春節',VN:'越南新年',KR:'秋夕',JP:'正月',TH:'潑水節',AU:'聖誕節'};
+const locName=()=>{ const N=nameSet(S.stage==='PRO'&&LV[S.lv]?LV[S.lv].cty:S.nat); return pick(N[0])+pick(N[1]); };
+const HOLI={TW:'農曆新年',CN:'春節',VN:'越南新年',KR:'秋夕',JP:'正月',TH:'潑水節',AU:'聖誕節',EN:'聖誕節',ES:'三王節',FR:'聖誕節',DE:'聖誕節',IT:'聖誕節',PT:'聖誕節',NL:'國王節',HR:'聖誕節',
+  BR:'狂歡節',AR:'聖誕節',UY:'狂歡節',CO:'聖誕節',US:'感恩節',MX:'亡靈節',CA:'感恩節',MA:'開齋節',SN:'塔巴斯基節',NG:'聖誕節',EG:'開齋節',CV:'聖誕節'};
 /* 一則對話:選項可有 req(條件才出現,rq 為標籤)、nx(結果後接著的第二段抉擇) */
 function runDialog(dg,tag,cls,after,done){
   const el=card(cls,tag+dg.n,`<p>${dg.d}</p><div class="mres"></div>`);
@@ -1844,7 +1979,7 @@ function vignette(next){
 
 /* ================= 連續劇情線 ================= */
 /* 每條線是一串事件,各自有出現條件;一季最多推進一個事件(在場外對話的時段,55% 機率) */
-const rivalLg=ov=>ov>=62?'歐洲五大聯賽':ov>=55?'歐洲聯賽':ov>=48?'亞洲頂級聯賽':'國內聯賽';
+const rivalLg=ov=>ov>=62?'歐洲五大聯賽':ov>=55?'歐洲聯賽':ov>=48?'頂級聯賽':'次級聯賽';
 function arcSeason(){ /* 季前:建立劇情線、宿敵成長 */
   const A=S.arcs=S.arcs||{}, N=NAMES[S.nat], nm=()=>pick(N[0])+pick(N[1]);
   if(!A.rival)A.rival={n:nm(),ov:ovr()+ri(1,4),w:0,l:0,rel:0,done:{}};
@@ -2153,7 +2288,7 @@ function posReview(cont){
 }
 /* ---------- 隊內競爭:同位置 1–2 名虛擬隊友,OVR 落在球隊 par −6～+10 ---------- */
 function curPar(){ return S.stage==='YOUTH'?YOUTH_PAR[S.youthTier]:S.stage==='UNI'?UNI_PAR[S.uniTier]:LV[S.lv].par+TIER_PAR[S.clubTier]; }
-function rivalName(){ const L=NAMES[S.stage==='PRO'?LV[S.lv].cty:S.nat]; return pick(L[0])+pick(L[1]); }
+function rivalName(){ const L=nameSet(S.stage==='PRO'?LV[S.lv].cty:S.nat); return pick(L[0])+pick(L[1]); }
 function newRival(){ return {name:rivalName(),ovr:clamp(curPar()+ri(-6,10),15,80),age:S.stage==='YOUTH'?S.age+ri(-1,1):S.stage==='UNI'?S.age+ri(-1,2):ri(19,31)}; }
 const roleOf=gap=>gap>=3?0:gap>=-2?1:gap>=-7?2:3;
 const rivalTop=()=>S.rivals.length?Math.max(...S.rivals.map(r=>r.ovr)):0;
@@ -2509,20 +2644,22 @@ function awardTraits(got){
 }
 /* 年度獎項(季末,冠軍結果出爐後):亞洲足球先生、金球獎 */
 function yearAwards(){
-  const st=S.lastSt; if(S.stage!=='PRO')return; let afc=false, gb=false;
+  const st=S.lastSt; if(S.stage!=='PRO')return; let cfa=false, gb=false; const C=cfOf(), cf=NATS[S.nat].cf||'AFC';
   if(st&&st.App&&st.role==='主力'){
     const L=LV[S.lv], champ=S.champYear===S.year;
     const score=st.Rt+(L.top5?0.6:L.eu?0.3:0)+(champ?0.2:0)+(S.ntOn?0.1:0);
-    if(score>=7.9&&chance(35+(score-7.9)*60)){ afc=true; S.honors.push(`${S.year+1} 亞洲足球先生`);
-      card('gold','亞洲足球先生',`你被選為 <b class="hl">${S.year+1} 年亞洲足球先生</b>！`); }
+    /* 洲足球先生:亞洲 7.9、南美/非洲/中北美 8.0、歐洲最難(要在五大聯賽) */
+    const th=cf==='AFC'?7.9:cf==='UEFA'?8.3:8.0;
+    if(score>=th&&(cf!=='UEFA'||L.top5)&&chance(35+(score-th)*60)){ cfa=true; S.honors.push(`${S.year+1} ${C.awd}`);
+      card('gold',C.awd,`你被選為 <b class="hl">${S.year+1} 年${C.awd}</b>！`); }
     if(L.top5&&champ&&st.Rt>=8.0&&chance(15)){ gb=true; S.honors.push(`${S.year+1} 金球獎`);
       card('gold','金球獎',`不可思議——你拿下了 <b class="hl">${S.year+1} 年金球獎</b>，世界足壇的最高個人榮譽。`); }
   }
   /* 其他年度得主(虛構) */
-  const top=['ENG','ESP','GER','ITA','FRA'], asia=pick(['J1','K1','CSL','AUS']);
-  const b=awardee(pick(top)), a=awardee(asia), lines=[];
-  if(!gb)lines.push(`金球獎：${b.n}（${b.c}）`);
-  if(!afc)lines.push(`亞洲足球先生：${a.n}（${a.c}）`);
+  const top=['ENG','ESP','GER','ITA','FRA'], lines=[];
+  const who=lst=>{ const ctry=pick(lst), N=nameSet(NAT_CODE[ctry]); return `${pick(N[0])+pick(N[1])}（${ctry}・${pick(TEAMS[pick(top)].slice(0,6))}）`; };
+  if(!gb){ const b=awardee(pick(top)); lines.push(`金球獎：${b.n}（${b.c}）`); }
+  if(!cfa)lines.push(`${C.awd}：${cf==='AFC'?(a=>`${a.n}（${a.c}）`)(awardee(pick(['J1','K1','CSL','AUS']))):who(C.opp)}`);
   if(lines.length)card('info',`${S.year+1} 年度獎項`,lines.join('<br>'));
 }
 
@@ -2659,6 +2796,9 @@ function leagueCands(allowDown){
   const o=ovr(), cur=S.lv?LV[S.lv].par:0, inEU=!!(S.lv&&LV[S.lv].eu), N=NATS[S.nat];
   return Object.keys(LV).filter(k=>{ const L=LV[k];
     if(L.local&&!N.home.includes(k))return false; /* 小聯賽只簽本國球員 */
+    if(L.cfs&&!L.cfs.includes(N.cf||'AFC')&&!N.home.includes(k))return false; /* 南美、非洲等聯賽只簽同區球員 */
+    /* 跨洲去非歐洲聯賽(例如歐洲球員去亞洲、亞洲球員去美國):要明顯高於該聯賽水準才有人找 */
+    const rg=L.eu?'UEFA':((NATS[L.cty]||{}).cf||'AFC'); if(rg!==(N.cf||'AFC')&&rg!=='UEFA'&&!N.home.includes(k)&&o<L.par+5)return false;
     if(o<L.min)return false;
     if(L.wp&&N.wp&&o<L.par+3-(S.caps>=30?2:S.caps>=10?1:0))return false; /* 工作證:國家隊出賽多可降門檻 */
     if(L.par>cur&&o<L.par-1)return false;
@@ -2671,9 +2811,10 @@ function leagueCands(allowDown){
 function genOffers(n,allowDown){
   const ls=leagueCands(allowDown), out=[], used=new Set([S.club]);
   if(!ls.length)return out;
-  const top=ls.slice(0,3);
+  const top=[...new Set([...ls.slice(0,3),...ls.filter(k=>NATS[S.nat].home.includes(k))])]; /* 本土聯賽一定在優先名單裡 */
+  const home=(NATS[S.nat].cf||'AFC')!=='AFC'?ls.filter(k=>NATS[S.nat].home.includes(k)):[]; /* 亞洲以外的球員:近半報價來自本土 */
   for(let i=0;i<n*4&&out.length<n;i++){
-    const of=makeOffers(pick(R()<0.7?top:ls),1)[0];
+    const of=makeOffers(home.length&&R()<0.45?pick(home):pick(R()<0.7?top:ls),1)[0];
     if(of&&!used.has(of.club)){ used.add(of.club); out.push(of); } }
   return out;
 }
@@ -2713,7 +2854,7 @@ function uniYearEnd(){
 /* 世界大學運動會:奇數年舉辦,綜合夠高才入選;依國家實力擲名次 */
 function universiade(){
   if(S.year%2===0||ovr()<NATS[S.nat].nt-8)return;
-  const t=NATS[S.nat].tier, rk=R()*100, medal=rk<[25,18,12,7,4][t-1]?'金牌':rk<[45,34,24,15,9][t-1]?'銀牌':rk<[60,48,36,24,15][t-1]?'銅牌':null;
+  const t=ti(NATS[S.nat].tier), rk=R()*100, medal=rk<[25,18,12,7,4][t]?'金牌':rk<[45,34,24,15,9][t]?'銀牌':rk<[60,48,36,24,15][t]?'銅牌':null;
   S.pool+=medal?3:1;
   if(medal){ S.uniMedal++; S.honors.push(`${S.year} 世大運（${medal}）`); }
   card(medal?'gold':'info','世界大學運動會',`入選${NATS[S.nat].n}大學代表隊，${medal?`拿下 <b class="hl">${medal}</b>！`:'止步淘汰賽。'}（能力點 +${medal?3:1}）`);
@@ -2736,18 +2877,19 @@ function youthExit(){
   /* 本土低級別 2 份;能力夠就加本土頂級;本土聯賽弱的國家,能力夠可直接赴日韓次級 */
   const offers=makeOffers(homeLow(),2), top=homeTop();
   if(top!==homeLow()&&o>=LV[top].min)offers.push(...makeOffers(top,1));
-  if(LV[homeLow()].par<40&&o>=38)offers.push(...makeOffers(pick(['J2','K2']),o>=42?2:1));
+  const N=NATS[S.nat], alt=N.alt||(N.cf==='AFC'?['J2','K2']:null);
+  if(alt&&LV[homeLow()].par<40&&o>=38)offers.push(...makeOffers(pick(alt),o>=42?2:1));
   const opts=offers.map((of,i)=>offerOpt(of,i===0));
   /* 歐洲青訓試訓:潛力夠高才有機會;失敗只能晚一步回國簽短約 */
-  if(potAvg>=60){ const p=clamp(Math.round(25+(potAvg-60)*4+(S.traits.genius?20:0)),10,70);
+  if(potAvg>=60&&N.cf!=='UEFA'){ const p=clamp(Math.round(25+(potAvg-60)*4+(S.traits.genius?20:0)),10,70);
     opts.push({t:'赴歐青訓試訓',warn:true,s:`成功率 ${p}%｜成功直接簽歐洲球隊；失敗只能回國簽 1 年短約`,f:()=>{
-      if(chance(p)){ const lv=pick(['NED','POR','BEL']), club=pick(TEAMS[lv].filter(t=>tierOf(lv,t)>=2));
+      if(chance(p)){ const lv=pick(N.trial||['NED','POR','BEL']), club=pick(TEAMS[lv].filter(t=>tierOf(lv,t)>=2));
         card('gold','試訓成功',`${club}的青訓總監看中你的潛力，開出一份長約。`);
         signTo({lv,club,tier:tierOf(lv,club),yrs:4}); }
       else { card('bad','試訓失敗','在歐洲待了兩個月，最後沒拿到合約。回國時本土球隊早已補滿名單。');
         signTo({...makeOffers(homeLow(),1)[0],yrs:1}); S.trust=38; }
       advance(); }}); }
-  opts.push({t:'升大學',s:'踢 4 年大學聯賽再進職業｜畢業可覺醒「學院派」，有學歷保底；職業生涯晚 4 年開始',f:()=>{
+  if(UNIS[S.nat])opts.push({t:'升大學',s:'踢 4 年大學聯賽再進職業｜畢業可覺醒「學院派」，有學歷保底；職業生涯晚 4 年開始',f:()=>{
     const o=ovr(); S.stage='UNI'; S.stageYr=0; S.uni=pick(UNIS[S.nat]); S.uniTier=o>=36?1:o>=31?2:3; S.rivals=[];
     card('info','升學',`你選擇進入 <b class="hl">${S.uni}</b>（${['','強校','中堅','新興隊伍'][S.uniTier]}），一邊念書一邊踢大學聯賽。`); advance(); }});
   choose('18 歲的十字路口',opts);
@@ -2828,7 +2970,7 @@ function contractEnd(){
   /* 30 歲後永遠有本土頂級聯賽的返鄉報價 */
   const home=NATS[S.nat].home;
   if(S.age>=30&&!home.includes(S.lv)&&!offers.some(x=>home.includes(x.lv))){ const h=makeOffers(homeTop(),1)[0]; opts.push(offerOpt(h,false,`返鄉：${ofName(h)}`)); }
-  if(!opts.length&&S.age<30&&o>=LV[homeLow()].min)opts.push(offerOpt({...makeOffers(homeLow(),1)[0],yrs:1},false));
+  if(!opts.length&&S.age<30&&(S.age<26||o>=LV[homeLow()].min))opts.push(offerOpt({...makeOffers(homeLow(),1)[0],yrs:1},false));
   if(opts.length)opts[0].main=true;
   if(S.age>=30||!opts.length)opts.push(retireOpt(`合約到期，於 ${S.year+1} 年夏天宣布引退。`));
   choose(`自由球員 · 綜合能力 ${o}`,opts);
@@ -2874,8 +3016,13 @@ function natCallRoll(cont){
 function intlYear(Y,cont){
   const N=NATS[S.nat], q=[];
   if(Y>=2030&&Y%4===2)q.push(()=>wcCycle(Y,next));
-  if(Y>=2027&&Y%4===3)q.push(()=>acCycle(Y,next));
-  if(Y>=2026&&Y%4===2)q.push(()=>u23Cycle(T_AG,Y,true,next));
+  const cf=N.cf||'AFC';
+  if(cf==='AFC'&&Y>=2027&&Y%4===3)q.push(()=>contCupCycle(T_AC,Y,next));
+  if(cf==='UEFA'&&Y>=2028&&Y%4===0)q.push(()=>contCupCycle(T_EURO,Y,next));
+  if(cf==='CONMEBOL'&&Y>=2028&&Y%4===0)q.push(()=>contCupCycle(T_COPA,Y,next));
+  if(cf==='CONCACAF'&&Y>=2027&&Y%2===1)q.push(()=>contCupCycle(T_GOLD,Y,next));
+  if(cf==='CAF'&&Y>=2027&&Y%2===1)q.push(()=>contCupCycle(T_AFCON,Y,next));
+  if(cf==='AFC'&&Y>=2026&&Y%4===2)q.push(()=>u23Cycle(T_AG,Y,true,next));
   if(Y>=2028&&Y%4===0)q.push(()=>u23Cycle(T_OLY,Y,false,next));
   if(Y>=2027&&Y%2===1&&['JP','KR','CN','TW'].includes(S.nat))q.push(()=>regionCycle(T_E1,Y,next));
   if(Y>=2026&&Y%2===0&&['VN','TH'].includes(S.nat))q.push(()=>regionCycle(T_AFF,Y,next));
@@ -2912,31 +3059,36 @@ function wcCycle(Y,next){
   const N=NATS[S.nat], p0=Math.round(wcQualRate());
   /* 亞洲區 18 強賽最後一輪:關鍵時刻成功出線率 ×1.6(最多 +15%),失敗 ×0.7 */
   if(S.ntOn&&S.stage==='PRO'&&p0>=5&&p0<=93&&chance(70)){ const p1=clamp(Math.min(p0+15,Math.round(p0*1.6)),1,99), p2=clamp(Math.round(p0*0.7),1,99); /* 依比例調整,弱國不會因一場比賽翻倍 */
-    card('talk',`${Y} 世界盃資格賽`,`亞洲區 18 強賽最後一輪，${N.n}只要贏球就能${p0<50?'保住出線希望':'大幅接近世界盃門票'}。目前出線率 ${p0}%（贏球 → ${p1}%、失利 → ${p2}%）。`);
-    bigMoment(`${Y} 世界盃資格賽18強賽`,N.n,pick(OPP_AS.filter(x=>x!==N.n)),TOUR_PAR.亞洲盃,ok=>wcRoll(Y,next,ok?p1:p2)); return; }
+    card('talk',`${Y} 世界盃資格賽`,`${cfOf().wcq}，${N.n}只要贏球就能${p0<50?'保住出線希望':'大幅接近世界盃門票'}。目前出線率 ${p0}%（贏球 → ${p1}%、失利 → ${p2}%）。`);
+    bigMoment(`${Y} 世界盃資格賽・關鍵戰`,N.n,pick(cfOf().opp.filter(x=>x!==N.n)),TOUR_PAR[cfOf().cup.n],ok=>wcRoll(Y,next,ok?p1:p2)); return; }
   wcRoll(Y,next,p0);
 }
-function acCycle(Y,next){
-  const N=NATS[S.nat], p=N.tier>=5?Math.round(25+ntBonus()*100):N.tier>=4?Math.round(60+ntBonus()*100):100; /* 弱國要打會外賽 */
-  if(!chance(p)){ card('bad',`${Y} 亞洲盃`,`${N.n}沒能從會外賽突圍（晉級率 ${p}%）。`); next(); return; }
+function contCupCycle(T,Y,next){
+  const N=NATS[S.nat], cf=N.cf||'AFC', t=N.tier;
+  /* 會外賽晉級率:亞洲沿用舊規則;歐洲國家盃 24 隊、非洲國家盃 24 隊依檔次;美洲盃、金盃賽直接參賽 */
+  const p=cf==='AFC'?(t>=5?Math.round(25+ntBonus()*100):t>=4?Math.round(60+ntBonus()*100):100)
+    :cf==='UEFA'?clamp(Math.round([100,100,92,75,55,35][t]+ntBonus()*100),5,100)
+    :cf==='CAF'?clamp(Math.round([100,98,95,88,75,55][t]+ntBonus()*100),5,100):100;
+  if(!chance(p)){ card('bad',`${Y} ${T.n}`,`${N.n}沒能從資格賽突圍（晉級率 ${p}%）。`); next(); return; }
   if(!S.ntOn){ next(); return; }
-  /* 亞洲盃在 1 月,聯賽打到一半:俱樂部施壓 */
-  if(S.stage==='PRO'&&!S.loan&&!S.ct.mil&&chance(S.clubTier===3?55:S.clubTier===1?35:25)){
-    card('talk',`${Y} 亞洲盃｜俱樂部施壓`,`亞洲盃在 1 月開打，正是${S.club}${S.clubTier===3?'保級':S.clubTier===1?'爭冠':'衝排名'}的關鍵期。總教練私下希望你以「小傷」為由婉拒徵召。`);
+  /* 在聯賽季中舉行的賽事(亞洲盃、非洲國家盃):俱樂部施壓 */
+  if(T.mid&&S.stage==='PRO'&&!S.loan&&!S.ct.mil&&chance(S.clubTier===3?55:S.clubTier===1?35:25)){
+    card('talk',`${Y} ${T.n}｜俱樂部施壓`,`${T.n}在聯賽賽季中開打，正是${S.club}${S.clubTier===3?'保級':S.clubTier===1?'爭冠':'衝排名'}的關鍵期。總教練私下希望你以「小傷」為由婉拒徵召。`);
     choose('俱樂部施壓 — 你的決定？',[
-      {t:'代表國家出征',main:true,s:'教練信任↓｜國家隊教練印象↑',f:()=>{ meter('trust',-10); S.ntRep=clamp(S.ntRep+1,-3,3); board(); playTourney(T_AC,Y,true,false,next); }},
+      {t:'代表國家出征',main:true,s:'教練信任↓｜國家隊教練印象↑',f:()=>{ meter('trust',-10); S.ntRep=clamp(S.ntRep+1,-3,3); board(); playTourney(T,Y,true,false,next); }},
       {t:'留在俱樂部',s:'教練信任↑｜球迷↓｜國家隊教練印象 −2',f:()=>{ const o=[meter('trust',8),meter('fans',-6)].filter(Boolean); S.ntRep=clamp(S.ntRep-2,-3,3);
-        card('info',`${Y} 亞洲盃`,`你留在${S.club}。國家隊總教練在記者會上說：「我尊重他的決定。」語氣很冷。${o.length?'<br><span class="fx">'+o.join('｜')+'</span>':''}`); board(); next(); }}]);
+        card('info',`${Y} ${T.n}`,`你留在${S.club}。國家隊總教練在記者會上說：「我尊重他的決定。」語氣很冷。${o.length?'<br><span class="fx">'+o.join('｜')+'</span>':''}`); board(); next(); }}]);
     return; }
-  playTourney(T_AC,Y,true,false,next);
+  playTourney(T,Y,true,false,next);
 }
+const acCycle=(Y,next)=>contCupCycle(T_AC,Y,next);
 /* U23 賽事:23 歲以下且達門檻 −4,或國家隊核心以超齡名額入選;韓國未免役球員爭取超齡意願高 */
 function u23Cycle(T,Y,isAG,next){
   const N=NATS[S.nat], u23=S.age+1<=23;
   if(S.stage!=='PRO'){ next(); return; }
   const pick23=u23?ovr()>=N.nt-4:(S.ntOn&&ovr()>=N.nt+6&&chance(N.mil==='KR'&&S.mil==='none'&&isAG?80:30));
   if(!pick23){ next(); return; }
-  if(!isAG){ const qp=[70,50,30,15,5][N.tier-1]; if(!chance(qp)){ card('bad',`${Y} 奧運資格賽`,`${N.n} U23 沒能拿到奧運門票。`); next(); return; } }
+  if(!isAG){ const qp=[85,70,50,30,15,5][N.tier]; if(!chance(qp)){ card('bad',`${Y} 奧運資格賽`,`${N.n} U23 沒能拿到奧運門票。`); next(); return; } }
   /* 亞運、奧運不在 FIFA 強制放人期:超齡或旅歐球員,俱樂部可能拒絕放人 */
   if(!S.ct.mil&&(!u23||LV[S.lv].eu)&&chance(!u23?50:35)){
     const kr=N.mil==='KR'&&S.mil==='none', p=clamp(Math.round(40+(S.trust-50)/2+(S.fans-50)/4+(kr?20:0)),15,90);
@@ -2950,7 +3102,7 @@ function u23Cycle(T,Y,isAG,next){
   playTourney(T,Y,false,!u23,next);
 }
 /* ================= 大賽淘汰賽之路、決賽、點球大戰、大賽個人獎項(v0.16) ================= */
-const TROPHY={世界盃:'大力神盃',歐冠:'大耳朵盃',亞冠:'亞冠獎盃',亞洲盃:'亞洲盃',奧運:'奧運金牌'};
+const TROPHY={世界盃:'大力神盃',歐冠:'大耳朵盃',亞冠:'亞冠獎盃',亞洲盃:'亞洲盃',奧運:'奧運金牌',歐洲國家盃:'德勞內盃',美洲盃:'美洲盃',金盃賽:'金盃',非洲國家盃:'非洲國家盃'};
 const WDL={W:'勝',D:'和',L:'負'};
 function scoreFor(r){ if(r==='D'){ const n=ri(0,2); return [n,n]; } const a=ri(1,3), b=ri(0,a-1); return r==='W'?[a,b]:[b,a]; }
 /* 國家隊小組賽:三場比分與積分 */
@@ -3044,10 +3196,10 @@ function pkShootout(c,cb){
 }
 /* 大賽個人獎項:kind WC 世界盃、AC 亞洲盃、CL 歐冠、ACL 亞冠;info {i 到達輪次, n 總輪數, win, mvp, tg 進球, okc 關鍵時刻成功數} */
 function tourneyAwards(kind,Y,info){
-  const comp={WC:'世界盃',AC:'亞洲盃',CL:'歐冠',ACL:'亞冠'}[kind], champ=info.win, fin=info.i>=info.n-1, deep=info.i>=info.n-2;
+  const comp=info.comp||{WC:'世界盃',AC:'亞洲盃',CL:'歐冠',ACL:'亞冠'}[kind], champ=info.win, fin=info.i>=info.n-1, deep=info.i>=info.n-2;
   const club=kind==='CL'||kind==='ACL';
   const who=()=>{ if(club){ const o=awardee(pick(kind==='CL'?CL_EU:CL_AS)); return `${o.n}（${o.c}）`; }
-    const ctry=pick((kind==='WC'?OPP_WC:OPP_AS).filter(x=>x!==NATS[S.nat].n)), N=NAMES[{日本:'JP',韓國:'KR',澳洲:'AU',中國:'CN',越南:'VN',泰國:'TH'}[ctry]]||NAMES.EU;
+    const ctry=pick((info.opp||(kind==='WC'?OPP_WC:OPP_AS)).filter(x=>x!==NATS[S.nat].n)), N=nameSet(NAT_CODE[ctry]);
     return `${pick(N[0])+pick(N[1])}（${ctry}）`; };
   const me=`<b class="hl">${S.name}</b>（${club?S.club:NATS[S.nat].n}）`, got=[], rows=[];
   const add=(k,mine,txt)=>{ if(mine){ got.push(k); S.honors.push(`${Y} ${comp}${k}`); } rows.push(`<tr><td>${k}</td><td>${mine?me:who()}${txt?'・'+txt:''}</td></tr>`); };
@@ -3066,17 +3218,34 @@ function tourneyAwards(kind,Y,info){
 const OPP_WC=['巴西','法國','阿根廷','英格蘭','西班牙','德國','葡萄牙','荷蘭','克羅埃西亞','烏拉圭','墨西哥','美國','摩洛哥','塞內加爾','比利時','瑞士'];
 const OPP_AS=['日本','韓國','澳洲','伊朗','沙烏地阿拉伯','卡達','伊拉克','烏茲別克','阿聯','中國','越南','泰國','約旦','阿曼'];
 const OPP_OLY=['巴西','西班牙','法國','阿根廷','日本','埃及','墨西哥','德國','摩洛哥','美國'];
-const TOUR_PAR={世界盃:57,亞洲盃:50,亞運:44,奧運:50,東亞錦標賽:46,東協錦標賽:38}; /* 大賽關鍵時刻的對手強度 */
+const OPP_EU=['法國','西班牙','英格蘭','德國','葡萄牙','荷蘭','義大利','比利時','克羅埃西亞','丹麥','瑞士','奧地利','塞爾維亞','波蘭','土耳其','烏克蘭','蘇格蘭'];
+const OPP_SA=['巴西','阿根廷','烏拉圭','哥倫比亞','厄瓜多','智利','巴拉圭','秘魯','委內瑞拉','玻利維亞'];
+const OPP_NA=['美國','墨西哥','加拿大','哥斯大黎加','巴拿馬','牙買加','宏都拉斯','薩爾瓦多','海地','瓜地馬拉'];
+const OPP_AF=['摩洛哥','塞內加爾','奈及利亞','埃及','維德角','象牙海岸','阿爾及利亞','突尼西亞','喀麥隆','迦納','馬利','南非'];
+const TOUR_PAR={世界盃:57,亞洲盃:50,亞運:44,奧運:50,東亞錦標賽:46,東協錦標賽:38,歐洲國家盃:57,美洲盃:55,金盃賽:46,非洲國家盃:48}; /* 大賽關鍵時刻的對手強度 */
+/* 洲際國家隊賽事:cont = 洲際盃(決賽走完整流程)、mid = 在聯賽季中舉行(俱樂部可能施壓) */
+Object.assign(T_AC,{cont:1,mid:1});
+const T_EURO={n:'歐洲國家盃',st:['小組賽','16 強','8 強','4 強','決賽'],g:[.92,.85,.7,.55,.4],k:[.6,.5,.4,.3,.22],cont:1,opp:OPP_EU};
+const T_COPA={n:'美洲盃',st:['小組賽','8 強','4 強','決賽'],g:[.95,.85,.7,.5,.35],k:[.6,.5,.4,.3,.2],cont:1,opp:OPP_SA};
+const T_GOLD={n:'金盃賽',st:['小組賽','8 強','4 強','決賽'],g:[.98,.95,.85,.7,.5],k:[.7,.65,.5,.35,.25],cont:1,opp:OPP_NA};
+const T_AFCON={n:'非洲國家盃',st:['小組賽','16 強','8 強','4 強','決賽'],g:[.95,.88,.75,.6,.45],k:[.62,.55,.45,.35,.25],cont:1,mid:1,opp:OPP_AF};
+/* 洲別:洲際盃、對手、年度獎項、世界盃資格賽關鍵戰 */
+const CF={AFC:{n:'亞洲',cup:T_AC,opp:OPP_AS,awd:'亞洲足球先生',wcq:'亞洲區 18 強賽最後一輪'},
+  UEFA:{n:'歐洲',cup:T_EURO,opp:OPP_EU,awd:'歐足聯年度最佳球員',wcq:'歐洲區資格賽小組最後一輪'},
+  CONMEBOL:{n:'南美',cup:T_COPA,opp:OPP_SA,awd:'南美足球先生',wcq:'南美區資格賽最後一輪'},
+  CONCACAF:{n:'中北美',cup:T_GOLD,opp:OPP_NA,awd:'中北美年度最佳球員',wcq:'中北美區資格賽最後一輪'},
+  CAF:{n:'非洲',cup:T_AFCON,opp:OPP_AF,awd:'非洲足球先生',wcq:'非洲區資格賽小組最後一輪'}};
+const cfOf=()=>CF[NATS[S.nat].cf||'AFC'];
 function playTourney(T,Y,senior,overage,done){
-  const t=NATS[S.nat].tier; let b=ntBonus()+(S.traits.intlace?0.05:0)+(S.traits.clutch?0.03:0)+(S.tourPen||0); S.tourPen=0;
+  const t0=NATS[S.nat].tier, t=t0+1; let b=ntBonus()+(S.traits.intlace?0.05:0)+(S.traits.clutch?0.03:0)+(S.tourPen||0)+(t0===0?0.12:0); S.tourPen=0; /* t:陣列用 1 起算;世界強權另外 +12% */
   const me=NATS[S.nat].n+(T.u23?' U23':''), opps=(T.opp||(T===T_WC?OPP_WC:T===T_OLY?OPP_OLY:OPP_AS)).filter(x=>x!==NATS[S.nat].n);
-  const deep=T===T_WC, bigF=T===T_WC||T===T_AC||T===T_OLY, g0=S.mG, path=[], used=new Set(), title=`${Y} ${T.n}`;
+  const deep=T===T_WC, bigF=T===T_WC||!!T.cont||T===T_OLY, g0=S.mG, path=[], used=new Set(), title=`${Y} ${T.n}`;
   const opp=()=>{ const a=opps.filter(x=>!used.has(x)), o=pick(a.length?a:opps); used.add(o); return o; };
   let i=0, mo=false, moOk=null, okc=0, fr=null;
   const fin=()=>{ playTourneyEnd(T,Y,senior,overage,i,moOk,{path,mg:S.mG-g0,okc,fr,deep}); done(); };
   const step=()=>{
     while(i<T.st.length){
-      const st=T.st[i], last=i===T.st.length-1, p=(i===0?T.g:T.k)[t-1]+b;
+      const st=T.st[i], last=i===T.st.length-1, p=(i===0?T.g:T.k)[ti(t)]+b;
       if(i===0){ const adv=chance(p*100); path.push(groupCard(`${title}｜${st}`,me,opps,adv)); if(!adv)break; i++; continue; }
       /* 決賽:完整流程 */
       if(last&&bigF){ fr=null; finalSeries({comp:T.n,Y,me,opp:opp(),par:TOUR_PAR[T.n]+2,base:p,path:path.slice()},r=>{ fr=r; if(r.win)i++; fin(); }); return; }
@@ -3088,7 +3257,7 @@ function playTourney(T,Y,senior,overage,done){
       /* 其他大賽:淘汰賽第一場關鍵時刻,成功直接晉級並 +6% 後續勝率,失敗該場勝率減半 */
       if(i===1&&!mo){ mo=true; const o=opp();
         bigMoment(`${title}・${st}`,me,o,TOUR_PAR[T.n],ok=>{ moOk=ok; okc+=ok?1:0; let adv;
-          if(ok){ adv=true; b+=0.06; S.pool+=2; } else adv=chance(T.k[t-1]*50+b*100);
+          if(ok){ adv=true; b+=0.06; S.pool+=2; } else adv=chance(T.k[ti(t)]*50+b*100);
           path.push(koCard(title,st,me,o,adv,false)); if(adv){ i++; step(); } else fin(); });
         return; }
       const o=opp(), adv=chance(p*100); const [x,y]=scoreFor(adv?'W':'L'); path.push(`${st}：${me} ${x}–${y} ${o}　${adv?'晉級':'淘汰'}`);
@@ -3112,7 +3281,7 @@ function playTourneyEnd(T,Y,senior,overage,i,moOk,info){ info=info||{path:[],mg:
   if(!T.reg){ S.intlCount++; if(i>=T.st.length-2)S.intlDeep++; } /* 區域賽事不算進國家隊英雄 */
   const bonus2=moOk&&!info.deep;
   card(i>=T.st.length-2?'gold':'info',`${Y} ${T.n}｜總結`,`代表${NATS[S.nat].n}${T.u23?' U23':''}${overage?'（超齡球員）':''}出賽 ${apps} 場${g?`、進 ${g} 球`:''}，最終 <b class="hl">${label}</b>。${info.path.length?`<div class="statline">${info.path.join('<br>')}</div>`:''}${i>0?`大賽經驗帶來 <b class="up">${Math.min(4,i)+(bonus2?2:0)}</b> 點能力點${bonus2?'（含淘汰賽關鍵表現 +2）':''}。`:''}`);
-  if(senior&&(T===T_WC||(T===T_AC&&i>=1)))tourneyAwards(T===T_WC?'WC':'AC',Y,{i,n:T.st.length,win:i===T.st.length,tg:g,okc:info.okc||0});
+  if(senior&&(T===T_WC||(T.cont&&i>=1)))tourneyAwards(T===T_WC?'WC':'AC',Y,{i,n:T.st.length,win:i===T.st.length,tg:g,okc:info.okc||0,comp:T===T_WC?null:T.n,opp:T.opp});
   if(medal==='金牌'||i>=T.st.length-1){ meter('fans',T===T_WC?12:6); if(medal==='金牌')confetti(); }
   /* 韓國兵役:亞運金牌或奧運獎牌免役 */
   if(NATS[S.nat].mil==='KR'&&S.mil==='none'&&((T===T_AG&&medal==='金牌')||(T===T_OLY&&medal))){
@@ -3180,12 +3349,15 @@ function naturalCheck(cont){
    拿下歐冠/亞冠,隔季踢世俱盃。一季最多一次盃賽關鍵時刻 */
 const CUP_N={ENG:'英格蘭足總盃',EFL:'英格蘭足總盃',ESP:'國王盃',ESP2:'國王盃',GER:'德國盃',GER2:'德國盃',ITA:'義大利盃',ITA2:'義大利盃',
   FRA:'法國盃',FRA2:'法國盃',NED:'荷蘭盃',POR:'葡萄牙盃',BEL:'比利時盃',J1:'天皇盃',J2:'天皇盃',K1:'韓國足協盃',K2:'韓國足協盃',
-  CSL:'中國足協盃',CHN2:'中國足協盃',AUS:'澳洲盃',THA:'泰國足總盃',VIE:'越南盃',TW1:'台灣企業盃'};
+  CSL:'中國足協盃',CHN2:'中國足協盃',AUS:'澳洲盃',THA:'泰國足總盃',VIE:'越南盃',TW1:'台灣企業盃',
+  ENG3:'英格蘭足總盃',ESP3:'國王盃',GER3:'德國盃',ITA3:'義大利盃',FRA3:'法國盃',POR2:'葡萄牙盃',NED2:'荷蘭盃',CRO:'克羅埃西亞盃',CRO2:'克羅埃西亞盃',
+  BRA:'巴西盃',BRA2:'巴西盃',ARG:'阿根廷盃',ARG2:'阿根廷盃',URU:'烏拉圭盃',COL:'哥倫比亞盃',MLS:'美國公開盃',USL:'美國公開盃',CPL:'加拿大錦標賽',
+  MEX:'墨西哥盃',MEX2:'墨西哥盃',MAR:'摩洛哥王座盃',EGY:'埃及盃',SEN:'塞內加爾盃',NGA:'奈及利亞總統盃',CPV:'維德角盃'};
 const CUP_ST=['第三輪','16 強','8 強','4 強','決賽'];
-const CL_EU=['ENG','ESP','GER','ITA','FRA','NED','POR','BEL'], CL_AS=['J1','K1','CSL','AUS','THA','VIE'];
+const CL_EU=['ENG','ESP','GER','ITA','FRA','NED','POR','BEL','CRO'], CL_AS=['J1','K1','CSL','AUS','THA','VIE'];
 const CL_ST=['小組賽','16 強','8 強','4 強','決賽'];
 /* 洲際盃賽每輪勝率:[小組出線, 淘汰賽] */
-const CL_P={ENG:[.85,.6],ESP:[.85,.6],GER:[.8,.55],ITA:[.8,.55],FRA:[.75,.5],NED:[.55,.4],POR:[.55,.4],BEL:[.45,.35],
+const CL_P={ENG:[.85,.6],ESP:[.85,.6],GER:[.8,.55],ITA:[.8,.55],FRA:[.75,.5],NED:[.55,.4],POR:[.55,.4],BEL:[.45,.35],CRO:[.45,.33],
   J1:[.6,.45],K1:[.6,.45],CSL:[.5,.4],AUS:[.45,.38],THA:[.3,.3],VIE:[.2,.25]};
 /* 洲際賽事:b = 對手較弱的勝率加成、par = 關鍵時刻對手強度修正 */
 const CONT={歐冠:{pool:CL_EU,b:0,par:3},歐霸:{pool:CL_EU,b:.08,par:0},歐協聯:{pool:CL_EU,b:.15,par:-3},亞冠:{pool:CL_AS,b:0,par:3},亞冠二級:{pool:CL_AS,b:.1,par:-1}};
@@ -3260,10 +3432,11 @@ const ASIA_TOP=['J1','K1','CSL','AUS'], ASIA_2=['J2','K2'];
 const lgW=k=>LV[k].top5?1:LV[k].eu?0.6:ASIA_TOP.includes(k)?0.5:ASIA_2.includes(k)?0.3:0.2;
 const seasonPts=r=>r.lv&&r.st.App?Math.max(0,r.st.Rt-6.0)*r.st.Min/90:0;
 /* 榮譽加分:由上往下取第一個符合的規則 */
-const HONOR_PTS=[[/世界盃金球獎/,150],[/世界盃(金靴|金手套)/,80],[/世界盃最佳年輕球員/,40],[/歐冠最佳球員/,100],[/歐冠(射手王|最佳年輕球員)/,50],
+const HONOR_PTS=[[/歐洲國家盃（冠軍/,130],[/歐洲國家盃（亞軍/,65],[/美洲盃（冠軍/,120],[/美洲盃（亞軍/,60],[/非洲國家盃（冠軍/,70],[/非洲國家盃（亞軍/,35],[/金盃賽（冠軍/,40],
+  [/(歐洲國家盃|美洲盃|非洲國家盃|金盃賽)(最佳球員|金靴)/,40],[/(歐洲國家盃|美洲盃|非洲國家盃|金盃賽)（(4 強|止步4 強)/,25],[/(歐洲國家盃|美洲盃|非洲國家盃|金盃賽)/,10],[/世界盃金球獎/,150],[/世界盃(金靴|金手套)/,80],[/世界盃最佳年輕球員/,40],[/歐冠最佳球員/,100],[/歐冠(射手王|最佳年輕球員)/,50],
   [/亞冠最佳球員/,40],[/亞冠(射手王|最佳年輕球員)/,20],[/亞洲盃(最佳球員|金靴)/,40],[/決賽最佳球員/,25],[/世俱盃（冠軍/,60],[/世俱盃（亞軍/,25],[/歐霸（冠軍/,70],[/歐霸（亞軍/,35],[/歐霸（4 強/,15],[/歐協聯（冠軍/,40],[/歐協聯（亞軍/,20],[/歐協聯（4 強/,8],
   [/亞冠二級（冠軍/,30],[/亞冠二級（亞軍/,15],[/亞冠二級（4 強/,6],[/東協錦標賽（冠軍/,40],[/東亞錦標賽（冠軍/,25],[/(東協|東亞)錦標賽/,5],[/歐冠（冠軍/,150],[/歐冠（亞軍/,70],[/歐冠（4 強/,35],[/亞冠（冠軍/,60],[/亞冠（亞軍/,30],[/亞冠（4 強/,15],[/盃冠軍（/,30],[/金球獎/,300],[/世界盃（(冠軍|亞軍)/,200],[/世界盃（止步(8 強|4 強)/,100],[/世界盃/,40],
-  [/亞洲足球先生/,80],[/最佳球員/,60],[/(英超|西甲|德甲|義甲|法甲)冠軍/,60],[/金靴|金手套/,40],
+  [/歐足聯年度最佳球員/,150],[/(亞洲|南美|非洲)足球先生|中北美年度最佳球員/,80],[/最佳球員/,60],[/(英超|西甲|德甲|義甲|法甲)冠軍/,60],[/金靴|金手套/,40],
   [/亞洲盃（冠軍/,60],[/奧運（(金牌|銀牌|銅牌)/,40],[/亞運（金牌/,30],[/亞洲盃（亞軍/,30],
   [/年度最佳陣容/,20],[/冠軍（/,20],[/最佳年輕球員/,10],[/亞洲盃/,10]];
 /* 聯賽獎項與冠軍乘上該聯賽權重;國際賽不打折 */

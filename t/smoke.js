@@ -3,16 +3,16 @@
 // 位置依序輪 GK/DF/MF/FW、國籍輪 7 國;每段約 10–20 秒
 const {JSDOM}=require('jsdom'); const fs=require('fs'), path=require('path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
-const N=+process.argv[2]||7, SEEDP=process.argv[3]||'smk';
+const N=+process.argv[2]||7, SEEDP=process.argv[3]||'smk', ONLY=process.argv[4]?process.argv[4].split(','):null;
 const tally={}; let errs=[];
-const pos=['GK','DF','MF','FW'], nats=['TW','JP','KR','AU','CN','VN','TH'];
+const pos=['GK','DF','MF','FW'], nats=['TW','JP','KR','AU','CN','VN','TH','EN','ES','FR','DE','IT','PT','NL','HR','BR','AR','UY','CO','US','MX','CA','MA','SN','NG','EG','CV'];
 (async()=>{for(let k=0;k<N;k++){
   const dom=new JSDOM(html,{runScripts:'dangerously',url:'https://x.test/?seed='+SEEDP+k,pretendToBeVisual:true});
   const w=dom.window; w.scrollTo=()=>{}; w.Element.prototype.scrollIntoView=function(){};
   w.addEventListener('error',e=>errs.push(String(e.error&&e.error.stack||e.message)));
   const d=w.document;
   try{
-    d.querySelector(`[data-v="${pos[k%4]}"]`).click(); d.querySelector(`[data-v="${nats[k%7]}"]`).click();
+    d.querySelector(`[data-v="${pos[k%4]}"]`).click(); d.querySelector(`[data-v="${(ONLY?ONLY[k%ONLY.length]:nats[(k*7+3)%27])}"]`).click();
     const nm=d.querySelector('input'); if(nm)nm.value='測試';
     d.getElementById('btn-start').click();
     let steps=0, idle=0;
@@ -29,7 +29,7 @@ const pos=['GK','DF','MF','FW'], nats=['TW','JP','KR','AU','CN','VN','TH'];
     const S=w.eval('S');
     const titles=[...d.querySelectorAll('.card')].map(c=>(c.querySelector('h3,.ch,.ttl')||c).textContent.slice(0,30));
     for(const t of titles){ const m=t.match(/^(回聲|劇情|插曲|後續|場外|關鍵時刻)/); if(m)tally[m[1]]=(tally[m[1]]||0)+1; }
-    console.log(`#${k} ${pos[k%4]} ${nats[k%7]} age=${S.age} done=${S.done} steps=${steps} mem=${Object.keys(S.mem||{}).join(',')} arcs=${Object.keys(S.arcs||{}).join(',')}`);
+    console.log(`#${k} ${pos[k%4]} ${(ONLY?ONLY[k%ONLY.length]:nats[(k*7+3)%27])} age=${S.age} done=${S.done} steps=${steps} mem=${Object.keys(S.mem||{}).join(',')} arcs=${Object.keys(S.arcs||{}).join(',')}`);
   }catch(e){ errs.push(String(e.stack)); }
   w.close();
 }
