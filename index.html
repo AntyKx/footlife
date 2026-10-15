@@ -623,7 +623,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.19.0';
+const APP_VER='v0.20.0';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1728,6 +1728,87 @@ const DIALOGS=[
   {t:'回國出席發表會',m:'norm',s:'收入↑、狀態小幅↓',ok:{pay:1,fans:4,form:-2},okt:'發表會現場擠滿了人，連警察都來維持秩序'},
   {t:'穿傳統服飾拍廣告',m:'bold',p:60,s:'可能大受歡迎',ok:{fans:10,pay:1},ng:{fans:-2},okt:'照片在泰國社群瘋傳',ngt:'造型被網友拿去做梗圖'},
   {t:'只授權照片',m:'safe',s:'收入小幅↑',ok:{pay:0.5},okt:'看板上的你笑得很燦爛'}]},
+ /* ---- v0.20 新國籍專屬對話(20 國) ---- */
+ {n:'三獅軍團的壓力',st:'PRO',c:()=>S.nat==='EN'&&S.ntOn,d:'小報頭版放了你的大頭照：「他能終結幾十年的無冕之痛嗎？」記者連你家門口的垃圾桶都不放過。',o:[
+  {t:'接受專訪，談談夢想',m:'norm',s:'球迷↑',ok:{fans:6},okt:'你說「我只想把獎盃帶回家」，這句話被印成了 T 恤'},
+  {t:'公開批評小報文化',m:'bold',p:40,s:'可能圈粉，也可能被盯上',ok:{fans:10},ng:{fans:-6,mem:'tabloid'},okt:'很多球員私下傳訊息感謝你',ngt:'小報開始連載你的「黑歷史」'},
+  {t:'關掉手機',m:'safe',s:'狀態↑',ok:{form:5},okt:'你只看訓練場上的東西'}]},
+ {n:'離開西班牙',st:'PRO',c:()=>S.nat==='ES'&&abroad(),d:'新球隊的教練不喜歡短傳：「這裡不是西班牙，球要往前踢。」',o:[
+  {t:'改變踢法，多打直傳',m:'norm',s:'教練信任↑',ok:{trust:8,ab:['vis|kic',1]},okt:'你學會了另一種足球'},
+  {t:'用傳控說服教練',m:'bold',p:45,s:'成功＝教練信任大幅↑',ok:{trust:10,fans:4},ng:{trust:-8},okt:'你連續傳了二十腳，最後一腳送出助攻。教練閉嘴了',ngt:'教練在中場休息時把你換下'},
+  {t:'私下找西班牙同鄉吃飯',m:'safe',s:'狀態↑',ok:{form:5},okt:'一盤西班牙海鮮飯，讓你想起家鄉的球場'}]},
+ {n:'巴黎郊區的孩子',st:'PRO',c:()=>S.nat==='FR'&&S.fans>=40,d:'你長大的那個郊區社區，球場的人工草皮已經破得不能踢了。社區主委打電話給你。',o:[
+  {t:'出錢重鋪整座球場',m:'norm',s:'花一筆錢、球迷大幅↑',ok:{pay:-1.5,fans:10,mem:'clinic'},okt:'剪綵那天，整個社區的孩子都穿著你的球衣'},
+  {t:'在社群號召募款',m:'bold',p:60,s:'可能一呼百應',ok:{fans:8,form:3},ng:{fans:-2},okt:'三天就募到了兩座球場的錢',ngt:'有人說你「自己有錢不出」'},
+  {t:'寄一批球鞋回去',m:'safe',s:'球迷↑',ok:{fans:4},okt:'孩子們拍了一支感謝影片'}]},
+ {n:'德國式的紀律',st:'PRO',c:()=>S.nat==='DE'&&abroad(),d:'新隊友訓練常遲到，戰術會議也有人在滑手機。你從小不是這樣長大的。',o:[
+  {t:'在更衣室直接說',m:'bold',p:45,s:'可能立威，也可能被孤立',ok:{trust:8},ng:{trust:-5},okt:'隔天，所有人都準時了',ngt:'隊友在背後叫你「德國教官」'},
+  {t:'以身作則，每天最早到',m:'norm',s:'教練信任↑',ok:{trust:6,form:-2},okt:'教練在晨會上點了你的名字'},
+  {t:'入境隨俗',m:'safe',s:'狀態↑',ok:{form:5},okt:'你學會了晚十分鐘也沒關係'}]},
+ {n:'錯過世界盃的陰影',st:'PRO',c:()=>S.nat==='IT'&&S.ntOn,d:'藍衣軍團連續兩屆沒打進世界盃，整個國家都在問：「義大利足球怎麼了？」',o:[
+  {t:'「我們會回來的。」',m:'norm',s:'球迷↑、國家隊教練印象↑',ok:{fans:6,nt:1},okt:'這句話上了每一家體育報的頭版'},
+  {t:'批評足協的青訓制度',m:'bold',p:40,s:'可能引起改革，也可能被冷凍',ok:{fans:10},ng:{nt:-2},okt:'足協宣布成立青訓改革委員會，還邀你當顧問',ngt:'下一期國家隊名單沒有你'},
+  {t:'專心踢好俱樂部比賽',m:'safe',s:'狀態↑',ok:{form:5},okt:'你用表現回答'}]},
+ {n:'天才的標籤',st:'PRO',c:()=>S.nat==='PT'&&S.age<=23,d:'葡萄牙媒體已經把你稱為「下一個國家隊靈魂人物」。你才二十出頭。',o:[
+  {t:'享受聚光燈',m:'bold',p:50,s:'可能更有自信，也可能被捧殺',ok:{fans:10,form:4},ng:{form:-6},okt:'你在下一場踢出生涯最佳表現',ngt:'壓力讓你連續三場失常'},
+  {t:'「我還有很多要學。」',m:'safe',s:'教練信任↑',ok:{trust:5},okt:'教練說：「這孩子腦袋很清楚。」'},
+  {t:'請老將當導師',m:'norm',s:'關鍵能力↑',ok:{ab:['key',1],trust:2},okt:'老將每天訓練後多陪你練半小時'}]},
+ {n:'全攻全守的信徒',st:'PRO',c:()=>S.nat==='NL',d:'新教練要你學荷蘭的老傳統：每個位置都要會踢。「後衛要會組織，前鋒要會防守。」',o:[
+  {t:'全力學習多個位置',m:'norm',s:'次要能力↑',ok:{ab:['weak',2],form:-2},okt:'你在訓練裡輪過了五個位置'},
+  {t:'「我只想踢好一個位置。」',m:'bold',p:45,s:'可能被尊重，也可能被冷落',ok:{form:5,ab:['best',1]},ng:{trust:-6},okt:'教練說：「好，那你要成為那個位置最好的人。」',ngt:'教練覺得你不夠全面'},
+  {t:'先觀察隊友怎麼做',m:'safe',s:'視野↑',ok:{ab:['vis|gkp',1]},okt:'你看懂了這套戰術的邏輯'}]},
+ {n:'格子軍團',st:'PRO',c:()=>S.nat==='HR'&&S.ntOn,d:'人口不到四百萬的國家，卻一次又一次在世界盃走得很遠。總教練說：「我們靠的是心。」',o:[
+  {t:'把國家隊放在第一位',m:'norm',s:'國家隊教練印象↑、教練信任↓',ok:{nt:1,trust:-3},okt:'你每一次集訓都提前報到'},
+  {t:'帶頭唱國歌',m:'bold',p:60,s:'球迷可能大幅↑',ok:{fans:10},ng:{fans:-2},okt:'看台跟著你一起唱，全隊都紅了眼眶',ngt:'你唱錯了一句歌詞，被做成了梗圖'},
+  {t:'跟老將學經驗',m:'safe',s:'狀態↑',ok:{form:5},okt:'老將告訴你：「大賽靠的是腦袋，不是腳。」'}]},
+ {n:'桑巴的期待',st:'PRO',c:()=>S.nat==='BR'&&abroad(),d:'歐洲的教練說你「花式太多、效率太低」。但巴西的球迷就是愛看你的盤帶。',o:[
+  {t:'簡化動作，追求效率',m:'norm',s:'教練信任↑',ok:{trust:8},okt:'你的傳球成功率創了新高'},
+  {t:'繼續用桑巴風格說話',m:'bold',p:50,s:'可能讓全世界愛上你，也可能坐板凳',ok:{fans:12,ab:['dri',1]},ng:{trust:-8},okt:'你的彩虹過人登上了全球集錦',ngt:'教練說：「這裡不是街頭足球。」'},
+  {t:'在訓練裡兩種都練',m:'safe',s:'盤帶↑',ok:{ab:['dri',1]},okt:'你知道什麼時候該花式，什麼時候該簡單'}]},
+ {n:'阿根廷的十號',st:'PRO',c:()=>S.nat==='AR'&&!isGK()&&S.fans>=40,d:'國家隊的十號球衣空出來了。媒體問你：「你敢穿嗎？」',o:[
+  {t:'「我準備好了。」',m:'bold',p:45,s:'成功＝球迷大幅↑；失敗＝壓力倍增',ok:{fans:12,form:4},ng:{form:-6,fans:-4},okt:'你穿上十號的第一場就進了球',ngt:'你穿上十號後連續五場沒有表現'},
+  {t:'「那件球衣屬於傳奇。」',m:'safe',s:'球迷↑',ok:{fans:5},okt:'球迷說你懂得尊重'},
+  {t:'讓總教練決定',m:'norm',s:'國家隊教練印象↑',ok:{nt:1},okt:'總教練說：「我會看你們的表現。」'}]},
+ {n:'烏拉圭的狠勁',st:'PRO',c:()=>S.nat==='UY',d:'烏拉圭人有一個詞叫「Garra」——永不放棄的狠勁。隊友說你踢得太溫柔了。',o:[
+  {t:'下一場拚每一顆球',m:'bold',p:55,s:'成功＝狀態、教練信任↑；也可能吃牌',ok:{form:6,trust:5},ng:{trust:-3},okt:'你在補時還在拚命回追，看台喊出你的名字',ngt:'你拚過頭，吃了一張黃牌'},
+  {t:'加練對抗',m:'norm',s:'對抗↑',ok:{ab:['phy|sta',1],form:-2},okt:'你的身體變得更硬了'},
+  {t:'用自己的方式踢',m:'safe',s:'狀態↑',ok:{form:4},okt:'你相信溫柔也可以很有力'}]},
+ {n:'咖啡國度的驕傲',st:'PRO',c:()=>S.nat==='CO'&&abroad(),d:'哥倫比亞的家鄉為你的每一場比賽辦了戶外轉播，凌晨三點也擠滿了人。',o:[
+  {t:'錄影片感謝家鄉',m:'norm',s:'球迷↑',ok:{fans:6},okt:'影片在哥倫比亞被轉了上百萬次'},
+  {t:'承諾進球後跳家鄉的舞',m:'bold',p:50,s:'成功＝球迷大幅↑',ok:{fans:12,form:3},ng:{form:-3},okt:'你進球後在角旗區跳起了昆比亞舞，全隊都跟著跳',ngt:'那場沒進球，你在場邊默默跳了兩步'},
+  {t:'專心比賽',m:'safe',s:'狀態↑',ok:{form:4},okt:'你知道他們要的是勝利'}]},
+ {n:'美國足球的代言人',st:'PRO',c:()=>S.nat==='US'&&(abroad()||S.fans>=50),d:'美國的電視台想拍一部你的紀錄片，說你能讓更多美國孩子愛上足球。',o:[
+  {t:'答應拍攝',m:'bold',p:50,en:1,s:'人氣大幅↑；可能影響訓練',ok:{fans:12,pay:1.5},ng:{form:-6},okt:'紀錄片在串流平台排行第一',ngt:'攝影機跟了你三個月，你的狀態也跟著掉了'},
+  {t:'只接受一天專訪',m:'norm',s:'球迷↑',ok:{fans:5},okt:'那集節目收視率很高'},
+  {t:'婉拒',m:'safe',s:'狀態↑',ok:{form:4},okt:'你說：「等我拿到冠軍再拍。」'}]},
+ {n:'第五場的魔咒',st:'PRO',c:()=>S.nat==='MX'&&S.ntOn,d:'墨西哥已經連續好幾屆世界盃在 16 強止步，球迷管這叫「第五場的魔咒」。記者問你怎麼打破。',o:[
+  {t:'「這一代不一樣。」',m:'bold',p:45,s:'可能點燃士氣，也可能成為笑柄',ok:{fans:10,nt:1},ng:{fans:-5},okt:'整個國家都在轉貼你的發言',ngt:'這句話被拿來跟前幾屆的口號做比較'},
+  {t:'「一場一場踢。」',m:'safe',s:'狀態↑',ok:{form:5},okt:'你不想談魔咒'},
+  {t:'請心理師幫全隊上課',m:'norm',s:'國家隊教練印象↑',ok:{nt:1,trust:2},okt:'總教練說這是很好的主意'}]},
+ {n:'冰球國度的足球員',st:'PRO',c:()=>S.nat==='CA',d:'在加拿大，冰球永遠是第一運動。電台主持人開玩笑：「足球？那是夏天打發時間的東西。」',o:[
+  {t:'上節目跟他辯論',m:'bold',p:55,s:'可能讓更多人關注足球',ok:{fans:10},ng:{fans:-3},okt:'主持人最後說：「好吧，我會去看你的比賽。」',ngt:'你被冰球迷灌爆留言'},
+  {t:'去冰球比賽開球',m:'norm',s:'球迷↑',ok:{fans:6},okt:'冰球迷給了你熱烈的掌聲'},
+  {t:'用成績證明',m:'safe',s:'狀態↑',ok:{form:5},okt:'你說：「總有一天，足球會是第一。」'}]},
+ {n:'兩個國家的召喚',st:'PRO',c:()=>S.nat==='MA'&&S.age<=23&&S.caps<5,d:'你在法國出生長大，法國青年隊和摩洛哥國家隊同時打電話給你。這個決定會跟著你一輩子。',o:[
+  {t:'選擇摩洛哥',m:'norm',s:'球迷大幅↑、國家隊教練印象↑',ok:{fans:10,nt:1},okt:'你穿上紅色球衣的那天，祖母在電話裡哭了'},
+  {t:'再等等，先踢好俱樂部',m:'safe',s:'狀態↑',ok:{form:4},okt:'你把兩通電話都留著'},
+  {t:'公開表示兩邊都愛',m:'bold',p:50,s:'可能被理解，也可能兩邊都不討好',ok:{fans:6},ng:{fans:-6},okt:'兩邊的球迷都說你很真誠',ngt:'兩邊的球迷都說你在算計'}]},
+ {n:'回饋家鄉',st:'PRO',c:()=>S.nat==='SN'&&S.salary>=200,d:'你從小踢球的村子還沒有一所像樣的學校。村長寫信問你能不能幫忙。',o:[
+  {t:'出錢蓋學校和球場',m:'norm',s:'花一大筆錢、球迷大幅↑',ok:{pay:-2.5,fans:12,flag:'fund',mem:'fund'},okt:'學校開學那天，你在新球場踢了第一腳'},
+  {t:'捐一批物資',m:'safe',s:'球迷↑',ok:{pay:-0.5,fans:5},okt:'孩子們收到了新的課本和球鞋'},
+  {t:'號召隊友一起捐款',m:'bold',p:60,s:'成功＝球迷大幅↑、教練信任↑',ok:{fans:10,trust:4},ng:{fans:2},okt:'整支球隊都捐了，球會還宣布每年辦一場慈善賽',ngt:'只有幾個隊友響應'}]},
+ {n:'超級老鷹的獎金',st:'PRO',c:()=>S.nat==='NG'&&S.ntOn,d:'國家隊的出場獎金又拖欠了三個月。隊友們在飯店裡討論要不要罷訓。',o:[
+  {t:'帶頭跟足協談判',m:'bold',p:45,s:'成功＝隊友感激；失敗＝被足協記恨',ok:{fans:8,nt:1},ng:{nt:-2},okt:'足協當晚就把獎金匯進了每個人的戶頭',ngt:'足協發聲明說你「破壞團結」'},
+  {t:'先比賽，賽後再說',m:'norm',s:'國家隊教練印象↑',ok:{nt:1},okt:'你們贏了比賽，足協也承諾會補發'},
+  {t:'自己掏錢補隊友的獎金',m:'safe',s:'花一筆錢、球迷↑',ok:{pay:-1,fans:6},okt:'年輕隊友們一直記得這件事'}]},
+ {n:'全國的期待',st:'PRO',c:()=>S.nat==='EG'&&(abroad()||S.fans>=50),d:'開羅的咖啡館裡，每一台電視都在轉播你的比賽。你的照片被畫在大樓的外牆上。',o:[
+  {t:'回開羅參加慈善賽',m:'norm',s:'球迷大幅↑、狀態小幅↓',ok:{fans:10,form:-2},okt:'體育場塞滿了八萬人'},
+  {t:'承諾帶埃及打進世界盃',m:'bold',p:45,s:'可能點燃全國，也可能變成壓力',ok:{fans:12,nt:1},ng:{form:-5},okt:'這句話被印在每一份報紙上',ngt:'你開始失眠'},
+  {t:'低調做自己',m:'safe',s:'狀態↑',ok:{form:5},okt:'你知道他們的愛很沉重'}]},
+ {n:'小島的大夢想',st:'PRO',c:()=>S.nat==='CV'&&S.ntOn,d:'維德角只有幾十萬人口，散落在大西洋的十座小島上。國家隊每一次出賽，全國都停下來看。',o:[
+  {t:'在社群用克里奧爾語感謝大家',m:'norm',s:'球迷↑',ok:{fans:8},okt:'每一座島上都有人轉貼了'},
+  {t:'承諾帶國家隊創造歷史',m:'bold',p:50,s:'成功＝球迷大幅↑、國家隊教練印象↑',ok:{fans:12,nt:1},ng:{form:-4},okt:'你的承諾成了全國的口號',ngt:'壓力讓你在下一場踢得很緊張'},
+  {t:'回家鄉的島上辦足球營',m:'safe',s:'球迷↑',ok:{fans:5,mem:'clinic'},okt:'孩子們赤腳在沙灘上跟你踢了一整天'}]},
  /* ---- v0.18 位置專屬對話 ---- */
  {n:'致命失誤之後',st:'PRO',c:()=>S.grp==='GK',d:'上週你在補時漏接一記平淡的傳中，球隊因此丟了三分。今天走進訓練場，大家都刻意不提這件事。',o:[
   {t:'主動在更衣室道歉',m:'norm',s:'教練信任↑、狀態↑',ok:{trust:5,form:3},okt:'隊長拍拍你：「誰沒失誤過？下一場幫我們撲回來。」'},
@@ -3102,7 +3183,7 @@ function u23Cycle(T,Y,isAG,next){
   playTourney(T,Y,false,!u23,next);
 }
 /* ================= 大賽淘汰賽之路、決賽、點球大戰、大賽個人獎項(v0.16) ================= */
-const TROPHY={世界盃:'大力神盃',歐冠:'大耳朵盃',亞冠:'亞冠獎盃',亞洲盃:'亞洲盃',奧運:'奧運金牌',歐洲國家盃:'德勞內盃',美洲盃:'美洲盃',金盃賽:'金盃',非洲國家盃:'非洲國家盃'};
+const TROPHY={自由盃:'解放者盃',中北美冠軍盃:'中北美冠軍盃',非洲冠軍聯賽:'非洲冠軍聯賽獎盃',世界盃:'大力神盃',歐冠:'大耳朵盃',亞冠:'亞冠獎盃',亞洲盃:'亞洲盃',奧運:'奧運金牌',歐洲國家盃:'德勞內盃',美洲盃:'美洲盃',金盃賽:'金盃',非洲國家盃:'非洲國家盃'};
 const WDL={W:'勝',D:'和',L:'負'};
 function scoreFor(r){ if(r==='D'){ const n=ri(0,2); return [n,n]; } const a=ri(1,3), b=ri(0,a-1); return r==='W'?[a,b]:[b,a]; }
 /* 國家隊小組賽:三場比分與積分 */
@@ -3198,7 +3279,7 @@ function pkShootout(c,cb){
 function tourneyAwards(kind,Y,info){
   const comp=info.comp||{WC:'世界盃',AC:'亞洲盃',CL:'歐冠',ACL:'亞冠'}[kind], champ=info.win, fin=info.i>=info.n-1, deep=info.i>=info.n-2;
   const club=kind==='CL'||kind==='ACL';
-  const who=()=>{ if(club){ const o=awardee(pick(kind==='CL'?CL_EU:CL_AS)); return `${o.n}（${o.c}）`; }
+  const who=()=>{ if(club){ const o=awardee(pick((info.pool||(kind==='CL'?CL_EU:CL_AS)).filter(k=>TEAMS[k]))); return `${o.n}（${o.c}）`; }
     const ctry=pick((info.opp||(kind==='WC'?OPP_WC:OPP_AS)).filter(x=>x!==NATS[S.nat].n)), N=nameSet(NAT_CODE[ctry]);
     return `${pick(N[0])+pick(N[1])}（${ctry}）`; };
   const me=`<b class="hl">${S.name}</b>（${club?S.club:NATS[S.nat].n}）`, got=[], rows=[];
@@ -3355,42 +3436,49 @@ const CUP_N={ENG:'英格蘭足總盃',EFL:'英格蘭足總盃',ESP:'國王盃',E
   MEX:'墨西哥盃',MEX2:'墨西哥盃',MAR:'摩洛哥王座盃',EGY:'埃及盃',SEN:'塞內加爾盃',NGA:'奈及利亞總統盃',CPV:'維德角盃'};
 const CUP_ST=['第三輪','16 強','8 強','4 強','決賽'];
 const CL_EU=['ENG','ESP','GER','ITA','FRA','NED','POR','BEL','CRO'], CL_AS=['J1','K1','CSL','AUS','THA','VIE'];
+const CL_SA=['BRA','ARG','URU','COL'], CL_NA=['MLS','MEX'], CL_AF=['EGY','MAR','SEN','NGA'];
 const CL_ST=['小組賽','16 強','8 強','4 強','決賽'];
 /* 洲際盃賽每輪勝率:[小組出線, 淘汰賽] */
 const CL_P={ENG:[.85,.6],ESP:[.85,.6],GER:[.8,.55],ITA:[.8,.55],FRA:[.75,.5],NED:[.55,.4],POR:[.55,.4],BEL:[.45,.35],CRO:[.45,.33],
+  BRA:[.8,.55],ARG:[.75,.52],URU:[.5,.38],COL:[.5,.38],MLS:[.6,.45],MEX:[.65,.5],EGY:[.65,.5],MAR:[.65,.5],SEN:[.3,.28],NGA:[.35,.3],
   J1:[.6,.45],K1:[.6,.45],CSL:[.5,.4],AUS:[.45,.38],THA:[.3,.3],VIE:[.2,.25]};
 /* 洲際賽事:b = 對手較弱的勝率加成、par = 關鍵時刻對手強度修正 */
-const CONT={歐冠:{pool:CL_EU,b:0,par:3},歐霸:{pool:CL_EU,b:.08,par:0},歐協聯:{pool:CL_EU,b:.15,par:-3},亞冠:{pool:CL_AS,b:0,par:3},亞冠二級:{pool:CL_AS,b:.1,par:-1}};
-function contComp(){ const eu=CL_EU.includes(S.lv), as=CL_AS.includes(S.lv), t=S.clubTier; if(!eu&&!as)return null; const r=R()*100;
-  if(eu)return t===1?'歐冠':t===2?(r<30?'歐冠':r<70?'歐霸':r<90?'歐協聯':null):(r<15?'歐協聯':null);
+const CONT={自由盃:{pool:CL_SA,b:0,par:3,rg:'南美'},南美盃:{pool:CL_SA,b:.08,par:-1},中北美冠軍盃:{pool:CL_NA,b:0,par:2,rg:'中北美'},
+  非洲冠軍聯賽:{pool:CL_AF,b:0,par:2,rg:'非洲'},非洲聯合會盃:{pool:CL_AF,b:.08,par:-1},歐冠:{pool:CL_EU,b:0,par:3,rg:'歐洲'},歐霸:{pool:CL_EU,b:.08,par:0},歐協聯:{pool:CL_EU,b:.15,par:-3},亞冠:{pool:CL_AS,b:0,par:3,rg:'亞洲'},亞冠二級:{pool:CL_AS,b:.1,par:-1}};
+function contComp(){ const v=S.lv, t=S.clubTier; if(![CL_EU,CL_AS,CL_SA,CL_NA,CL_AF].some(a=>a.includes(v)))return null; const r=R()*100;
+  if(CL_EU.includes(v))return t===1?'歐冠':t===2?(r<30?'歐冠':r<70?'歐霸':r<90?'歐協聯':null):(r<15?'歐協聯':null);
+  if(CL_SA.includes(v))return t===1?'自由盃':t===2?(r<35?'自由盃':r<75?'南美盃':null):(r<15?'南美盃':null);
+  if(CL_NA.includes(v))return t===1?'中北美冠軍盃':t===2&&r<30?'中北美冠軍盃':null;
+  if(CL_AF.includes(v))return t===1?'非洲冠軍聯賽':t===2?(r<35?'非洲冠軍聯賽':r<70?'非洲聯合會盃':null):(r<15?'非洲聯合會盃':null);
   return t===1?'亞冠':t===2?(r<30?'亞冠':r<75?'亞冠二級':null):null; }
-const CWC_OPP=['弗拉門哥','河床','博卡青年','帕梅拉斯','蒙特雷','艾阿赫利','西雅圖海灣人'];
+const TOP_CL=['歐冠','亞冠','自由盃','中北美冠軍盃','非洲冠軍聯賽']; /* 各洲最高層級:每輪淘汰賽關鍵時刻＋決賽流程 */
+const CWC_OPP=['弗拉門哥','河床','博卡青年','帕梅拉斯','蒙特雷','阿赫利','西雅圖海灣人'];
 function clubCups(cont){
   const L=LV[S.lv], Y=seasonLabel(S.year), rel=clamp((ovr()-curPar())*0.01,-0.05,0.08), role=S.lastSt.role==='主力'?0.03:0;
   let usedMoment=false; const q=[], cb=S.cupB&&S.cupB.y===S.year&&S.cupB.club===S.club?S.cupB:{cup:0,cont:0};
   /* 世俱盃:上季拿下歐冠/亞冠,且仍在同一隊 */
-  if(S.cwc&&S.cwc.y===S.year&&S.cwc.club===S.club){ const eu=S.cwc.eu; S.cwc=null;
+  if(S.cwc&&S.cwc.y===S.year&&S.cwc.club===S.club){ const eu=S.cwc.eu; S.cwcRg=S.cwc.rg; S.cwc=null;
     q.push(()=>{ let i=0; const p=[eu?.85:.45,eu?.62:.25], b=rel+role;
       const end=()=>{ const label=i===2?'冠軍':i===1?'亞軍':'止步準決賽';
         S.honors.push(`${Y} 世俱盃（${label}・${S.club}）`); if(i===2){ S.cups++; S.pool+=2; meter('fans',10); confetti(); }
-        card(i>=1?'gold':'info',`${Y} 世俱盃`,`以${eu?'歐洲':'亞洲'}冠軍身分出戰世俱盃：<b class="hl">${label}</b>。${i===2?'<br>賽事成果 <b class="up">+2</b> 點（季末自由分配）':''}`); board(); next(); };
+        card(i>=1?'gold':'info',`${Y} 世俱盃`,`以${S.cwcRg||(eu?'歐洲':'亞洲')}冠軍身分出戰世俱盃：<b class="hl">${label}</b>。${i===2?'<br>賽事成果 <b class="up">+2</b> 點（季末自由分配）':''}`); board(); next(); };
       if(!chance(p[0]*100+b*100)){ end(); return; } i=1;
       if(!usedMoment){ usedMoment=true;
         bigMoment(`${Y} 世俱盃決賽`,S.club,eu?pick(CWC_OPP):pick(TEAMS[pick(['ENG','ESP','GER','ITA'])].slice(0,3)),L.par+(eu?6:12),ok=>{ if(ok||chance(eu?35:15))i=2; end(); }); return; }
       if(chance(p[1]*100+b*100))i=2; end(); }); }
   /* 洲際 */
   const clName=S.contPlan&&S.contPlan.y===S.year&&S.contPlan.club===S.club?S.contPlan.n:contComp();
-  if(clName==='歐冠'||clName==='亞冠'){
+  if(TOP_CL.includes(clName)){
     q.push(()=>{ const P=CL_P[S.lv], C=CONT[clName]; let i=0, b=rel+role+(S.clubTier===1?0.05:0)+C.b+cb.cont, okc=0, fr=null;
       const pool=C.pool.filter(k=>k!==S.lv), used=new Set(), path=[], g0=S.mG, title=`${Y} ${clName}`;
       const opp=()=>{ let o; for(let k=0;k<6;k++){ o=pick(TEAMS[pick(pool)].slice(0,8)); if(!used.has(o))break; } used.add(o); return o; };
       const end=()=>{ const label=i===5?'冠軍':i===4?'亞軍':i===3?'4 強':`止步${CL_ST[i]}`;
         const cp=i===5?3:i===4?2:i===3?1:0; S.pool+=cp;
         if(i>=3){ S.honors.push(`${Y} ${clName}（${label}・${S.club}）`); S.cups++; }
-        if(i===5){ meter('fans',10); meter('trust',5); S.cwc={y:S.year+1,club:S.club,eu:clName==='歐冠'}; }
+        if(i===5){ meter('fans',10); meter('trust',5); S.cwc={y:S.year+1,club:S.club,eu:clName==='歐冠',rg:C.rg}; }
         const apps=6+Math.max(0,Math.min(i,4)-1)*2+(i>=4?1:0), tg=(isGK()?0:Math.round(apps*GOAL_BASE[S.dpos]*0.55*(0.6+R()*0.8)))+(S.mG-g0);
         card(i>=3?'gold':'info',`${title}｜總結`,`${S.club}在${clName}的旅程：<b class="hl">${label}</b>。出賽 ${apps} 場${tg?`、進 ${tg} 球`:''}。<div class="statline">${path.join('<br>')}</div>${cp?`賽事成果 <b class="up">+${cp}</b> 點（季末自由分配）`:''}`);
-        if(i>=1)tourneyAwards(clName==='歐冠'?'CL':'ACL',Y,{i,n:5,win:i===5,tg,okc});
+        if(i>=1)tourneyAwards(clName==='歐冠'?'CL':'ACL',Y,{i,n:5,win:i===5,tg,okc,comp:clName,pool:C.pool});
         board(); next(); };
       const go=()=>{ while(i<5){ const pr=(i===0?P[0]:P[1])+b;
           if(i===0){ const adv=chance(pr*100); path.push(groupCard6(`${title}｜小組賽`,adv)); if(!adv)break; i++; continue; }
@@ -3432,7 +3520,10 @@ const ASIA_TOP=['J1','K1','CSL','AUS'], ASIA_2=['J2','K2'];
 const lgW=k=>LV[k].top5?1:LV[k].eu?0.6:ASIA_TOP.includes(k)?0.5:ASIA_2.includes(k)?0.3:0.2;
 const seasonPts=r=>r.lv&&r.st.App?Math.max(0,r.st.Rt-6.0)*r.st.Min/90:0;
 /* 榮譽加分:由上往下取第一個符合的規則 */
-const HONOR_PTS=[[/歐洲國家盃（冠軍/,130],[/歐洲國家盃（亞軍/,65],[/美洲盃（冠軍/,120],[/美洲盃（亞軍/,60],[/非洲國家盃（冠軍/,70],[/非洲國家盃（亞軍/,35],[/金盃賽（冠軍/,40],
+const HONOR_PTS=[[/自由盃（冠軍/,90],[/自由盃（亞軍/,45],[/自由盃（4 強/,20],[/南美盃（冠軍/,40],[/南美盃（亞軍/,20],[/南美盃（4 強/,8],
+  [/中北美冠軍盃（冠軍/,45],[/中北美冠軍盃（亞軍/,22],[/中北美冠軍盃（4 強/,10],[/非洲冠軍聯賽（冠軍/,50],[/非洲冠軍聯賽（亞軍/,25],[/非洲冠軍聯賽（4 強/,10],
+  [/非洲聯合會盃（冠軍/,25],[/非洲聯合會盃（亞軍/,12],[/非洲聯合會盃（4 強/,5],[/(自由盃|中北美冠軍盃|非洲冠軍聯賽)最佳球員/,40],[/(自由盃|中北美冠軍盃|非洲冠軍聯賽)(射手王|最佳年輕球員)/,15],
+  [/歐洲國家盃（冠軍/,130],[/歐洲國家盃（亞軍/,65],[/美洲盃（冠軍/,120],[/美洲盃（亞軍/,60],[/非洲國家盃（冠軍/,70],[/非洲國家盃（亞軍/,35],[/金盃賽（冠軍/,40],
   [/(歐洲國家盃|美洲盃|非洲國家盃|金盃賽)(最佳球員|金靴)/,40],[/(歐洲國家盃|美洲盃|非洲國家盃|金盃賽)（(4 強|止步4 強)/,25],[/(歐洲國家盃|美洲盃|非洲國家盃|金盃賽)/,10],[/世界盃金球獎/,150],[/世界盃(金靴|金手套)/,80],[/世界盃最佳年輕球員/,40],[/歐冠最佳球員/,100],[/歐冠(射手王|最佳年輕球員)/,50],
   [/亞冠最佳球員/,40],[/亞冠(射手王|最佳年輕球員)/,20],[/亞洲盃(最佳球員|金靴)/,40],[/決賽最佳球員/,25],[/世俱盃（冠軍/,60],[/世俱盃（亞軍/,25],[/歐霸（冠軍/,70],[/歐霸（亞軍/,35],[/歐霸（4 強/,15],[/歐協聯（冠軍/,40],[/歐協聯（亞軍/,20],[/歐協聯（4 強/,8],
   [/亞冠二級（冠軍/,30],[/亞冠二級（亞軍/,15],[/亞冠二級（4 強/,6],[/東協錦標賽（冠軍/,40],[/東亞錦標賽（冠軍/,25],[/(東協|東亞)錦標賽/,5],[/歐冠（冠軍/,150],[/歐冠（亞軍/,70],[/歐冠（4 強/,35],[/亞冠（冠軍/,60],[/亞冠（亞軍/,30],[/亞冠（4 強/,15],[/盃冠軍（/,30],[/金球獎/,300],[/世界盃（(冠軍|亞軍)/,200],[/世界盃（止步(8 強|4 強)/,100],[/世界盃/,40],
