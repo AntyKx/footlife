@@ -762,6 +762,33 @@ html.calm .htick span,html.calm .btn.shine::after{animation:none} html.calm .hti
 .nn{display:inline-flex;align-items:center;gap:0}
 #nat-desc .nd-flag{display:flex;align-items:center;flex:0 0 auto}
 #bd-name small .flag{width:16px;height:10.67px;vertical-align:-1px;margin-right:4px}
+/* ---------- v0.25.7 右欄:生涯面板＋里程碑 ---------- */
+#side .side-top{display:flex;justify-content:flex-end}
+#side-dash{display:grid;gap:8px;margin:4px 0 14px}
+.dsec{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:9px 12px}
+.dsec h5{font-size:11.5px;letter-spacing:.1em;color:var(--dim);font-weight:700;margin:0 0 6px}
+.dsec p{font-size:12.5px;line-height:1.6;color:var(--chalk);margin:0} .dsec p b{color:var(--amber)} .dsec p .up{color:var(--good)}
+.dsec .flag{width:16px;height:10.67px;vertical-align:-1px;margin-right:5px}
+.dk{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px}
+.dk span{background:var(--sub);border-radius:8px;padding:3px 0;text-align:center}
+.dk b{display:block;font:700 18px/1.15 var(--num);color:var(--chalk)} .dk small{font-size:10.5px;color:var(--dim)}
+.dg{position:relative;display:flex;justify-content:space-between;gap:8px;font-size:12.5px;padding:3px 0 7px}
+.dg b{font:700 13px var(--num);color:var(--amber)}
+.dg i{position:absolute;left:0;bottom:2px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--amber))}
+.dg{background:linear-gradient(var(--edge),var(--edge)) left bottom 2px/100% 3px no-repeat}
+.drv{font-size:12.5px;color:var(--dim);padding:0 4px} .drv b{color:var(--chalk)}
+#side h3{margin-top:2px}
+.sg{margin-bottom:6px}
+.sg-h{display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;color:var(--chalk);cursor:pointer;padding:4px 2px;font:700 13px var(--num);letter-spacing:.04em;text-align:left}
+.sg-h::before{content:'▾';color:var(--amber);font-size:11px} .sg.shut .sg-h::before{content:'▸'}
+.sg-h small{font:500 11.5px var(--sans);color:var(--dim)}
+.sg-h em{margin-left:auto;font-style:normal;font-size:11px;color:var(--dim);background:var(--sub);border-radius:999px;padding:0 7px}
+.sg.shut .sg-b{display:none}
+.sd{display:grid;grid-template-columns:22px 1fr;column-gap:6px;align-items:start;padding:6px 9px}
+.sd .ic{grid-row:1/3;font-style:normal;font-size:13px;line-height:1.5;text-align:center;color:var(--amber)} .sd .ic .flag{width:16px;height:10.67px;margin:3px 0 0}
+.sd b{grid-column:2} .sd span{grid-column:2}
+.sd.red .ic{color:var(--bad)}
+#side-list{padding-left:0} #side-list::before,html.th #side-list::before{display:none} .sd::before{display:none}
 html.calm *,html.calm *::before,html.calm *::after{animation:none!important;transition:none!important}
 html.calm .var{display:none}
 </style>
@@ -825,7 +852,7 @@ html.calm .var{display:none}
 </div>
 <div id="app">
   <header id="board" style="display:none">
-    <div id="bd-top"><span id="bd-num">7</span><div id="bd-name"></div><button id="btn-rev" title="回顧之前的畫面">回顧</button><button id="btn-side" title="生涯大事記">大事記</button><button id="btn-prefs" title="配色與動畫">⚙</button><button id="btn-restart" title="重新開始">↺</button></div>
+    <div id="bd-top"><span id="bd-num">7</span><div id="bd-name"></div><button id="btn-rev" title="回顧之前的畫面">回顧</button><button id="btn-side" title="生涯面板與里程碑">生涯</button><button id="btn-prefs" title="配色與動畫">⚙</button><button id="btn-restart" title="重新開始">↺</button></div>
     <div id="bd-bug"><span id="bd-lg">青訓</span><span id="bd-team"></span><span id="bd-clock">0'</span></div>
     <div id="bd-grid">
       <div class="bd-cell"><b id="bd-age">15</b><span>年齡</span></div>
@@ -848,7 +875,7 @@ html.calm .var{display:none}
   <div id="prefs"><div class="box"><h3>配色與動畫<button id="prefs-x">關閉 ✕</button></h3><div class="thm" id="thm"></div>
     <label><input type="checkbox" id="calm-ck"> 減少動畫</label><p class="hint">關掉卡片進場、換畫面、GOAL! 大字與彩帶。系統開啟「減少動態效果」時也會自動套用。</p></div></div>
   <div id="achp"><div class="box"><h3>成就收藏櫃<button id="achp-x">關閉 ✕</button></h3><div id="ach-body"></div></div></div>
-  <aside id="side"><h3><span>生涯大事記 <em id="side-n">0</em></span><button id="side-x">關閉 ✕</button></h3><div id="side-list"><p id="side-empty">冠軍、轉會、國家隊、關鍵時刻……都會記在這裡，點一下可以跳回當時的畫面。</p></div></aside>
+  <aside id="side"><div class="side-top"><button id="side-x">關閉 ✕</button></div><div id="side-dash"></div><h3><span>里程碑 <em id="side-n">0</em></span></h3><div id="side-list"><p id="side-empty">冠軍、獎項、轉會、國家隊、重傷……生涯的轉折點會依賽季記在這裡，點一下可以跳回當時的畫面。</p></div></aside>
 </div>
 <script>
 /* ================= RNG（種子化） ================= */
@@ -868,7 +895,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.25.6';
+const APP_VER='v0.25.7';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1233,16 +1260,42 @@ function card(cls,title,html){ const d=document.createElement('div');
 /* 生涯大事記:寬螢幕右欄,新的在上;點一下展開該年度並捲到那張卡 */
 let SIDE_N=0;
 function sideAdd(title,cls,el,txt){
-  const L=$('side-list'); if(!L||typeof S==='undefined'||!S)return; const e=$('side-empty'); if(e)e.remove();
+  if(typeof S==='undefined'||!S)return;
+  if(cls==='gold'&&typeof tickPush==='function')tickPush(`${S.year}・${title}`);
+  /* v0.25.7 只記里程碑:關鍵時刻與劇情不記;引退後只記「生涯落幕」 */
+  if(/^(won|lost|story)$/.test(cls)||(S.done&&title!=='生涯落幕')||/^(訓練成果|生涯評價|成就|歷史地位|十年後)/.test(title))return;
+  const L=$('side-list'); if(!L)return; const e=$('side-empty'); if(e)e.remove();
+  let g=L.querySelector(`.sg[data-y="${S.year}"]`);
+  if(!g){ L.querySelectorAll('.sg').forEach(x=>x.classList.add('shut'));
+    g=document.createElement('div'); g.className='sg'; g.dataset.y=S.year;
+    g.innerHTML=`<button class="sg-h"><span>${seasonLabel(S.year)}</span><small>${S.age} 歲</small><em>0</em></button><div class="sg-b"></div>`;
+    g.querySelector('.sg-h').onclick=()=>g.classList.toggle('shut'); L.prepend(g); }
+  const ic=/冠軍|捧盃|金牌/.test(title)?'🏆':/獎|最佳|金靴|金手套|足球先生|陣容/.test(title)?'★':/簽約|轉會|升格|回家了|外租|租借/.test(title)?'⇄':/國家隊|世界盃|國家盃|美洲盃|亞洲盃|金盃賽|奧運|亞運|錦標賽|世大運/.test(title)?(typeof flagSVG==='function'?flagSVG(S.nat):'◉'):/特質/.test(title)?'◆':/升級/.test(title)?'▲':/降級/.test(title)?'▼':/傷/.test(title)?'✚':/red/.test(cls)?'!':'●';
   const b=document.createElement('button'); b.className='sd '+cls;
   const t=(txt||'').replace(/\s+/g,' ').trim();
-  b.innerHTML=`<small>${S.year}・${S.age} 歲</small><b>${title}</b>${t?`<span>${t.length>44?t.slice(0,44)+'…':t}</span>`:''}`;
+  b.innerHTML=`<i class="ic">${ic}</i><b>${title}</b>${t?`<span>${t.length>40?t.slice(0,40)+'…':t}</span>`:''}`;
   b.onclick=()=>{ $('side').classList.remove('open'); if(!el.isConnected){ b.title='這一年的紀錄已經清掉了'; b.style.opacity='.5'; return; }
     const sc=el.closest('.scr'); if(sc&&!sc.classList.contains('cur')){ $('log').classList.add('review'); syncRev(); }
     el.scrollIntoView({block:'center'}); el.classList.add('ping'); setTimeout(()=>el.classList.remove('ping'),1400); };
-  L.prepend(b); $('side-n').textContent=++SIDE_N;
-  if(cls==='gold'&&typeof tickPush==='function')tickPush(`${S.year}・${title}`);
+  const body=g.querySelector('.sg-b'); body.prepend(b); g.querySelector('.sg-h em').textContent=body.children.length;
+  $('side-n').textContent=++SIDE_N;
 }
+/* v0.25.7 右欄生涯面板:上季數據、合約與國家隊、生涯、下一個目標、宿敵 */
+function sideDash(){ const D=$('side-dash'); if(!D||typeof S==='undefined'||!S)return;
+  const gk=isGK(), pro=S.log.filter(r=>r.lv), last=S.log[S.log.length-1], sec=(t,b)=>`<div class="dsec"><h5>${t}</h5>${b}</div>`; let h='';
+  if(last){ const st=last.st, kp=[['出場',st.App],gk?['零封',st.CS]:['進球',st.G],gk?['失球',st.GA]:['助攻',st.A],['評分',st.Rt||'—']];
+    const LL=S.lastLg&&S.lastLg.y===last.y&&S.lastLg.club===baseTm(last.tm)?S.lastLg:null;
+    h+=sec(`上季 ${seasonLabel(last.y)}・${baseTm(last.tm)}`,`<div class="dk">${kp.map(([n,v])=>`<span><b>${v}</b><small>${n}</small></span>`).join('')}</div>${LL?`<p>聯賽第 <b>${LL.rank}</b> 名${LL.q?`・取得${LL.q}資格`:''}</p>`:''}`); }
+  if(S.stage==='PRO'&&S.ct&&S.lv){ const sal=salaryFor(S.lv,ovr()-LV[S.lv].par,S.ct.mult);
+    h+=sec('合約與國家隊',`<p>${S.club}${S.loan?'（租借）':''}・合約剩 <b>${S.ct.yrs}</b> 年</p><p>年薪約 <b>${fmtMoney(sal)}</b>・身價約 ${fmtMoney(marketValue())}</p><p>${flagSVG(S.nat)}${S.ntOn?'<b class="up">國家隊入選中</b>':'國家隊未入選'}${S.caps?`・${S.caps} 場${gk?'':` ${S.intlG} 球`}`:''}</p>`); }
+  else h+=sec(S.stage==='UNI'?'大學':'青訓',`<p>${S.stage==='UNI'?S.uni:S.team}${S.acad&&!S.acadOut?`・${S.acad.club}學院`:''}</p>`);
+  if(pro.length){ const t=pro.reduce((a,r)=>{ a.G+=r.st.G||0; a.CS+=r.st.CS||0; a.App+=r.st.App||0; return a; },{G:0,CS:0,App:0});
+    h+=sec('生涯',`<p>職業 <b>${pro.length}</b> 季・${new Set(pro.filter(r=>!r.loan).map(r=>r.tm)).size} 隊・出場 ${t.App}・${gk?`零封 ${t.CS}`:`進球 ${t.G}`}</p><p>榮譽 <b>${S.honors.length}</b> 項${S.honors.filter(x=>/冠軍（/.test(x)).length?`・冠軍 ${S.honors.filter(x=>/冠軍（/.test(x)).length} 座`:''}</p>`); }
+  if(typeof ACH!=='undefined'&&pro.length){ const A=achCtx([]);
+    const gs=ACH.filter(a=>a.lv).map(a=>{ let v=0; try{ v=+a.v(A)||0; }catch(e){} const l=a.lv.filter(x=>v>=x).length; if(!v||l>=a.lv.length)return null; return {a,l,v,nx:a.lv[l],r:v/a.lv[l]}; }).filter(Boolean).sort((x,y)=>y.r-x.r).slice(0,3);
+    if(gs.length)h+=sec('下一個目標',gs.map(g=>`<div class="dg"><span>${g.a.tn?g.a.tn[g.l]:`${g.a.n}（${ACH_TIER[g.l]}）`}</span><b>${g.v}/${g.nx}</b><i style="width:${Math.round(g.r*100)}%"></i></div>`).join('')); }
+  const RV=S.arcs&&S.arcs.rival; if(RV&&RV.n&&RV.w+RV.l)h+=`<p class="drv">宿敵 <b>${RV.n}</b>：${RV.w} 勝 ${RV.l} 敗</p>`;
+  D.innerHTML=h; }
 function divider(t){ /* 新賽季:畫面裡加一條年度標記(回顧模式才顯示),並清掉太舊的畫面 */
   const h=document.createElement('div'); h.className='yr-head'; h.textContent=t; logTarget().appendChild(h);
   if(typeof S!=='undefined'&&S)$('log').querySelectorAll('.scr').forEach(sc=>{ if(+sc.dataset.y&&+sc.dataset.y<S.year-MAX_YEARS&&sc!==SCR&&sc!==TGT)sc.remove(); });
@@ -1266,7 +1319,7 @@ function board(phase){ if(phase!==undefined)S.ph=phase; /* 不帶參數時沿用
   ['trust','fans','form'].forEach(k=>{ const el=$('mt-'+k); el.querySelector('b').style.width=S[k]+'%'; el.querySelector('em').textContent=S[k];
     el.classList.toggle('lo',S[k]<30); el.classList.toggle('hi',S[k]>=70); });
   $('bd-time').dataset.ph=S.ph||0; [0,1,2].forEach(i=>$('lp'+i).classList.toggle('on',i===(S.ph||0)));
-  abPanel();
+  abPanel(); sideDash();
 }
 /* 記分板能力面板:數值/潛力、能力條(白線＝潛力)、下方細條＝升下一級的累積進度;黃字＝計入目前位置綜合 */
 let AB_PREV=null;
