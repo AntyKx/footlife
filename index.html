@@ -814,17 +814,23 @@ html.calm .htick span,html.calm .btn.shine::after{animation:none} html.calm .hti
 .hero-pitch .hp-net,html.th .hero-pitch g.hp-net{fill:none;stroke:#ffffff70;stroke-width:.45}
 .hero-pitch .hp-post{fill:none;stroke:#fff;stroke-width:1.8;stroke-linejoin:round}
 .hero-pitch .pole{stroke:#fff;stroke-width:.8} .hero-pitch .fl{fill:var(--amber)}
-.hero-pitch .sh{fill:#0007} .hero-pitch .op circle,html.th .hero-pitch .op circle{fill:#e8eef8;stroke:#0b1020;stroke-width:.8}
-.hero-pitch .gkp circle,html.th .hero-pitch .gkp circle{fill:#c6f05a}
-.hero-pitch .mt circle{fill:var(--blue);stroke:#0b1020;stroke-width:.8}
-.hero-pitch .me circle{fill:var(--amber);stroke:#0b1020;stroke-width:1.2}
-.hero-pitch .me text{font:800 7px var(--num);letter-spacing:.12em;fill:var(--amber);paint-order:stroke;stroke:#0b1020;stroke-width:2}
 .hero-pitch .hp-ball circle{fill:#fff;stroke:#111;stroke-width:.6} .hero-pitch .hp-ball path{fill:#111}
 .hero-pitch .hp-run{stroke:var(--amber);stroke-width:1.8;stroke-dasharray:5 5;animation:dash 2.4s linear infinite}
 .hero-pitch .hp-pass{stroke:#fff;stroke-opacity:.55;stroke-width:1.1;stroke-dasharray:3 4}
 .hero-pitch .hp-goal-t text{font:800 30px var(--num);letter-spacing:.12em;fill:var(--amber);paint-order:stroke;stroke:#070b14;stroke-width:5;font-style:italic}
 html.th .hero-pitch g{stroke:none}
 html.calm .hball,html.calm .lower3 .trk i,html.calm .hero-pitch .hp-flash circle{animation:none}
+/* ---------- v0.26.0 首頁動畫:小人球員、射門破網、轉播字卡 ---------- */
+.hero-pitch .fig .fs,.hero-pitch .fs{fill:#0008}
+.hero-pitch .fig .fr{fill:none;stroke:var(--amber);stroke-width:.06;opacity:.9}
+.hero-pitch .hp-ball circle{fill:#fff;stroke:#111;stroke-width:.14} .hero-pitch .hp-ball path{fill:#111}
+.hero-pitch .hp-tele{fill:none;stroke:var(--amber);stroke-width:1.4;stroke-dasharray:4 4;stroke-linecap:round;animation:dash 1.4s linear infinite;filter:drop-shadow(0 0 3px var(--amber))}
+#hp-gl .gbar{fill:var(--amber)} #hp-gl .gbar2{fill:var(--bad)} #hp-gl .gbar3{fill:#0b1020e6}
+#hp-gl .gt{font:800 italic 25px var(--num);letter-spacing:.14em;fill:#0b1020}
+#hp-gl .gm{font:800 14px var(--num);fill:#fff}
+#hp-gl .gs{font:700 7.5px var(--num);letter-spacing:.14em;fill:var(--amber)}
+.hero-pitch .yt path{fill:var(--amber)} .hero-pitch .yt text{font:800 7px var(--num);letter-spacing:.1em;fill:var(--amber);paint-order:stroke;stroke:#0b1020;stroke-width:2}
+.hero-pitch.scored .hp-flash circle{animation-duration:.7s}
 html.calm *,html.calm *::before,html.calm *::after{animation:none!important;transition:none!important}
 html.calm .var{display:none}
 </style>
@@ -845,29 +851,23 @@ html.calm .var{display:none}
           <radialGradient id="hfl" cx="50%" cy="10%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></radialGradient>
           <linearGradient id="hvg" x1="0" y1="0" x2="0" y2="1"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>
           <pattern id="hcrowd" width="9" height="7" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.6"/><circle cx="6.5" cy="5.5" r="1.6"/></pattern></defs>
-        <g clip-path="url(#hpc)">
-          <rect width="400" height="230" class="hp-sky"/>
-          <path d="M0 0 L400 0 L400 31.3 L0 31.3 Z" class="hp-stand"/><path d="M0 0 L400 0 L400 31.3 L0 31.3 Z" fill="url(#hcrowd)" class="hp-crowd"/><path class="hp-tier" d="M0 11 H400 M0 21.5 H400"/>
-          <g class="hp-flash"><circle cx="58" cy="22" r="1.4"/><circle cx="141" cy="9" r="1.2"/><circle cx="262" cy="30" r="1.4"/><circle cx="330" cy="14" r="1.2"/><circle cx="96" cy="38" r="1.1"/><circle cx="371" cy="40" r="1.3"/></g>
+        <g clip-path="url(#hpc)"><rect width="400" height="230" class="hp-sky"/>
+         <g id="hp-cam">
+          <path d="M-120 -80 H520 V31.3 H-120Z" class="hp-stand"/><path d="M-120 -80 H520 V31.3 H-120Z" fill="url(#hcrowd)" class="hp-crowd"/><path class="hp-tier" d="M-120 -9 H520 M-120 1 H520 M-120 11 H520 M-120 21.5 H520"/>
+          <g class="hp-flash"><circle cx="58" cy="22" r="1.4"/><circle cx="141" cy="9" r="1.2"/><circle cx="262" cy="30" r="1.4"/><circle cx="330" cy="14" r="1.2"/><circle cx="96" cy="38" r="1.1"/><circle cx="371" cy="40" r="1.3"/><circle cx="22" cy="6" r="1.2"/><circle cx="190" cy="16" r="1.3"/><circle cx="300" cy="3" r="1.1"/><circle cx="-30" cy="25" r="1.3"/><circle cx="430" cy="20" r="1.2"/><circle cx="230" cy="-4" r="1.2"/></g>
           <g class="hp-grass"><path class="g0" d="M-55.6 29.9 L455.6 29.9 L473.3 36.9 L-73.3 36.9 Z"/><path class="g1" d="M-73.3 36.9 L473.3 36.9 L506.7 50.0 L-106.7 50.0 Z"/><path class="g0" d="M-106.7 50.0 L506.7 50.0 L549.4 66.9 L-149.4 66.9 Z"/><path class="g1" d="M-149.4 66.9 L549.4 66.9 L605.9 89.2 L-205.9 89.2 Z"/><path class="g0" d="M-205.9 89.2 L605.9 89.2 L684.2 120.0 L-284.2 120.0 Z"/><path class="g1" d="M-284.2 120.0 L684.2 120.0 L800.0 165.7 L-400.0 165.7 Z"/><path class="g0" d="M-400.0 165.7 L800.0 165.7 L988.6 240.1 L-588.6 240.1 Z"/><path class="g1" d="M-588.6 240.1 L988.6 240.1 L1350.0 382.6 L-950.0 382.6 Z"/><path class="g0" d="M-950.0 382.6 L1350.0 382.6 L2323.1 766.3 L-1923.1 766.3 Z"/><path class="g1" d="M-1923.1 766.3 L2323.1 766.3 L14000.0 5370.9 L-13600.0 5370.9 Z"/></g>
           <path class="hp-ad" d="M19.6 35.8 L380.4 35.8 L380.4 31.3 L19.6 31.3 Z"/>
           <text class="hp-adt" x="200" y="34.6" text-anchor="middle">FOOTLIFE ・ 足球人生 ・ FOOTLIFE ・ 足球人生 ・ FOOTLIFE ・ 足球人生</text>
-          <rect width="400" height="230" fill="url(#hfl)"/>
+          <rect x="-120" y="-80" width="640" height="400" fill="url(#hfl)"/>
           <g class="hp-l"><path d="M26.2 50.0 L373.8 50.0"/><path d="M26.2 50.0 L-1364.0 1017.5"/><path d="M373.8 50.0 L1764.0 1017.5"/><path d="M97.0 50.0 L37.3 120.0 L362.7 120.0 L303.0 50.0"/><path d="M153.2 50.0 L146.7 66.9 L253.3 66.9 L246.8 50.0"/><path d="M141.0 120.0 L143.5 123.8 L146.5 127.4 L150.1 130.9 L154.1 134.2 L158.6 137.2 L163.6 139.9 L169.0 142.3 L174.7 144.3 L180.8 146.0 L187.0 147.1 L193.5 147.8 L200.0 148.1 L206.5 147.8 L213.0 147.1 L219.2 146.0 L225.3 144.3 L231.0 142.3 L236.4 139.9 L241.4 137.2 L245.9 134.2 L249.9 130.9 L253.5 127.4 L256.5 123.8 L259.0 120.0"/><path d="M22.3 52.8 L23.4 52.7 L24.6 52.6 L25.8 52.3 L27.1 52.0 L28.4 51.5 L29.5 51.1 L30.5 50.6 L31.3 50.0"/><path d="M377.7 52.8 L376.6 52.7 L375.4 52.6 L374.2 52.3 L372.9 52.0 L371.6 51.5 L370.5 51.1 L369.5 50.6 L368.7 50.0"/><circle cx="200.0" cy="89.2" r="1.3" class="dotw"/></g>
-          <g class="hp-net"><animateTransform attributeName="transform" type="translate" dur="4.8s" repeatCount="indefinite" values="0 0;0 0;0 -1.6;0 .6;0 0;0 0" keyTimes="0;.54;.57;.61;.66;1"/><path d="M184.0 37.6 L184.7 34.3 L184.7 44.4"/><path d="M186.6 37.6 L187.3 34.3 L187.3 44.4"/><path d="M189.3 37.6 L189.8 34.3 L189.8 44.4"/><path d="M192.0 37.6 L192.4 34.3 L192.4 44.4"/><path d="M194.7 37.6 L194.9 34.3 L194.9 44.4"/><path d="M197.3 37.6 L197.5 34.3 L197.5 44.4"/><path d="M200.0 37.6 L200.0 34.3 L200.0 44.4"/><path d="M202.7 37.6 L202.5 34.3 L202.5 44.4"/><path d="M205.3 37.6 L205.1 34.3 L205.1 44.4"/><path d="M208.0 37.6 L207.6 34.3 L207.6 44.4"/><path d="M210.7 37.6 L210.2 34.3 L210.2 44.4"/><path d="M213.4 37.6 L212.7 34.3 L212.7 44.4"/><path d="M216.0 37.6 L215.3 34.3 L215.3 44.4"/><path d="M181.3 48.0 L182.2 42.4 L217.8 42.4 L218.7 48.0"/><path d="M181.3 45.9 L182.2 40.4 L217.8 40.4 L218.7 45.9"/><path d="M181.3 43.8 L182.2 38.4 L217.8 38.4 L218.7 43.8"/><path d="M181.3 41.7 L182.2 36.5 L217.8 36.5 L218.7 41.7"/><path d="M181.3 39.6 L182.2 34.5 L217.8 34.5 L218.7 39.6"/><path d="M181.5 36.7 L218.5 36.7"/><path d="M181.7 35.9 L218.3 35.9"/><path d="M182.0 35.1 L218.0 35.1"/><path d="M181.3 37.6 L182.2 34.3 L182.2 44.4"/><path d="M218.7 37.6 L217.8 34.3 L217.8 44.4"/><path d="M182.2 34.3 L217.8 34.3"/></g>
+          <g id="hp-net" class="hp-net"><path d="M184.0 37.6 L184.7 34.3 L184.7 44.4"/><path d="M186.6 37.6 L187.3 34.3 L187.3 44.4"/><path d="M189.3 37.6 L189.8 34.3 L189.8 44.4"/><path d="M192.0 37.6 L192.4 34.3 L192.4 44.4"/><path d="M194.7 37.6 L194.9 34.3 L194.9 44.4"/><path d="M197.3 37.6 L197.5 34.3 L197.5 44.4"/><path d="M200.0 37.6 L200.0 34.3 L200.0 44.4"/><path d="M202.7 37.6 L202.5 34.3 L202.5 44.4"/><path d="M205.3 37.6 L205.1 34.3 L205.1 44.4"/><path d="M208.0 37.6 L207.6 34.3 L207.6 44.4"/><path d="M210.7 37.6 L210.2 34.3 L210.2 44.4"/><path d="M213.4 37.6 L212.7 34.3 L212.7 44.4"/><path d="M216.0 37.6 L215.3 34.3 L215.3 44.4"/><path d="M181.3 48.0 L182.2 42.4 L217.8 42.4 L218.7 48.0"/><path d="M181.3 45.9 L182.2 40.4 L217.8 40.4 L218.7 45.9"/><path d="M181.3 43.8 L182.2 38.4 L217.8 38.4 L218.7 43.8"/><path d="M181.3 41.7 L182.2 36.5 L217.8 36.5 L218.7 41.7"/><path d="M181.3 39.6 L182.2 34.5 L217.8 34.5 L218.7 39.6"/><path d="M181.5 36.7 L218.5 36.7"/><path d="M181.7 35.9 L218.3 35.9"/><path d="M182.0 35.1 L218.0 35.1"/><path d="M181.3 37.6 L182.2 34.3 L182.2 44.4"/><path d="M218.7 37.6 L217.8 34.3 L217.8 44.4"/><path d="M182.2 34.3 L217.8 34.3"/></g>
           <path class="hp-post" d="M181.3 50.0 L181.3 37.6 L218.7 37.6 L218.7 50.0"/>
           <path class="pole" d="M26.2 50.0 L26.2 41.3"/><path class="fl" d="M26.2 41.3 l6 2 l-6 2Z"/><path class="pole" d="M373.8 50.0 L373.8 41.3"/><path class="fl" d="M373.8 41.3 l-6 2 l6 2Z"/>
-          <g class="op" transform="translate(174.4 80.3)"><ellipse class="sh" cx="0" cy="1" rx="4.2" ry="1.575"/><circle cy="-3.5" r="3.5"/></g><g class="op" transform="translate(233.3 86.8)"><ellipse class="sh" cx="0" cy="1" rx="4.44" ry="1.665"/><circle cy="-3.7" r="3.7"/></g><g class="op" transform="translate(120.9 99.2)"><ellipse class="sh" cx="0" cy="1" rx="4.8" ry="1.8"/><circle cy="-4.0" r="4.0"/></g><g class="op" transform="translate(292.0 110.5)"><ellipse class="sh" cx="0" cy="1" rx="5.04" ry="1.8900000000000001"/><circle cy="-4.2" r="4.2"/></g><g class="op" transform="translate(191.2 138.4)"><ellipse class="sh" cx="0" cy="1" rx="5.88" ry="2.205"/><circle cy="-4.9" r="4.9"/></g><g class="mt" transform="translate(356.8 176.5)"><ellipse class="sh" cx="0" cy="1" rx="6.96" ry="2.61"/><circle cy="-5.8" r="5.8"/></g><g class="mt" transform="translate(56.2 155.8)"><ellipse class="sh" cx="0" cy="1" rx="6.359999999999999" ry="2.385"/><circle cy="-5.3" r="5.3"/></g>
-          <g class="op gkp" transform="translate(200.0 52.2)"><ellipse class="sh" cx="0" cy="1" rx="3.5999999999999996" ry="1.35"/><circle cy="-3" r="3"/>
-            <animateTransform attributeName="transform" type="translate" dur="4.8s" repeatCount="indefinite" values="200.0 52.2;200.0 52.2;205.0 52.2;194.0 50.2;194.0 50.2;200.0 52.2" keyTimes="0;.42;.5;.58;.9;1"/></g>
-          <path class="hp-run" d="M139.5 215.5 Q179.5 185.5 218.3 101.9" fill="none"/>
-          <path class="hp-pass" d="M356.8 176.5 L218.3 101.9" fill="none"/>
-          <g class="me"><ellipse class="sh" cx="0" cy="1" rx="6" ry="2.3"/><circle cy="-5" r="5"/><text y="-13" text-anchor="middle">YOU</text>
-            <animateMotion dur="4.8s" repeatCount="indefinite" path="M139.5 215.5 Q179.5 185.5 218.3 101.9" keyPoints="0;1;1" keyTimes="0;.45;1" calcMode="linear"/></g>
-          <g class="hp-ball"><circle r="3"/><path d="M0 -1.5 L1.4 -.5 L.9 1.2 L-.9 1.2 L-1.4 -.5Z"/>
-            <animateMotion dur="4.8s" repeatCount="indefinite" path="M356.8 176.5 L218.3 101.9 L189.0 39.9" keyPoints="0;0;.62;.62;1;1" keyTimes="0;.22;.45;.47;.55;1" calcMode="linear"/></g>
-          <g class="hp-goal-t" opacity="0"><animate attributeName="opacity" dur="4.8s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;.55;.58;.84;.9;1"/><text x="200" y="27" text-anchor="middle">GOAL!</text></g>
-          <rect width="400" height="230" fill="url(#hvg)"/>
+          <g id="hp-act"></g>
+         </g>
+         <rect id="hp-fl" width="400" height="230" fill="#fff" opacity="0"/>
+         <g id="hp-gl" opacity="0"><g class="gin"><path class="gbar2" d="M14 170 H64 L58 196 H8Z"/><text class="gm" x="35" y="188.5" text-anchor="middle">15'</text><path class="gbar" d="M66 170 H196 L190 196 H60Z"/><text class="gt" x="124" y="191" text-anchor="middle">GOAL!</text><path class="gbar3" d="M60 198 H232 L229 210 H57Z"/><text class="gs" x="66" y="207">YOU ・ 第一個職業進球 ・ 1–0</text></g></g>
+         <rect width="400" height="230" fill="url(#hvg)"/>
         </g>
       </svg>
       <div class="hbug"><div><b>27</b><span>國籍</span></div><div><b>48</b><span>聯賽</span></div><div><b>850</b><span>真實球隊</span></div><div><b>∞</b><span>種人生</span></div></div>
@@ -945,7 +945,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.25.9';
+const APP_VER='v0.26.0';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -4612,6 +4612,97 @@ function renderPrefs(){ const cur=document.documentElement.dataset.theme||'soft'
 function openPrefs(){ renderPrefs(); $('prefs').classList.add('open'); }
 $('btn-prefs').onclick=openPrefs; $('start-prefs').onclick=openPrefs;
 $('start-ach').onclick=openAch; $('achp-x').onclick=()=>$('achp').classList.remove('open');
+/* ================= 首頁球場動畫(v0.26.0):小人球員、一次完整進攻、轉播鏡頭;純裝飾,不碰種子亂數 ================= */
+function heroAnim(){
+  const sv=document.querySelector('.hero-pitch'), act=$('hp-act'), cam=$('hp-cam'); if(!sv||!act||!cam)return;
+  const NS='http://www.w3.org/2000/svg', mk=(t,c)=>{ const e=document.createElementNS(NS,t); if(c)e.setAttribute('class',c); return e; };
+  const ZC=45, F=230, H=23.66, HOR=-70.9, CX=200, T=10.6;
+  const P=(X,Z,Y=0)=>{ const d=ZC-Z; return [CX+F*X/d, HOR+F*(H-Y)/d]; }, SC=Z=>F/(ZC-Z);
+  const lerp=(a,b,u)=>a+(b-a)*u, ease=u=>u<.5?2*u*u:1-2*(1-u)*(1-u);
+  const at=(k,t)=>{ if(t<=k[0][0])return k[0].slice(1); for(let i=0;i<k.length-1;i++){ const a=k[i],b=k[i+1]; if(t<b[0]){ const u=(t-a[0])/(b[0]-a[0]); return a.slice(1).map((v,j)=>lerp(v,b[j+1],u)); } } return k[k.length-1].slice(1); };
+  /* 球衣:我方琥珀、對手白衫藍褲、門將螢光綠 */
+  const KIT={me:['#f2c14e','#1b2440','#f2c14e'],tm:['#f2c14e','#1b2440','#f2c14e'],op:['#eef2f8','#22346b','#c8323a'],gk:['#b9e83a','#1a1a1a','#b9e83a']};
+  const SKIN=['#f1c7a3','#d9a06f','#a86b43','#6e4429','#e3b38a'], HAIR=['#1a1410','#3b2616','#111','#6b4a2a','#1a1410'];
+  /* 球員動線 [秒, X, Z];X 橫向(公尺)、Z 距球門線 */
+  const PL=[
+    {id:'me',k:'me',tr:[[0,-7,27],[1.6,-6.5,24],[2.4,-5.2,21.5],[3.7,1.6,13.4],[4.0,2.6,11.8],[4.4,3.3,10.8],[4.9,5.5,10.6],[6.6,15,7.5],[7.4,16.5,7],[9.5,16.5,7]]},
+    {id:'a',k:'tm',tr:[[0,15.5,27],[1.85,13,21],[2.4,12.6,20],[4.3,12,14.5],[5.2,13,12],[7.4,15.7,8.4],[9.5,15.7,8.4]]},
+    {id:'b',k:'tm',tr:[[0,-2,31],[1.9,-1.2,24.5],[2.5,-1,23.6],[2.8,-.6,23.2],[4.6,1,18],[7.6,13.6,9],[9.5,13.6,9]]},
+    {id:'c',k:'tm',tr:[[0,-15,23],[2.8,-12,16],[4.4,-8,10],[7.4,14.5,6],[9.5,14.5,6]]},
+    {id:'o1',k:'op',tr:[[0,-3,12],[2.5,-2,12.5],[3.7,0,11.4],[4.4,1.6,10.3],[5,1.8,9.8],[9.5,0,11]]},
+    {id:'o2',k:'op',tr:[[0,5,12],[2.5,4.5,13],[3.9,4.6,11.6],[4.6,4.2,10.8],[9.5,4.2,11.5]]},
+    {id:'o3',k:'op',tr:[[0,15,13],[1.7,14,18.5],[2.4,13.2,19],[4.2,11.2,15.5],[9.5,10,14]]},
+    {id:'o4',k:'op',tr:[[0,-14,12],[3,-11.5,12.5],[4.6,-9,11],[9.5,-8,11]]},
+    {id:'o5',k:'op',tr:[[0,2,19],[1.8,-.2,21.5],[2.6,-.6,21.2],[3.9,1,16],[9.5,1,15]]},
+    {id:'gk',k:'gk',tr:[[0,0,1.4],[3.7,.6,2.4],[4.36,1.3,2.8],[4.66,-1.6,2.1],[7.2,-1.6,2.1],[8,-.4,1.8],[9.5,-.4,1.8]],rot:[[0,0],[4.36,0],[4.62,-82],[7.2,-82],[7.9,0],[9.5,0]]}];
+  /* 球:持球(own)或飛行(fly:起點、終點、弧高) */
+  const BALL=[[0,1.85,'own','a'],[1.85,2.5,'fly',[13,21,0],[-1,23.6,0],0],[2.5,2.66,'own','b'],[2.66,3.72,'fly',[-.7,23.2,0],[1.8,13.2,0],2.6],
+    [3.72,4.38,'own','me'],[4.38,4.66,'fly',[3.3,10.8,0],[-2.9,0,1.95],.35],[4.66,4.84,'fly',[-2.9,0,1.95],[-3.1,-1.9,1.3],0],[4.84,5.3,'fly',[-3.1,-1.9,1.3],[-2.9,-1.6,0],.2],[5.3,T+1,'fly',[-2.9,-1.6,0],[-2.9,-1.6,0],0]];
+  const fig=PL.map((p,i)=>{ const [sh,so,sk]=KIT[p.k], skin=SKIN[i%5], g=mk('g','fig'+(p.k==='me'?' me':''));
+    g.innerHTML=`<ellipse class="fs" rx=".46" ry=".13"/>${p.k==='me'?'<ellipse class="fr" rx=".75" ry=".24"/>':''}<g class="bd">`+
+      [0,1].map(()=>`<g class="lg"><path d="M0 0V.5" stroke="${skin}" stroke-width=".15" stroke-linecap="round"/><path d="M0 .42V.84" stroke="${sk}" stroke-width=".17"/><ellipse cx=".04" cy=".88" rx=".11" ry=".055" fill="#111"/></g>`).join('')+
+      `<rect x="-.25" y="-1.1" width=".5" height=".32" rx=".06" fill="${so}"/>`+
+      [0,1].map(()=>`<g class="ar"><path d="M0 0V.5" stroke="${skin}" stroke-width=".11" stroke-linecap="round"/><path d="M0 0V.2" stroke="${sh}" stroke-width=".15" stroke-linecap="round"/></g>`).join('')+
+      `<path d="M-.29 -1.56Q0 -1.64 .29 -1.56L.26 -1.02H-.26Z" fill="${sh}"/><path d="M-.26 -1.1H.26" stroke="#0002" stroke-width=".05"/>`+
+      `<circle cy="-1.75" r=".145" fill="${skin}"/><path d="M-.15 -1.76A.15 .15 0 0 1 .15 -1.76Q0 -1.8 -.15 -1.76Z" fill="${HAIR[i%5]}"/></g>`+
+      '';
+    act.appendChild(g); return {p,g,bd:g.querySelector('.bd'),lg:[...g.querySelectorAll('.lg')],ar:[...g.querySelectorAll('.ar')],ph:i*1.7}; });
+  const run=mk('path','hp-tele'), bsh=mk('ellipse','fs'), ball=mk('g','hp-ball'), yt=mk('g','yt');
+  yt.innerHTML='<path d="M-3 -4H3L0 -.6Z"/><text y="-6" text-anchor="middle">YOU</text>';
+  ball.innerHTML='<circle r="1"/><path d="M0 -.48L.46 -.15L.28 .4H-.28L-.46 -.15Z"/>';
+  const tele=[]; for(let t=2.4;t<=3.76;t+=.12){ const [x,z]=at(PL[0].tr,t); tele.push(P(x,z).map(v=>v.toFixed(1)).join(' ')); }
+  run.setAttribute('d','M'+tele.join(' L'));
+  const gl=$('hp-gl'), gin=gl.querySelector('.gin'), fl=$('hp-fl'), net=$('hp-net');
+  let cx=200, cy=115, cz=1.12, t0=null, prev=null, raf=0, lastT=0;
+  function ballAt(t){ const s=BALL.find(b=>t>=b[0]&&t<b[1])||BALL[BALL.length-1];
+    if(s[2]==='own'){ const f=PL.find(p=>p.id===s[3]), [x,z]=at(f.tr,t), [x2,z2]=at(f.tr,t+.12), dx=x2-x, dz=z2-z, m=Math.hypot(dx,dz)||1;
+      return [x+dx/m*.45,z+dz/m*.45+(m<.01?-.4:0),.11]; }
+    const u=Math.min(1,(t-s[0])/(s[1]-s[0])), a=s[3], b=s[4]; return [lerp(a[0],b[0],u),lerp(a[1],b[1],u),lerp(a[2],b[2],u)+4*s[5]*u*(1-u)+.11]; }
+  function frame(t,dt){
+    const order=[];
+    fig.forEach(f=>{ const [x,z]=at(f.p.tr,t), [px,pz]=at(f.p.tr,Math.max(0,t-.05)), sp=t>.05?Math.hypot(x-px,z-pz)/.05:0, s=SC(z)*1.4, [sx,sy]=P(x,z);
+      const rot=f.p.rot?at(f.p.rot,t)[0]:0, cel=f.p.k!=='op'&&f.p.k!=='gk'&&t>5&&t<9.6;
+      f.ph+=dt*Math.min(sp,9)*2.2; const sw=Math.sin(f.ph)*Math.min(1,sp/2)*30;
+      f.g.setAttribute('transform',`translate(${sx.toFixed(2)} ${sy.toFixed(2)}) scale(${s.toFixed(3)})`);
+      const bob=Math.abs(Math.cos(f.ph))*Math.min(1,sp/3)*.06+(cel&&sp<.5?Math.abs(Math.sin(t*6+f.ph))*.28:0);
+      f.bd.setAttribute('transform',rot?`translate(0 -.45) rotate(${rot.toFixed(1)}) translate(0 .45)`:`translate(0 ${(-bob).toFixed(3)})`);
+      f.lg.forEach((l,i)=>l.setAttribute('transform',`translate(${i?.11:-.11} -.93) rotate(${(i?sw:-sw).toFixed(1)})`));
+      const kick=f.p.id==='me'&&t>4.25&&t<4.5?Math.sin((t-4.25)/.25*Math.PI)*-70:0; if(kick)f.lg[1].setAttribute('transform',`translate(.11 -.93) rotate(${kick.toFixed(1)})`);
+      f.ar.forEach((a,i)=>a.setAttribute('transform',`translate(${i?.29:-.29} -1.5) rotate(${(cel?(i?-155:155)+Math.sin(t*9+i)*12:(i?-sw*.8-10:sw*.8+10)).toFixed(1)})`));
+      if(f.p.k==='me')yt.setAttribute('transform',`translate(${sx.toFixed(2)} ${(sy-s*(2.05+bob)).toFixed(2)})`);
+      order.push([z,f.g]); });
+    const [bx,bz,by]=ballAt(t), [gx,gy]=P(bx,bz), [hx,hy]=P(bx,bz,by), r=Math.max(1.6,.2*SC(bz)*1.4);
+    ball.setAttribute('transform',`translate(${hx.toFixed(2)} ${hy.toFixed(2)}) scale(${r.toFixed(2)}) rotate(${((t*620)%360).toFixed(0)})`);
+    bsh.setAttribute('cx',gx.toFixed(2)); bsh.setAttribute('cy',gy.toFixed(2)); bsh.setAttribute('rx',(r*.9).toFixed(2)); bsh.setAttribute('ry',(r*.3).toFixed(2));
+    order.push([bz+.3,ball]); order.sort((a,b)=>a[0]-b[0]);
+    act.appendChild(run); act.appendChild(bsh); order.forEach(([,e])=>act.appendChild(e)); act.appendChild(yt);
+    run.style.opacity=t>1.5&&t<3.9?Math.min(1,(t-1.5)*2,(3.9-t)*3):0;
+    /* 進球:球網鼓起、閃光、字卡 */
+    const nb=t>4.62&&t<5.3?Math.sin((t-4.62)/.68*Math.PI):0; net.setAttribute('transform',`translate(0 ${(-nb*1.8).toFixed(2)})`);
+    fl.setAttribute('opacity',t>4.66&&t<5.1?((5.1-t)/.44*.4).toFixed(2):0);
+    const gu=t<4.85?0:t<5.15?ease((t-4.85)/.3):t<8.6?1:t<8.9?1-(t-8.6)/.3:0;
+    gl.setAttribute('opacity',gu.toFixed(2)); gin.setAttribute('transform',`translate(${((1-gu)*-70).toFixed(1)} 0)`);
+    sv.classList.toggle('scored',t>4.7&&t<8.6);
+    /* 鏡頭:跟著球、進攻時推近 */
+    const fx=200+(hx-200)*.5, fy=115+(hy-115)*.45, fz=t<3.2?1.12:t<6?1.32:t<9?1.18:1.12, k=dt?1-Math.exp(-dt*2.6):1;
+    cx+=(fx-cx)*k; cy+=(fy-cy)*k; cz+=(fz-cz)*k;
+    const hw=200/cz, hh=115/cz; cx=Math.min(Math.max(cx,-100+hw),500-hw); cy=Math.min(Math.max(cy,-60+hh),250-hh);
+    cam.setAttribute('transform',`translate(200 115) scale(${cz.toFixed(3)}) translate(${(-cx).toFixed(2)} ${(-cy).toFixed(2)})`);
+    act.style.opacity=t<.35?t/.35:t>T-.5?Math.max(0,(T-t)/.5):1;
+  }
+  const calm=()=>document.documentElement.classList.contains('calm');
+  function loop(ts){ raf=0; const st=$('start'); if(!st||getComputedStyle(st).display==='none')return;
+    if(calm()){ frame(4.1,0); return; }
+    if(t0==null){ t0=ts; prev=ts; }
+    const t=((ts-t0)/1000)%T, dt=Math.min(.05,(ts-prev)/1000); prev=ts;
+    if(t<lastT){ fig.forEach(f=>f.ph=0); cx=200; cy=115; cz=1.12; } lastT=t;
+    frame(t,dt); raf=requestAnimationFrame(loop); }
+  frame(0,0); raf=requestAnimationFrame(loop);
+  const wake=()=>{ if(!raf&&!document.hidden){ t0=null; lastT=0; raf=requestAnimationFrame(loop); } };
+  document.addEventListener('visibilitychange',wake);
+  new MutationObserver(wake).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
+}
+heroAnim();
 $('achp').onclick=e=>{ if(e.target.id==='achp')$('achp').classList.remove('open'); };
 $('prefs-x').onclick=()=>$('prefs').classList.remove('open');
 $('prefs').onclick=e=>{ if(e.target.id==='prefs')$('prefs').classList.remove('open'); };
