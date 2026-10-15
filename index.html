@@ -706,6 +706,57 @@ html.calm .wipe,html.calm .floodfx{display:none}
 .ach em{position:absolute;top:6px;right:8px;font:700 11px var(--num);letter-spacing:.1em;color:var(--on-amber);background:var(--amber);padding:0 6px;border-radius:4px;font-style:normal}
 .ach.r-e{border-color:color-mix(in srgb,var(--story) 60%,var(--edge))}
 .ach.r-l{border-color:var(--amber);box-shadow:0 0 14px color-mix(in srgb,var(--amber) 25%,transparent)}
+/* ---------- v0.25.3 首頁 ---------- */
+html.th.glow .s-sky{display:block}
+html.th.glow .s-sky .lt{background:linear-gradient(180deg,color-mix(in srgb,var(--amber) 14%,transparent),transparent 70%)}
+.hero .kicker,html.th .hero .kicker{display:flex;align-items:center;gap:10px;font:700 12px var(--num);letter-spacing:.3em;color:var(--dim)}
+.hero .live{display:inline-flex;align-items:center;gap:6px;background:var(--bad);color:#fff;padding:2px 8px 2px 7px;border-radius:4px;letter-spacing:.15em}
+.hero .live i{width:7px;height:7px;border-radius:50%;background:#fff;animation:blink 1.4s steps(2) infinite}
+#start h1 .en{font:800 clamp(64px,12vw,112px)/.9 var(--num);letter-spacing:.01em}
+#start h1 em{font-size:clamp(20px,3.6vw,26px);letter-spacing:.24em;margin-top:6px}
+.lower3{display:inline-flex;margin-top:14px;border-radius:6px;overflow:hidden;box-shadow:0 6px 18px #0005;font-size:14px}
+.lower3 b{background:var(--amber);color:var(--on-amber);padding:4px 12px;font:800 16px/1.6 var(--num);letter-spacing:.06em}
+.lower3 span{background:var(--panel2);color:var(--chalk);padding:4px 14px;line-height:1.75;font-weight:700}
+#start .sub{margin-top:12px}
+.hero-pitch{max-width:500px;margin-top:6px;filter:drop-shadow(0 18px 30px #0007)}
+html.th .hero-pitch g.hp-b,html.th .hero-pitch g.hp-opp,html.th .hero-pitch g.hp-mate,.hero-pitch g.hp-b{stroke:none}
+.hero-pitch .hp-a{fill:var(--pitch1)} .hero-pitch .hp-b path{fill:var(--pitch2)}
+.hero-pitch .hp-l,html.th .hero-pitch g.hp-l{fill:none;stroke:var(--pline);stroke-width:1.4}
+.hero-pitch .hp-goal{fill:color-mix(in srgb,var(--chalk) 12%,transparent);stroke:var(--chalk);stroke-width:1.4}
+.hero-pitch .hp-run{stroke:var(--amber);stroke-width:2.2;stroke-dasharray:5 6;animation:dash 2.4s linear infinite}
+.hero-pitch .hp-pass{stroke:var(--chalk);stroke-opacity:.45;stroke-width:1.2;stroke-dasharray:3 4}
+.hero-pitch .hp-opp circle,html.th .hero-pitch .hp-opp circle{fill:var(--bad);stroke:none} .hero-pitch .hp-opp .gk{fill:color-mix(in srgb,var(--bad) 50%,var(--chalk))}
+.hero-pitch .hp-mate circle{fill:var(--blue)}
+.hero-pitch .hp-me{fill:var(--amber);stroke:var(--bg);stroke-width:1.5}
+.hero-pitch .hp-ball{fill:#fff;stroke:#111;stroke-width:.8}
+.hbug{display:flex;max-width:500px;margin-top:10px;border-radius:8px;overflow:hidden;border:1px solid var(--edge);background:var(--sub)}
+.hbug div{flex:1;text-align:center;padding:6px 4px;border-left:1px solid var(--edge)} .hbug div:first-child{border-left:none;background:var(--amber)}
+.hbug div:first-child b,.hbug div:first-child span{color:var(--on-amber)}
+.hbug b{display:block;font:700 22px/1.1 var(--num);color:var(--chalk)} .hbug span{font-size:11px;color:var(--dim);letter-spacing:.08em}
+.htick{max-width:500px;margin-top:8px;overflow:hidden;white-space:nowrap;font-size:12.5px;color:var(--dim);border-top:1px solid var(--edge);padding-top:6px}
+.htick span{display:inline-block;padding-left:100%;animation:tick 30s linear infinite} .htick em{font-style:normal;color:var(--amber);margin:0 6px}
+.feat{display:none}
+/* 面板 */
+#start .panel{border-top:3px solid var(--amber)}
+.field label{display:flex;align-items:center;gap:8px}
+.field label i{font:800 13px var(--num);font-style:normal;color:var(--on-amber);background:var(--amber);border-radius:4px;padding:0 6px;letter-spacing:.05em}
+.field label .lg{margin-left:auto;font-size:11px;letter-spacing:.05em;font-weight:400;color:var(--dim)}
+.seg.pos button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px 9px}
+.seg button small{font-size:10.5px;font-weight:500;color:var(--dim);letter-spacing:.02em;white-space:nowrap}
+#seg-nat .seg button{display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 2px 7px}
+.tdots{display:inline-flex;gap:3px}
+.tdots i{width:5px;height:5px;border-radius:50%;background:var(--edge)}
+.tdots i.on{background:var(--amber)}
+.seg button.on .tdots i.on{box-shadow:0 0 6px var(--amber)}
+#nat-desc{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+#nat-desc span{flex:1 1 auto;min-width:0;background:var(--sub);border:1px solid var(--edge);border-radius:8px;padding:5px 10px}
+#nat-desc small{display:block;font-size:10.5px;color:var(--dim);letter-spacing:.06em}
+#nat-desc b{font-size:13px;color:var(--chalk)} #nat-desc .tdots{margin-left:6px;vertical-align:1px}
+.btn.shine{position:relative;overflow:hidden}
+.btn.shine::after{content:'';position:absolute;top:0;bottom:0;left:-40%;width:30%;transform:skewX(-20deg);background:linear-gradient(90deg,transparent,#ffffff59,transparent);animation:shine 3.2s ease-in-out infinite}
+@keyframes shine{0%,55%{left:-40%}100%{left:130%}}
+@media (max-width:600px){ .hero-pitch{display:block;max-width:100%} .htick{display:none} #start h1 .en{font-size:64px} .seg.pos button small{white-space:normal;font-size:9.5px;line-height:1.3} .field label .lg{display:none} }
+html.calm .htick span,html.calm .btn.shine::after{animation:none} html.calm .htick span{padding-left:0}
 html.calm *,html.calm *::before,html.calm *::after{animation:none!important;transition:none!important}
 html.calm .var{display:none}
 </style>
@@ -717,32 +768,38 @@ html.calm .var{display:none}
   <div class="s-sky"><i class="lt l1"></i><i class="lt l2"></i></div>
   <div class="wrap">
     <section class="hero">
-      <div class="kicker"><span class="dot"></span>FOOTBALL CAREER SIMULATOR</div>
+      <div class="kicker"><span class="live"><i></i>LIVE</span>FOOTBALL CAREER SIMULATOR</div>
       <h1 id="logo-tap"><span class="en">FOOTLIFE</span><em>足球人生模擬器</em></h1>
-      <p class="sub">從 15 歲青訓走到世界盃。簽約、轉會、德比、國家隊、引退——每一個關鍵時刻都算數。</p>
-      <svg class="hero-pitch" viewBox="0 0 360 200" aria-hidden="true">
-        <defs><radialGradient id="hg" cx="50%" cy="30%" r="70%"><stop offset="0" stop-color="#3b2a8a" stop-opacity=".55"/><stop offset="1" stop-color="#0c0f1d" stop-opacity="0"/></radialGradient>
-          <linearGradient id="hl" x1="0" x2="1"><stop offset="0" stop-color="#ffcf4a" stop-opacity="0"/><stop offset=".5" stop-color="#ffcf4a"/><stop offset="1" stop-color="#ff8a4c"/></linearGradient></defs>
-        <rect width="360" height="200" fill="url(#hg)"/>
-        <g fill="none" stroke="#ffffff" stroke-opacity=".16" stroke-width="1.4">
-          <path d="M20 190 L80 40 L280 40 L340 190 Z"/><path d="M50 115 L310 115"/><ellipse cx="180" cy="115" rx="46" ry="16"/>
-          <path d="M140 40 L135 62 L225 62 L220 40"/><path d="M124 190 L132 158 L228 158 L236 190"/></g>
-        <path class="run" d="M96 170 C140 140 170 128 200 96 S250 58 262 50" fill="none" stroke="url(#hl)" stroke-width="2.4" stroke-dasharray="5 6"/>
-        <circle cx="96" cy="170" r="6" fill="#ffcf4a" stroke="#fff" stroke-width="1.5"/>
-        <g class="hb"><circle cx="262" cy="50" r="7" fill="#fff" stroke="#141a33" stroke-width="1.2"/><path d="M262 45.5 l3.6 2.6 -1.4 4.2 h-4.4 l-1.4 -4.2z" fill="#141a33"/></g>
-        <rect x="160" y="30" width="40" height="10" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1.4"/>
+      <div class="lower3"><b>15 歲</b><span>從青訓走到世界盃</span></div>
+      <p class="sub">簽約、轉會、德比、國家隊、引退——每一個關鍵時刻都由你決定。</p>
+      <svg class="hero-pitch" viewBox="0 0 400 230" aria-hidden="true">
+        <defs><clipPath id="hpc"><path d="M30 214 L96 44 L304 44 L370 214 Z"/></clipPath>
+          <radialGradient id="hfl" cx="50%" cy="0%" r="80%"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+        <g clip-path="url(#hpc)"><rect width="400" height="230" class="hp-a"/>
+          <g class="hp-b"><path d="M64 214 L116.8 44 L137.6 44 L98 214Z"/><path d="M132 214 L158.4 44 L179.2 44 L166 214Z"/><path d="M200 214 L200.0 44 L220.8 44 L234 214Z"/><path d="M268 214 L241.6 44 L262.4 44 L302 214Z"/><path d="M336 214 L283.2 44 L304.0 44 L370 214Z"/></g>
+          <rect width="400" height="230" fill="url(#hfl)"/></g>
+        <g class="hp-l"><path d="M30 214 L96 44 L304 44 L370 214 Z"/><path d="M58 140 L342 140"/><ellipse cx="200" cy="140" rx="50" ry="17"/>
+          <path d="M160 44 L155 68 L245 68 L240 44"/><path d="M134 214 L142 178 L258 178 L266 214"/></g>
+        <rect x="178" y="34" width="44" height="10" class="hp-goal"/>
+        <path id="hp-run" class="hp-run" d="M118 190 C150 160 176 150 196 120 S236 76 252 62" fill="none"/>
+        <path class="hp-pass" d="M300 130 Q280 96 252 62" fill="none"/>
+        <g class="hp-opp"><circle cx="232" cy="78" r="5"/><circle cx="270" cy="88" r="5"/><circle cx="214" cy="104" r="5"/><circle cx="200" cy="50" r="5" class="gk"/></g>
+        <g class="hp-mate"><circle cx="300" cy="130" r="5"/><circle cx="150" cy="120" r="5"/></g>
+        <circle class="hp-me" r="6.5"><animateMotion dur="3.6s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;.7;1" calcMode="linear"><mpath href="#hp-run"/></animateMotion></circle>
+        <circle class="hp-ball" r="3.6"><animateMotion dur="3.6s" repeatCount="indefinite" path="M300 130 Q280 96 252 62 L200 40" keyPoints="0;0;.75;1;1" keyTimes="0;.45;.72;.82;1" calcMode="linear"/></circle>
       </svg>
-      <ul class="feat"><li><b>27</b>國籍可選</li><li><b>48</b>個聯賽</li><li><b>850</b>支真實球隊</li><li><b>∞</b>種人生</li></ul>
+      <div class="hbug"><div><b>27</b><span>國籍</span></div><div><b>48</b><span>聯賽</span></div><div><b>850</b><span>真實球隊</span></div><div><b>∞</b><span>種人生</span></div></div>
+      <div class="htick"><span>學院出身的 17 歲新星提前升上一隊<em>｜</em>小國逆襲：踢上世界盃的那個夏天<em>｜</em>德比之夜，第 89 分鐘的單刀<em>｜</em>買回條款生效，他回家了<em>｜</em>金球獎頒獎典禮，最後一個名字是……</span></div>
     </section>
     <section class="panel">
       <div class="ptitle">建立你的球員</div>
-      <div class="field"><label>球員姓名</label><input id="in-name" maxlength="10" placeholder="例如：陳柏良" value=""></div>
-      <div class="field"><label>位置</label>
-      <div class="seg" id="seg-pos">
-        <button data-v="GK">門將</button><button data-v="DF">後衛</button>
-        <button data-v="MF">中場</button><button data-v="FW" class="on">前鋒</button>
+      <div class="field"><label><i>01</i>球員姓名</label><input id="in-name" maxlength="10" placeholder="例如：陳柏良" value=""></div>
+      <div class="field"><label><i>02</i>位置</label>
+      <div class="seg pos" id="seg-pos">
+        <button data-v="GK">門將<small>GK・最後一道防線</small></button><button data-v="DF">後衛<small>DF・零封與解圍</small></button>
+        <button data-v="MF">中場<small>MF・組織與助攻</small></button><button data-v="FW" class="on">前鋒<small>FW・進球決定一切</small></button>
       </div></div>
-      <div class="field"><label>國籍</label>
+      <div class="field"><label><i>03</i>國籍<span class="lg">燈號＝國家隊實力</span></label>
       <div id="seg-nat">
         <p class="natl">亞洲・大洋洲</p><div class="seg"><button data-v="TW" class="on">台灣</button><button data-v="JP">日本</button><button data-v="KR">韓國</button><button data-v="AU">澳洲</button>
         <button data-v="CN">中國</button><button data-v="VN">越南</button><button data-v="TH">泰國</button></div>
@@ -753,7 +810,7 @@ html.calm .var{display:none}
         <p class="natl">非洲</p><div class="seg"><button data-v="MA">摩洛哥</button><button data-v="SN">塞內加爾</button><button data-v="NG">奈及利亞</button><button data-v="EG">埃及</button>
         <button data-v="CV">維德角</button></div>
       </div><p id="nat-desc"></p></div>
-      <button class="btn main" id="btn-start">開始生涯 ▸ 15 歲・青訓第一年</button>
+      <button class="btn main shine" id="btn-start">開始生涯 ▸ 15 歲・青訓第一年</button>
       <p class="seedline">世界種子
       <input id="seed-show" maxlength="24">
       · <a href="#" id="seed-re" style="color:var(--blue)">換一個</a><br>相同種子＋相同選擇＝相同人生（可直接輸入朋友的種子碼）<br><span class="prefs-link" id="start-prefs">⚙ 配色與動畫</span>　<span class="prefs-link" id="start-ach">🏆 成就收藏</span></p>
@@ -806,7 +863,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.25.2';
+const APP_VER='v0.25.3';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -4355,10 +4412,16 @@ function acadReview(){
 $('bd-abt').onclick=function(){ const on=$('bd-ab').classList.toggle('open'); /* 預設展開,只記住「收起」 */
   this.textContent=on?'收起能力 ▴':'展開全部能力 ▾'; try{localStorage.setItem('fl_abshut',on?'':'1');}catch(e){} };
 try{ if(localStorage.getItem('fl_abshut')){ $('bd-ab').classList.remove('open'); $('bd-abt').textContent='展開全部能力 ▾'; } }catch(e){}
+/* v0.25.3 首頁:國籍按鈕下方的國家隊實力燈號、國籍說明卡 */
+document.querySelectorAll('#seg-nat button').forEach(b=>{ const n=NATS[b.dataset.v]; if(!n)return; const lit=5-n.tier;
+  b.insertAdjacentHTML('beforeend',`<span class="tdots">${[0,1,2,3,4].map(i=>`<i class="${i<lit?'on':''}"></i>`).join('')}</span>`); });
+function natDesc(){ const n=NATS[selNat], lit=5-n.tier;
+  $('nat-desc').innerHTML=`<span><small>國家隊實力</small><b>${NAT_TIERN[n.tier]}</b><em class="tdots">${[0,1,2,3,4].map(i=>`<i class="${i<lit?'on':''}"></i>`).join('')}</em></span>`+
+    `<span><small>世界盃基準出線</small><b>${n.wc}%</b></span><span><small>本土聯賽</small><b>${n.home.map(k=>LV[k].n).join('、')}</b></span>${n.mil?'<span><small>兵役</small><b>有</b></span>':''}`; }
+{ try{ const sv=JSON.parse(localStorage.getItem('fl-ach')||'{}'), k=Object.keys(sv).filter(x=>x[0]!=='_').length; const el=document.getElementById('start-ach'); if(el&&typeof ACH!=='undefined')el.textContent=`🏆 成就收藏 ${k}/${ACH.length}`; }catch(e){} }
 $('btn-rev').onclick=toggleReview; $('btn-side').onclick=()=>$('side').classList.add('open'); $('side-x').onclick=()=>$('side').classList.remove('open');
 $('btn-restart').onclick=function(){ if(confirm('確定要放棄這段人生，從頭開始嗎？'))location.href=location.pathname; };
 let selGrp='FW', selNat='TW';
-function natDesc(){ const n=NATS[selNat]; $('nat-desc').textContent=`國家隊實力：${NAT_TIERN[n.tier]}｜世界盃基準出線率 ${n.wc}%｜本土聯賽：${n.home.map(k=>LV[k].n).join('、')}${n.mil?'｜有兵役':''}`; }
 document.querySelectorAll('#seg-nat button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('#seg-nat button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on'); selNat=b.dataset.v; natDesc();
