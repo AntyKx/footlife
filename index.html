@@ -406,7 +406,128 @@ svg.scene{max-width:520px;margin-left:auto;margin-right:auto}
 .sd{position:relative;background:linear-gradient(180deg,#181f3b,#12172e);border-color:var(--line);border-left-width:1px;border-radius:10px}
 .sd::before{content:'';position:absolute;left:-14px;top:12px;width:8px;height:8px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 3px var(--bg)}
 .sd.gold::before{background:var(--amber)} .sd.red::before{background:var(--bad)} .sd.won::before{background:var(--good)} .sd.lost::before{background:#7a3a4a} .sd.story::before{background:#a99bff}
+/* ================= v0.15 配色主題 =================
+   classic = 原本的深藍紫(上面的樣式);soft 柔和夜賽、warm 暖灰夜間、day 日間淺色
+   三個新主題共用 html.th 底下的平面化規則:降對比、去光暈、縮字距 */
+html[data-theme="soft"]{--bg:#14171f;--panel:#1b1f2a;--panel2:#232836;--edge:#2c3240;--line:#2c3240;--chalk:#d8dce5;--dim:#8a90a0;
+  --amber:#e3b85a;--clay:#d9895a;--good:#6cc79a;--bad:#e07a74;--blue:#86b4dc;--pri:#4d63c9;--pri-txt:#f2f4fa;--pri-soft:#2a3466;
+  --sub:#11141b;--btn:#20242f;--hd:#9aa1b2;--story:#8f86d6;--pitch1:#1c2130;--pitch2:#1a1f2d;--pline:#ffffff26;--on-amber:#14171f;
+  --gold-bg:#211f22;--red-bg:#25191d;--act:#171a23f7;--shadow:none}
+html[data-theme="warm"]{--bg:#1a1816;--panel:#221f1c;--panel2:#2a2622;--edge:#383229;--line:#383229;--chalk:#e4ded3;--dim:#9a9286;
+  --amber:#e0a94e;--clay:#d98a55;--good:#8fbf7f;--bad:#d97b6c;--blue:#9db8c9;--pri:#c98a3a;--pri-txt:#1a1816;--pri-soft:#4a3a24;
+  --sub:#151311;--btn:#28241f;--hd:#a69d90;--story:#b39ad0;--pitch1:#24211d;--pitch2:#211e1a;--pline:#ffffff22;--on-amber:#1a1816;
+  --gold-bg:#28231a;--red-bg:#2a1d1a;--act:#1d1b18f7;--shadow:none}
+html[data-theme="day"]{--bg:#eef0f4;--panel:#ffffff;--panel2:#f3f5f9;--edge:#d9dde6;--line:#d9dde6;--chalk:#1f2430;--dim:#687083;
+  --amber:#b7791f;--clay:#c0602a;--good:#2f8a5b;--bad:#c2453d;--blue:#2d6fa3;--pri:#2f4ba8;--pri-txt:#ffffff;--pri-soft:#dfe5f7;
+  --sub:#f1f3f7;--btn:#f7f8fb;--hd:#5b6377;--story:#6a55c2;--pitch1:#dfe5ee;--pitch2:#d8dfea;--pline:#00000030;--on-amber:#ffffff;
+  --gold-bg:#fff8ea;--red-bg:#fdeeee;--act:#ffffffef;--shadow:0 1px 3px #0000001a}
+html.th body{background-color:var(--bg);background-image:none}
+html.th:not([data-theme="day"]) body{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 620'><g fill='none' stroke='%23ffffff' stroke-opacity='.035' stroke-width='2'><rect x='12' y='12' width='376' height='596' rx='4'/><line x1='12' y1='310' x2='388' y2='310'/><circle cx='200' cy='310' r='58'/><rect x='108' y='12' width='184' height='92'/><rect x='108' y='516' width='184' height='92'/></g></svg>");
+  background-size:min(560px,100vw) auto;background-position:center top;background-repeat:no-repeat;background-attachment:fixed}
+/* 記分板 */
+html.th #board{background:var(--panel);box-shadow:var(--shadow);border-color:var(--edge)}
+html.th #board::before{background:linear-gradient(90deg,var(--club,var(--pri)),var(--amber))}
+html.th .bd-cell{background:var(--sub);border-color:var(--edge)}
+html.th .bd-cell b{text-shadow:none}
+html.th #bd-bug{border-color:var(--edge)} html.th #bd-team{background:var(--sub)}
+html.th #bd-lg{color:var(--on-amber)} html.th #bd-clock{background:var(--pri);color:var(--pri-txt)}
+html.th .mt i{background:var(--sub);border-color:var(--edge)}
+html.th .mt i b{background:var(--pri)} html.th #mt-fans i b{background:var(--amber)} html.th #mt-form i b{background:var(--good)}
+html.th #bd-track{background:var(--edge)} html.th #bd-ball{box-shadow:none;background:var(--chalk)}
+html.th #bd-abt{background:var(--sub);border-color:var(--edge)}
+html.th .abc .ab1{background:var(--sub)} html.th .abc .ab1 i{background:linear-gradient(90deg,var(--pri),var(--amber))}
+html.th .abc .ab1 em{background:var(--dim)} html.th .abc .ab2{background:var(--edge)} html.th .abc .ab2 i{background:var(--blue)}
+html.th #btn-rev,html.th #btn-side,html.th #btn-restart,html.th #btn-prefs{border-color:var(--edge);color:var(--dim)}
+/* 卡片 */
+html.th .card{background:var(--panel);border-color:var(--edge);box-shadow:var(--shadow);border-radius:12px}
+html.th .card h4{color:var(--hd);letter-spacing:.06em}
+html.th .card p,html.th .mres{font-size:15px;line-height:1.75}
+html.th .card.gold{background:var(--gold-bg);border-color:color-mix(in srgb,var(--amber) 35%,transparent);box-shadow:var(--shadow)}
+html.th .card.red{background:var(--red-bg);border-color:color-mix(in srgb,var(--bad) 45%,transparent)}
+html.th .card.good{border-color:color-mix(in srgb,var(--good) 30%,transparent)} html.th .card.bad{border-color:color-mix(in srgb,var(--bad) 28%,transparent)}
+html.th .card.moment,html.th .card.story{background:var(--panel)}
+html.th .card.story{border-color:color-mix(in srgb,var(--story) 60%,transparent);box-shadow:var(--shadow)} html.th .card.story h4{color:var(--story)}
+html.th .card.moment.won{border-color:color-mix(in srgb,var(--amber) 50%,transparent)}
+html.th .card .call{color:var(--blue)}
+html.th .mmin,html.th .var{color:var(--on-amber)} html.th .var{background:var(--blue);color:var(--bg)}
+html.th .statline,html.th .tag{background:var(--sub);border-color:var(--edge)}
+html.th table.fin tr:nth-child(even) td{background:color-mix(in srgb,var(--chalk) 3%,transparent)}
+html.th table.ltab tr.me td{background:color-mix(in srgb,var(--amber) 12%,transparent)}
+html.th .yr-head{color:var(--dim);background:linear-gradient(90deg,transparent 4%,var(--edge) 22%,transparent 26%,transparent 74%,var(--edge) 78%,transparent 96%) center 60%/100% 1px no-repeat}
+html.th .scr-head{color:var(--dim);letter-spacing:.06em} html.th .scr-head .dots i{background:var(--edge)} html.th .scr-head .dots i.d{background:var(--pri)}
+html.th #log.review .scr.cur{border-top-color:var(--edge)}
+/* 球場 */
+html.th svg.scene{background:repeating-linear-gradient(180deg,var(--pitch1) 0 24px,var(--pitch2) 24px 48px);border-color:var(--edge)}
+html.th .scene .pl{stroke:var(--pline)} html.th .scene .pdot{fill:var(--pline)}
+html.th .scene .goal{stroke:var(--chalk);fill:color-mix(in srgb,var(--chalk) 8%,transparent)}
+html.th .scene .mate{fill:var(--story);stroke:none} html.th .scene .opp{fill:var(--bad);stroke:none} html.th .scene .ogk{fill:var(--blue);stroke:none}
+html[data-theme="day"] .scene .me{stroke:#1f2430}
+/* 按鈕與操作區 */
+html.th .btn{background:var(--btn);border-color:var(--edge);color:var(--chalk);box-shadow:none}
+html.th .btn:hover{box-shadow:none;border-color:var(--amber)}
+html.th .btn.main{background:var(--pri);border-color:var(--pri);color:var(--pri-txt);box-shadow:none}
+html.th .btn.main:hover{box-shadow:none;filter:brightness(1.08)}
+html.th .btn.main small{color:var(--pri-txt);opacity:.8}
+html.th .btn.warn{border-color:color-mix(in srgb,var(--clay) 45%,transparent)} html.th .btn.warn:hover{border-color:var(--clay)}
+html.th #act{background:var(--act);border-color:var(--edge);box-shadow:var(--shadow)}
+html.th #act .title{color:var(--dim);letter-spacing:.06em}
+html.th #act-toggle{background:var(--sub);border-color:var(--edge);color:var(--dim)}
+html.th .abrow{background:var(--panel);border-color:var(--edge)} html.th .abrow .bar{background:var(--sub)}
+html.th .abrow .bar i{background:linear-gradient(90deg,var(--pri),var(--amber))}
+html.th .abrow .pm button{background:var(--btn);border-color:var(--edge);color:var(--chalk)}
+html.th .abrow .pm .pl{background:var(--pri);border-color:var(--pri);color:var(--pri-txt)}
+html.th .tcard{background:var(--panel);border-color:var(--edge)} html.th .tcard.sel{background:var(--pri-soft);border-color:var(--pri);box-shadow:none}
+html.th .tcard.six{box-shadow:none} html.th .tcard .tpow i{color:var(--edge)}
+html.th .tcard .tsp,html.th .tcard .tsp b,html.th .abrow .spc{color:var(--blue)}
+html.th .tcard .tprog,html.th .trow .tbar{background:var(--edge)} html.th .tcard .tprog i,html.th .trow .tbar i{background:var(--blue)}
+html.th .chat .ag,html.th .chat .cl{background:var(--panel2)} html.th .chat .me{background:var(--pri);color:var(--pri-txt)}
+html.th .bigfx{text-shadow:0 4px 18px #0008}
+/* 大事記 */
+html.th #side h3{background:linear-gradient(180deg,var(--bg) 70%,transparent)}
+html.th #side-list::before{background:var(--edge)}
+html.th .sd{background:var(--panel);border-color:var(--edge)} html.th .sd::before{box-shadow:0 0 0 3px var(--bg)}
+html.th .sd.story::before{background:var(--story)}
+/* 首頁 */
+html.th #start{background:var(--bg)} html.th .s-sky{display:none}
+html.th .hero .kicker,html.th .ptitle{color:var(--dim)} html.th .hero .kicker .dot{box-shadow:none;animation:none}
+html.th #start h1 .en{background:none;color:var(--chalk);-webkit-text-fill-color:var(--chalk);text-shadow:none}
+html.th #start .sub{color:var(--dim)}
+html.th .hero-pitch g{stroke:var(--chalk)} html.th .hero-pitch rect[fill^="url"]{display:none}
+html.th .feat li{background:var(--panel);border-color:var(--edge)}
+html.th #start .panel{background:var(--panel);border-color:var(--edge);box-shadow:var(--shadow);backdrop-filter:none}
+html.th .ptitle::after{background:var(--edge)}
+html.th .field input,html.th .seg button{background:var(--sub);border-color:var(--edge);color:var(--dim)}
+html.th .field input{color:var(--chalk)}
+html.th .seg button.on{background:var(--panel2);box-shadow:none;color:var(--amber);border-color:var(--amber)}
+html.th .seg button:hover{border-color:var(--pri)}
+/* 種子輸入框(全主題) */
+#seed-show{width:120px;background:var(--panel2);color:var(--amber);border:1px solid var(--edge);border-radius:6px;padding:2px 6px;font-family:inherit;font-size:12px;text-align:center}
+/* ---------- 設定面板 ---------- */
+#btn-prefs{background:none;border:1px solid #2a3354;color:#8b93b0;border-radius:8px;font-size:13px;line-height:1;padding:4px 7px;margin-left:6px;cursor:pointer;flex:none}
+#prefs{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;background:#0008;padding:16px}
+#prefs.open{display:flex}
+#prefs .box{width:min(380px,100%);background:var(--panel);color:var(--chalk);border:1px solid var(--edge);border-radius:14px;padding:16px;box-shadow:0 20px 50px #0008}
+#prefs h3{font-size:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+#prefs h3 button{background:none;border:1px solid var(--edge);color:var(--dim);border-radius:6px;padding:0 8px;cursor:pointer}
+#prefs .thm{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#prefs .thm button{border-radius:10px;border:2px solid transparent;padding:10px;text-align:left;cursor:pointer;font:700 13px var(--sans)}
+#prefs .thm button small{display:block;font-weight:400;font-size:11px;opacity:.75;margin-top:2px}
+#prefs .thm button.on{border-color:var(--amber)}
+#prefs label{display:flex;gap:8px;align-items:center;margin-top:14px;font-size:13.5px;cursor:pointer}
+#prefs .hint{font-size:11.5px;color:var(--dim);margin-top:4px}
+#start .prefs-link{color:var(--blue);cursor:pointer}
+/* ---------- 動畫調整(全主題) ---------- */
+@keyframes flip{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card.flip{animation:flip .35s ease}
+.scene .mepl{animation:none}
+.scr.cur{animation:scrin .28s ease}
+@keyframes scrin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#log.review .scr{animation:none}
+html.calm *,html.calm *::before,html.calm *::after{animation:none!important;transition:none!important}
+html.calm .var{display:none}
 </style>
+<script>(function(){ var t='soft',c=false; try{ t=localStorage.getItem('fl-theme')||'soft'; c=localStorage.getItem('fl-calm')==='1'; }catch(e){}
+  var h=document.documentElement; h.dataset.theme=t; if(t!=='classic')h.classList.add('th'); if(c)h.classList.add('calm'); })();</script>
 </head>
 <body>
 <div id="start">
@@ -445,15 +566,15 @@ svg.scene{max-width:520px;margin-left:auto;margin-right:auto}
       </div><p id="nat-desc"></p></div>
       <button class="btn main" id="btn-start">開始生涯 ▸ 15 歲・青訓第一年</button>
       <p class="seedline">世界種子
-      <input id="seed-show" maxlength="24" style="width:120px;background:#0f1428;color:#ffcf4a;border:1px solid #2a3354;border-radius:6px;padding:2px 6px;font-family:inherit;font-size:12px;text-align:center">
-      · <a href="#" id="seed-re" style="color:var(--blue)">換一個</a><br>相同種子＋相同選擇＝相同人生（可直接輸入朋友的種子碼）</p>
+      <input id="seed-show" maxlength="24">
+      · <a href="#" id="seed-re" style="color:var(--blue)">換一個</a><br>相同種子＋相同選擇＝相同人生（可直接輸入朋友的種子碼）<br><span class="prefs-link" id="start-prefs">⚙ 配色與動畫</span></p>
     </section>
     <div id="ver-badge" style="position:fixed;top:6px;right:8px;font-size:10px;letter-spacing:1px;color:var(--dim);opacity:.55;font-family:monospace;z-index:50;pointer-events:none"></div>
   </div>
 </div>
 <div id="app">
   <header id="board" style="display:none">
-    <div id="bd-top"><span id="bd-num">7</span><div id="bd-name"></div><button id="btn-rev" title="回顧之前的畫面">回顧</button><button id="btn-side" title="生涯大事記">大事記</button><button id="btn-restart" title="重新開始">↺</button></div>
+    <div id="bd-top"><span id="bd-num">7</span><div id="bd-name"></div><button id="btn-rev" title="回顧之前的畫面">回顧</button><button id="btn-side" title="生涯大事記">大事記</button><button id="btn-prefs" title="配色與動畫">⚙</button><button id="btn-restart" title="重新開始">↺</button></div>
     <div id="bd-bug"><span id="bd-lg">青訓</span><span id="bd-team"></span><span id="bd-clock">0'</span></div>
     <div id="bd-grid">
       <div class="bd-cell"><b id="bd-age">15</b><span>年齡</span></div>
@@ -472,6 +593,8 @@ svg.scene{max-width:520px;margin-left:auto;margin-right:auto}
   <main id="log"></main>
   <button id="act-toggle" style="display:none">⌄ 收合選項</button>
   <footer id="act" style="display:none"></footer>
+  <div id="prefs"><div class="box"><h3>配色與動畫<button id="prefs-x">關閉 ✕</button></h3><div class="thm" id="thm"></div>
+    <label><input type="checkbox" id="calm-ck"> 減少動畫</label><p class="hint">關掉卡片進場、換畫面、GOAL! 大字與彩帶。系統開啟「減少動態效果」時也會自動套用。</p></div></div>
   <aside id="side"><h3><span>生涯大事記 <em id="side-n">0</em></span><button id="side-x">關閉 ✕</button></h3><div id="side-list"><p id="side-empty">冠軍、轉會、國家隊、關鍵時刻……都會記在這裡，點一下可以跳回當時的畫面。</p></div></aside>
 </div>
 <script>
@@ -492,7 +615,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.14.1';
+const APP_VER='v0.15.0';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -782,7 +905,7 @@ function allocUI(mode,label,done){
   function minus(k,quiet){ const h=hist[k]; if(!h||!h.length)return; const [got,pc,sp]=h.pop(); S.ab[k]-=got; S.carry[k]=pc; if(sp)su[k]--; pool++; if(!quiet){ render(); board(0); } }
   function render(){
     const spTxt=Object.keys(spec).filter(k=>spec[k]>0).map(k=>`${ABL[k]} ${specLeft(k)}/${spec[k]}`).join('、');
-    top.innerHTML=`剩餘 <b>${pool}</b> / ${total} 點${spTxt?`<small style="color:#9fd8ff">專項點數（投在該能力上效果 ×1.5，每 2 點多送 1 點）：${spTxt}</small>`:''}<small>黃字＝目前位置計入綜合｜「下一級」＝已累積／升一級所需點數，超過潛力成本加倍</small>`;
+    top.innerHTML=`剩餘 <b>${pool}</b> / ${total} 點${spTxt?`<small style="color:var(--blue)">專項點數（投在該能力上效果 ×1.5，每 2 點多送 1 點）：${spTxt}</small>`:''}<small>黃字＝目前位置計入綜合｜「下一級」＝已累積／升一級所需點數，超過潛力成本加倍</small>`;
     rows.innerHTML='';
     keys.forEach(k=>{ const v=S.ab[k],cap=v>=80,pk=(S.pot&&S.pot[k])||62,cst=abCost(k),cr=(S.carry&&S.carry[k])||0,u=used(k);
       const r=document.createElement('div'); r.className='abrow'+(cap?' capped':'');
@@ -1795,7 +1918,7 @@ function negotiate(of,onSign){
 }
 
 /* ================= 視覺效果(只用 Math.random,不影響種子) ================= */
-const calmFx=()=>!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const calmFx=()=>document.documentElement.classList.contains('calm')||!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 function bigText(t,cls){ if(calmFx())return; const d=document.createElement('div'); d.className='bigfx '+(cls||''); d.textContent=t;
   document.body.appendChild(d); setTimeout(()=>d.remove(),1400); }
 function confetti(){ if(calmFx())return; const cs=['#ffcf4a','#7a6cff','#6cc6ff','#ff8a4c','#ffffff'];
@@ -2936,6 +3059,22 @@ $('btn-start').onclick=()=>{
   startYear();
 };
 $('ver-badge').textContent=APP_VER;
+/* ---------- 配色與動畫設定(存在本機瀏覽器) ---------- */
+const THEMES=[['soft','柔和夜賽','預設・降低對比的深藍灰','#14171f','#d8dce5','#4d63c9'],['warm','暖灰夜間','藍光最少，晚上最舒服','#1a1816','#e4ded3','#c98a3a'],
+  ['day','日間淺色','白底深字，白天好讀','#eef0f4','#1f2430','#2f4ba8'],['classic','經典','原本的深藍紫','#0c0f1d','#eef1f8','#5b4bff']];
+function applyTheme(k){ const h=document.documentElement; h.dataset.theme=k; h.classList.toggle('th',k!=='classic');
+  try{ localStorage.setItem('fl-theme',k); }catch(e){}
+  const m=document.querySelector('meta[name="theme-color"]'), t=THEMES.find(x=>x[0]===k); if(m&&t)m.content=t[3]; renderPrefs(); }
+function renderPrefs(){ const cur=document.documentElement.dataset.theme||'soft';
+  $('thm').innerHTML=THEMES.map(([k,n,d,bg,tx,ac])=>`<button data-k="${k}" class="${k===cur?'on':''}" style="background:${bg};color:${tx};box-shadow:inset 4px 0 0 ${ac}">${n}<small>${d}</small></button>`).join('');
+  $('thm').querySelectorAll('button').forEach(b=>b.onclick=()=>applyTheme(b.dataset.k));
+  $('calm-ck').checked=document.documentElement.classList.contains('calm'); }
+function openPrefs(){ renderPrefs(); $('prefs').classList.add('open'); }
+$('btn-prefs').onclick=openPrefs; $('start-prefs').onclick=openPrefs;
+$('prefs-x').onclick=()=>$('prefs').classList.remove('open');
+$('prefs').onclick=e=>{ if(e.target.id==='prefs')$('prefs').classList.remove('open'); };
+$('calm-ck').onchange=e=>{ document.documentElement.classList.toggle('calm',e.target.checked); try{ localStorage.setItem('fl-calm',e.target.checked?'1':'0'); }catch(_){} };
+{ const t=THEMES.find(x=>x[0]===document.documentElement.dataset.theme), m=document.querySelector('meta[name="theme-color"]'); if(m&&t)m.content=t[3]; }
 </script>
 </body>
 </html>
