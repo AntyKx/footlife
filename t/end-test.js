@@ -21,7 +21,14 @@ const pos=['GK','DF','MF','FW'], R=a=>a[Math.floor(Math.random()*a.length)];
       const tc=[...d.querySelectorAll('#act .tcard')].filter(x=>!/\bsel\b|\bon\b/.test(x.className)); const tb=d.querySelector('#tb .btn');
       if(tc.length&&tb&&tb.disabled){ R(tc).click(); continue; }
       let bs=[...d.querySelectorAll('#act .btn:not([disabled])')].filter(b=>!/回到報價清單/.test(b.textContent));
-      if(S.done){ const sh=bs.find(b=>/產生結算圖/.test(b.textContent)); if(sh){ sh.click(); sharing=true; break; }
+      if(S.done){ const sh=bs.find(b=>/產生結算圖/.test(b.textContent)); if(sh){
+          /* 先開收藏櫃再關掉,按鈕要還在 */
+          bs.find(b=>/收藏櫃/.test(b.textContent)).click(); d.getElementById('achp-x').click(); await new Promise(r=>setTimeout(r,30));
+          const sh2=[...d.querySelectorAll('#act .btn')].find(b=>/產生結算圖/.test(b.textContent)); if(!sh2){ err.push('收藏櫃關掉後按鈕不見了'); break; }
+          sh2.click(); await new Promise(r=>setTimeout(r,30));
+          const b3=[...d.querySelectorAll('#act .btn')]; b3.find(b=>/收藏櫃/.test(b.textContent)).click(); d.getElementById('achp-x').click(); await new Promise(r=>setTimeout(r,30));
+          if(![...d.querySelectorAll('#act .btn')].some(b=>/重新開始/.test(b.textContent)))err.push('結算圖後開收藏櫃按鈕不見了');
+          sharing=true; break; }
         const nx=bs.find(b=>/下一步|▸/.test(b.textContent)); if(nx){ nx.click(); continue; } }
       if(!bs.length){ if(idle++>40)break; await new Promise(r=>setTimeout(r,30)); continue; } idle=0;
       if(!S.done&&S.age<30){ const keep=bs.filter(b=>!/引退|不踢職業/.test(b.textContent)); if(keep.length)bs=keep; }

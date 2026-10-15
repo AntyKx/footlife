@@ -895,7 +895,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.25.7';
+const APP_VER='v0.25.8';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -4245,8 +4245,11 @@ function endGameFinal(reason){
         card('gold','生涯評價',ev.lines.map((l,i)=>i?`★ ${l}`:`<b class="hl">${l}</b>`).join('<br>'));
         S.achGot=achRecord(hb); achCard(S.achGot);
         card('info','十年後',epilogue(ev,chs,hb)+'<div id="share-out" style="margin-top:8px"></div>');
-        choose('',[{t:'▸ 產生結算圖',main:true,f:()=>{ shareImage(ev,$('share-out')); choose('',[{t:'↺ 重新開始',main:true,f:()=>{ location.href=location.pathname; }},{t:'🏆 成就收藏櫃',f:openAch}]); }},
-          {t:'🏆 成就收藏櫃',f:openAch},{t:'↺ 重新開始',f:()=>{ location.href=location.pathname; }}]); }); }); });
+        /* 開收藏櫃後要把按鈕放回來(choose 點完會清掉選項) */
+        const again={t:'↺ 重新開始',f:()=>{ location.href=location.pathname; }}, ach=back=>({t:'🏆 成就收藏櫃',f:()=>{ openAch(); back(); }});
+        const after=()=>choose('',[{...again,main:true},ach(after)]);
+        const fin=()=>choose('',[{t:'▸ 產生結算圖',main:true,f:()=>{ shareImage(ev,$('share-out')); after(); }},ach(fin),again]);
+        fin(); }); }); });
 }
 /* 人生後記:把家庭、引退後的路、球隊與球迷的反應寫成一段結尾 */
 function epilogue(ev,chs,hb){
