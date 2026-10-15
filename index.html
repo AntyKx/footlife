@@ -682,6 +682,30 @@ html.th .abrow .bar i,html.th .abc .ab1 i{background:linear-gradient(90deg,var(-
 @keyframes wipe{to{left:120%}}
 html.calm .wipe,html.calm .floodfx{display:none}
 @media (prefers-reduced-motion:reduce){#bd-tick span{animation:none;padding-left:0}.wipe,.floodfx{display:none}}
+.ach-d{color:var(--dim);font-size:12px}
+/* ---------- v0.24 成就 ---------- */
+#achp{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;background:#0009;padding:16px}
+#achp.open{display:flex}
+#achp .box{width:min(560px,100%);max-height:calc(100vh - 32px);overflow-y:auto;background:var(--panel);color:var(--chalk);border:1px solid var(--edge);border-radius:14px;padding:16px;box-shadow:0 20px 50px #0008}
+#achp h3{font-size:15px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+#achp h3 button{background:none;border:1px solid var(--edge);color:var(--dim);border-radius:6px;padding:0 8px;cursor:pointer}
+#achp h5{font-size:12px;letter-spacing:.2em;color:var(--dim);margin:14px 0 6px}
+#achp .hint{font-size:12.5px;color:var(--dim)}
+.ach-row{display:grid;grid-template-columns:minmax(0,9em) 1fr auto;gap:10px;align-items:center;padding:7px 10px;border:1px solid var(--edge);border-radius:10px;margin-top:6px;background:var(--panel2)}
+.ach-row .ach-n{font-weight:700;font-size:14px}
+.ach-row .ach-t{font-size:11.5px;color:var(--dim);display:flex;align-items:center;gap:3px;white-space:nowrap}
+.ach-row .ach-t i{width:8px;height:8px;border-radius:50%;background:var(--edge);margin-right:1px}
+.ach-row .ach-t i.on{background:var(--amber)}
+.ach-row.locked{opacity:.45} .ach-row.locked .ach-n{color:var(--dim)}
+.ach-row.r-e:not(.locked){border-color:color-mix(in srgb,var(--story) 55%,var(--edge))}
+.ach-row.r-l:not(.locked){border-color:color-mix(in srgb,var(--amber) 70%,var(--edge));box-shadow:0 0 12px color-mix(in srgb,var(--amber) 20%,transparent)}
+@media(max-width:480px){.ach-row{grid-template-columns:1fr auto}.ach-row .ach-d{grid-column:1/-1;grid-row:2}}
+.achs{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.ach{position:relative;display:block;padding:8px 12px;border-radius:10px;background:var(--sub);border:1px solid var(--edge);animation:medal .5s cubic-bezier(.3,1.6,.5,1) both}
+.ach b{display:block;font-size:14.5px} .ach small{display:block;font-size:11.5px;color:var(--dim);line-height:1.45;margin-top:2px}
+.ach em{position:absolute;top:6px;right:8px;font:700 11px var(--num);letter-spacing:.1em;color:var(--on-amber);background:var(--amber);padding:0 6px;border-radius:4px;font-style:normal}
+.ach.r-e{border-color:color-mix(in srgb,var(--story) 60%,var(--edge))}
+.ach.r-l{border-color:var(--amber);box-shadow:0 0 14px color-mix(in srgb,var(--amber) 25%,transparent)}
 html.calm *,html.calm *::before,html.calm *::after{animation:none!important;transition:none!important}
 html.calm .var{display:none}
 </style>
@@ -732,7 +756,7 @@ html.calm .var{display:none}
       <button class="btn main" id="btn-start">開始生涯 ▸ 15 歲・青訓第一年</button>
       <p class="seedline">世界種子
       <input id="seed-show" maxlength="24">
-      · <a href="#" id="seed-re" style="color:var(--blue)">換一個</a><br>相同種子＋相同選擇＝相同人生（可直接輸入朋友的種子碼）<br><span class="prefs-link" id="start-prefs">⚙ 配色與動畫</span></p>
+      · <a href="#" id="seed-re" style="color:var(--blue)">換一個</a><br>相同種子＋相同選擇＝相同人生（可直接輸入朋友的種子碼）<br><span class="prefs-link" id="start-prefs">⚙ 配色與動畫</span>　<span class="prefs-link" id="start-ach">🏆 成就收藏</span></p>
     </section>
     <div id="ver-badge" style="position:fixed;top:6px;right:8px;font-size:10px;letter-spacing:1px;color:var(--dim);opacity:.55;font-family:monospace;z-index:50;pointer-events:none"></div>
   </div>
@@ -761,6 +785,7 @@ html.calm .var{display:none}
   <footer id="act" style="display:none"></footer>
   <div id="prefs"><div class="box"><h3>配色與動畫<button id="prefs-x">關閉 ✕</button></h3><div class="thm" id="thm"></div>
     <label><input type="checkbox" id="calm-ck"> 減少動畫</label><p class="hint">關掉卡片進場、換畫面、GOAL! 大字與彩帶。系統開啟「減少動態效果」時也會自動套用。</p></div></div>
+  <div id="achp"><div class="box"><h3>成就收藏櫃<button id="achp-x">關閉 ✕</button></h3><div id="ach-body"></div></div></div>
   <aside id="side"><h3><span>生涯大事記 <em id="side-n">0</em></span><button id="side-x">關閉 ✕</button></h3><div id="side-list"><p id="side-empty">冠軍、轉會、國家隊、關鍵時刻……都會記在這裡，點一下可以跳回當時的畫面。</p></div></aside>
 </div>
 <script>
@@ -781,7 +806,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.23.2';
+const APP_VER='v0.24.0';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1629,7 +1654,7 @@ function bigMoment(tag,me,opp,par,done,fx){ fx=fx||{}; /* fx:min/a/b 指定時�
   const sc=pickScene(), tell=pick(sc.tells), see=chance(scoutSee())||!!fx.see;
   const min=fx.min??ri(55,118), a=fx.a??ri(0,1), b=fx.b??a, el=momentCard(tag,sc,tell,see,min>90?`延長 ${min}`:min,me,a,b,opp);
   MTAG=tag; MHALF=!!fx.half;
-  choose(`${tag} — 你的選擇？`,sc.opts.map((o,i)=>{ const p=clamp(momentOdds(o,par)+(fx.bonus||0)+(o.m==='bold'?(fx.boldB||0):0),5,95);
+  choose(`${tag} — 你的選擇？`,sc.opts.map((o,i)=>{ const p=clamp(momentOdds(o,par)+(fx.bonus||0)+(o.m==='bold'?(fx.boldB||0):0)+sceneBonus(sc),5,95);
     return {t:o.t,main:o.m==='norm',warn:o.m==='bold',s:momentSub(o,p),
       f:()=>resolveMoment(sc,o,i===tell.o,p,el,ok=>{ MTAG=null; MHALF=false; board(); done(ok); })}; }));
 }
@@ -1639,9 +1664,27 @@ function leagueMoment(last,i,tot,done){
   const dby=derbyOf(); let vs=opp;
   STK=S.stage!=='PRO'?null:dby&&chance(25)?(vs=dby[0],dby[1]):last&&S.clubTier===1&&chance(35)?'爭冠關鍵戰':last&&S.clubTier===3&&chance(35)?'保級生死戰':null;
   const el=momentCard(STK?'關鍵時刻・'+STK:'關鍵時刻',sc,tell,see,min,me,a,b,vs);
-  choose(`關鍵時刻 — 你的選擇？（季中第 ${i}/${tot} 場｜${STK==='爭冠關鍵戰'?'結果直接影響奪冠機率':STK==='保級生死戰'?'結果直接影響降級機率':'成功讓球隊排名往上'}）`,sc.opts.map((o,j)=>{ const p=momentOdds(o);
+  choose(`關鍵時刻 — 你的選擇？（季中第 ${i}/${tot} 場｜${STK==='爭冠關鍵戰'?'結果直接影響奪冠機率':STK==='保級生死戰'?'結果直接影響降級機率':'成功讓球隊排名往上'}）`,sc.opts.map((o,j)=>{ const p=clamp(momentOdds(o)+sceneBonus(sc),5,95);
     return {t:o.t,main:o.m==='norm',warn:o.m==='bold',s:momentSub(o,p),
       f:()=>resolveMoment(sc,o,j===tell.o,p,el,ok=>{ const M=S.lgMo||(S.lgMo={ok:0,ng:0,stk:null}); ok?M.ok++:M.ng++; if(STK==='爭冠關鍵戰'||STK==='保級生死戰')M.stk={t:STK,ok}; STK=null; board(); done(); })}; }));
+}
+/* v0.24 情境特質加成:點球專家、德比之王、歐戰之夜、大賽恐懼 */
+const BIG_RE=/歐冠|歐霸|歐協聯|亞冠|自由盃|南美盃|中北美冠軍盃|非洲冠軍聯賽|非洲聯合會盃|世界盃|國家盃|美洲盃|亞洲盃|金盃賽|世俱盃|奧運/;
+const isDerbySTK=()=>!!STK&&!/爭冠|保級/.test(STK);
+function sceneBonus(sc){ let b=0; const T=S.traits;
+  if(T.pkpro&&/點球/.test(sc.t))b+=15;
+  if(T.derby&&isDerbySTK())b+=10;
+  if(MTAG&&BIG_RE.test(MTAG)){ if(T.bignight)b+=8; if(T.bigfear)b-=8; }
+  return b; }
+/* 情境特質的累計與解鎖 */
+function trackMomentTraits(sc,ok,sub){ const T=S.traits, inc=k=>(S[k]=(S[k]||0)+1);
+  if(ok&&isDerbySTK()&&inc('cDerby')>=5&&!T.derby)traitCard('derby','第五次在德比裡扛起球隊。看台上的人開始叫你「德比先生」——<b class="hl">德比關鍵時刻成功率 +10%、球迷人氣加倍</b>。');
+  if(MTAG&&BIG_RE.test(MTAG)){
+    if(ok){ S.bigFail=0; if(inc('cBig')>=6&&!T.bignight)traitCard('bignight','燈光越亮，你踢得越好——<b class="hl">洲際賽與大賽淘汰賽成功率 +8%</b>。'); }
+    else if(inc('bigFail')>=5&&!T.bigfear&&!T.bignight)traitCard('bigfear','大賽連續失手五次，媒體說你「一到大場面就消失」——<b class="dn">大賽成功率 −8%</b>。（贏下一場決賽可以解除）','bad'); }
+  if(ok&&/點球/.test(sc.t)&&inc('cPk')>=5&&!T.pkpro){ traitCard('pkpro','第五個點球得手。站上十二碼，你的心跳比門將還慢——<b class="hl">點球場景成功率 +15%</b>。');
+    if(T.yips){ removeTrait('yips'); card('good','心魔解除','點球恐懼症痊癒了。'); } }
+  if(ok&&sub&&inc('cSub')>=5&&!T.supersub)traitCard('supersub','第五次替補登場改變比賽。教練說：「你是我最好的武器。」——<b class="hl">替補身分時賽季評分 +0.2</b>。');
 }
 const FOUL_RE=/鏟|犯規|上搶|斷球|出腳|撲搶|硬吃|貼上去|撲向腳下|撲向持球者|衝出去封堵/;
 function resolveMoment(sc,o,read,p,el,next){
@@ -1654,7 +1697,7 @@ function resolveMoment(sc,o,read,p,el,next){
   if(ok){ momentSplit(o,mag).forEach(([k,v])=>out.push(loveGainTxt(k,v))); out.push(meter('form',mag*4)); out.push(meter('fans',o.k==='G'?(m==='bold'?6:3):['S','D'].includes(o.k)?(m==='bold'?4:2):1));
     if(['S','D'].includes(o.k))S.mDef=(S.mDef||0)+1;
     if(m==='bold')out.push(meter('trust',3));
-    if(STK)out.push(meter('fans',3));
+    if(STK)out.push(meter('fans',S.traits.derby&&isDerbySTK()?6:3));
     const cl=MCTX.clutch&&o.k!=='K'?MCTX.clutch:null;
     if(cl){ out.push(meter('fans',4)); out.push(meter('trust',2)); }
     if(o.k==='G'&&!isGK())S.mG++; else if(o.k==='A')S.mA++;
@@ -1681,6 +1724,7 @@ function resolveMoment(sc,o,read,p,el,next){
     setTimeout(()=>{ scEl.classList.add('flip'); setTimeout(()=>{ scEl.textContent=`${A} – ${B}`; },220); },calmFx()?0:700); }
   if(S.pendTrait==='setpiece'){ S.pendTrait=null;
     traitCard('setpiece','角球、自由球，只要球停在地上，就是你的時間——<b class="hl">每季額外貢獻定位球進球與助攻</b>。'); }
+  trackMomentTraits(sc,ok,S.stage==='PRO'&&clamp(roleOf(ovr()-rivalTop()+trustGap())-(S.roleAdj||0),0,3)>=2);
   checkTraitsMid(); next(ok);
 }
 
@@ -2590,7 +2634,7 @@ function awaken(){ const cands=shuffle(GRP_AB[S.grp].filter(k=>S.ab[k]<70)), bl=
 const TRAITN={genius:'天才',late:'大器晚成',iron:'鐵人',glass:'玻璃人',phoenix:'浴火重生',disc:'自律狂',clutch:'大心臟',
   goal:'進球機器',setpiece:'定位球專家',yips:'點球恐懼症',versatile:'全能戰士',franchise:'球隊之子',intlace:'國家隊英雄',
   distract:'外務纏身',cancer:'更衣室毒瘤',scum:'渣男',confidante:'閨中密友',scholar:'學院派'};
-Object.assign(TRAITN,{gent:'紳士球員',redcard:'紅牌專家'});
+Object.assign(TRAITN,{gent:'紳士球員',redcard:'紅牌專家',derby:'德比之王',bignight:'歐戰之夜',pkpro:'點球專家',supersub:'超級替補',bigfear:'大賽恐懼'});
 const NEG_TRAITS=['glass','yips','distract','cancer','scum','redcard'];
 function traitCard(key,desc,tone){ S.traits[key]=true; card(tone||'gold','隱藏特質解鎖：'+TRAITN[key],desc); board(); }
 function removeTrait(key){ if(S.traits[key]){ S.traits[key]=false; if(!S.removed.includes(TRAITN[key]))S.removed.push(TRAITN[key]); } }
@@ -2902,7 +2946,7 @@ function simSeason(par,games,r){
   if(app>0){ if(isGK())dc+=(st.CS/app-0.28)*0.8+(1.3-st.GA/Math.max(1,n90))*0.35;
     else if(['CB','FB','DM'].includes(dp))dc+=(st.CS/app-0.25)*1.5; }
   dc+=(S.mDef||0)*0.04;
-  st.Rt=app>0?+clamp(6.5+(d>0?Math.min(d,dCap)*0.05:Math.max(d,-15)*0.04)+ga+dc+pend*0.02+fb*0.15-(S.traits.yips?0.2:0)-red*0.08+(S.traits.gent?0.05:0)+N0(0.15),5.5,9.0).toFixed(2):0; /* 能力差:高於聯賽每點 +0.05(上限依聯賽水準:台灣企甲約 9、日職約 15、英超 20)、低於每點 −0.04(下限 −15);封頂避免碾壓低級別時灌水 */
+  st.Rt=app>0?+clamp(6.5+(d>0?Math.min(d,dCap)*0.05:Math.max(d,-15)*0.04)+ga+dc+pend*0.02+fb*0.15-(S.traits.yips?0.2:0)-red*0.08+(S.traits.gent?0.05:0)+(S.traits.supersub&&r>=2?0.2:0)+N0(0.15),5.5,9.0).toFixed(2):0; /* 能力差:高於聯賽每點 +0.05(上限依聯賽水準:台灣企甲約 9、日職約 15、英超 20)、低於每點 −0.04(下限 −15);封頂避免碾壓低級別時灌水 */
   return st;
 }
 const cardTxt=st=>st.Y||st.R?`｜🟨 ${st.Y||0}${st.R?`　🟥 ${st.R}`:''}${st.Ban?`（停賽 ${st.Ban} 場）`:''}`:'';
@@ -3065,7 +3109,7 @@ function teamStanding(){
   const prevTier=S.clubTier;
   if(rank===1){
     leagueTable('champ',1,note);
-    S.honors.push(`${seasonLabel(S.year)} ${L.n}冠軍（${S.club}）`); S.champYear=S.year; meter('fans',5);
+    S.honors.push(`${seasonLabel(S.year)} ${L.n}冠軍（${S.club}）`); S.champYear=S.year; meter('fans',5); if(S.clubTier===3&&!L.up)S.miracleT=true;
     card('gold','聯賽冠軍',`${S.club}奪下 <b class="hl">${L.n}冠軍</b>！${S.clubTier===3?'<br>一支被看好降級的球隊，寫下了奇蹟。':S.clubTier===2?'<br>沒有人看好你們，但你們做到了。':''}`);
     if(L.up&&!frozen){ promote(); return; }
   } else if(!frozen&&L.up&&rank<=2){ leagueTable('up',rank,note); promote(); return; }
@@ -3502,6 +3546,7 @@ function finalSeries(c,done){
     pkShootout(c,(win,mine)=>finish(win,s,s,true,mine));
   }
   function finish(win,x,y,pk,star,note){
+    if(win&&S.traits.bigfear){ removeTrait('bigfear'); card('good','心魔解除','捧起獎盃的那一刻，「大賽恐懼」的標籤被撕掉了。'); }
     const sc=`${c.me} ${x}–${y} ${c.opp}${pk?'（點球大戰）':''}`, mvp=win&&!!star&&chance(pk?50:35);
     if(win){
       const cheer={世界盃:`你把${tr}高高舉過頭頂。${NATS[S.nat].n}的街頭，此刻一定已經瘋了。`,歐冠:`隊長把${tr}交到你手上，你轉身面向看台，彩帶從天而降。`,
@@ -4047,9 +4092,10 @@ function endGameFinal(reason){
       nextPage('生涯評價',()=>{
         /* 第四頁:評價、場外人生、後記 */
         card('gold','生涯評價',ev.lines.map((l,i)=>i?`★ ${l}`:`<b class="hl">${l}</b>`).join('<br>'));
+        S.achGot=achRecord(hb); achCard(S.achGot);
         card('info','十年後',epilogue(ev,chs,hb)+'<div id="share-out" style="margin-top:8px"></div>');
-        choose('',[{t:'▸ 產生結算圖',main:true,f:()=>{ shareImage(ev,$('share-out')); choose('',[{t:'↺ 重新開始',main:true,f:()=>{ location.href=location.pathname; }}]); }},
-          {t:'↺ 重新開始',f:()=>{ location.href=location.pathname; }}]); }); }); });
+        choose('',[{t:'▸ 產生結算圖',main:true,f:()=>{ shareImage(ev,$('share-out')); choose('',[{t:'↺ 重新開始',main:true,f:()=>{ location.href=location.pathname; }},{t:'🏆 成就收藏櫃',f:openAch}]); }},
+          {t:'🏆 成就收藏櫃',f:openAch},{t:'↺ 重新開始',f:()=>{ location.href=location.pathname; }}]); }); }); });
 }
 /* 人生後記:把家庭、引退後的路、球隊與球迷的反應寫成一段結尾 */
 function epilogue(ev,chs,hb){
@@ -4081,7 +4127,7 @@ function shareImage(ev,out){
   const blocks=honors.map(h=>{ const L=[]; let cur=''; for(const ch of '· '+h){ if(c.measureText(cur+ch).width>maxW&&cur){ L.push(cur); cur='  '+ch; } else cur+=ch; } if(cur)L.push(cur); return L; });
   const half=Math.ceil(blocks.length/2), hH=Math.max(...[blocks.slice(0,half),blocks.slice(half)].map(b=>b.reduce((s,x)=>s+x.length*23,0)),0);
   const pro=S.log.filter(r=>r.lv), chs=careerChapters().filter(x=>x.kind!=='youth'), hist=S.histTxt||[], pct=scorePct(ev.sc);
-  let H=140+30+ev.lines.length*24+14+(34+chs.length*22+10)+(34+(hist.length+1)*22+10)+34+(lgs.length+1)*26+16+(S.caps?56:0)+(honors.length?30+hH+16:0)+34+pro.length*20+24+70;
+  let H=140+30+ev.lines.length*24+14+((S.achGot||[]).length?34+Math.ceil((S.achGot||[]).length/5)*22+10:0)+(34+chs.length*22+10)+(34+(hist.length+1)*22+10)+34+(lgs.length+1)*26+16+(S.caps?56:0)+(honors.length?30+hH+16:0)+34+pro.length*20+24+70;
   cv.width=W*scale; cv.height=H*scale; c.scale(scale,scale);
   c.fillStyle='#0c0f1d'; c.fillRect(0,0,W,H);
   c.strokeStyle='#2a3354'; c.lineWidth=3; c.strokeRect(10,10,W-20,H-20);
@@ -4099,6 +4145,10 @@ function shareImage(ev,out){
   chs.forEach((x,i)=>{ c.font='13px sans-serif'; c.fillStyle=x.honors.some(h=>/冠軍（/.test(h))?'#ffcf4a':'#d6dcf0';
     const t=`${i+1}. ${x.club}${x.kind==='loan'?'（租借）':x.kind==='uni'?'（大學）':''}　${x.y0}–${x.y1+1}　${chStat(x.t,gk)}${x.honors.filter(h=>/冠軍（/.test(h)).length?`　🏆×${x.honors.filter(h=>/冠軍（/.test(h)).length}`:''}`;
     c.fillText(t,PAD,y); y+=22; }); y+=10;
+  const ag=(S.achGot||[]).map(x=>achName(x.a,x.l));
+  if(ag.length){ hr(); title(`成就（${ag.length}）`); c.font='13px sans-serif'; c.fillStyle='#ffcf4a'; let line='', ly=[];
+    ag.forEach(t=>{ const nx=line?line+'・'+t:t; if(c.measureText(nx).width>W-PAD*2){ ly.push(line); line=t; } else line=nx; }); if(line)ly.push(line);
+    ly.forEach(l=>{ c.fillText(l,PAD,y); y+=22; }); y+=10; }
   hr(); title('歷史地位');
   c.font='bold 14px sans-serif'; c.fillStyle='#ffcf4a'; c.fillText(`勝過約 ${pct>=99.5?pct.toFixed(1):Math.round(pct)}% 的模擬足球人生`,PAD,y); y+=22;
   c.font='13px sans-serif'; c.fillStyle='#a9b8ff'; hist.forEach(t=>{ c.fillText('· '+t,PAD,y); y+=22; }); y+=10;
@@ -4141,6 +4191,78 @@ function shareImage(ev,out){
       if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'足球生涯結算',text:S.name+' 的足球人生'}); return; }
     }catch(e){ if(e&&e.name==='AbortError')return; }
     dl(); };
+}
+
+/* ================= 成就(v0.24):不影響數值,跨生涯收藏在瀏覽器 ================= */
+/* lv:分級門檻(值 ≥ 門檻即達該級);沒有 lv 的是單一成就(值 > 0 即達成) */
+const ACH_TIER=['銅','銀','金'], ACH_RAR={c:'常見',r:'稀有',e:'史詩',l:'傳說'};
+const ACH=[
+  {id:'goldboot',cat:'榮譽',n:'金靴收藏家',d:'聯賽金靴 2／4／6 次',lv:[2,4,6],r:'r',v:A=>A.cnt(h=>/金靴$/.test(h)&&!!honorLv(h))},
+  {id:'ballon',cat:'榮譽',n:'金球先生',d:'金球獎 1／3／5 次',lv:[1,3,5],r:'l',v:A=>A.cnt(h=>/^\d+ 金球獎$/.test(h))},
+  {id:'uclking',cat:'榮譽',n:'歐冠之王',d:'歐冠冠軍 1／3／5 座',lv:[1,3,5],r:'e',v:A=>A.cnt(h=>/歐冠（冠軍/.test(h))},
+  {id:'top5',cat:'榮譽',n:'五大聯賽征服者',d:'在 2／3／5 個五大聯賽拿過冠軍',lv:[2,3,5],r:'l',v:A=>new Set(S.honors.map(h=>(h.match(/(英超|西甲|德甲|義甲|法甲)冠軍（/)||[])[1]).filter(Boolean)).size},
+  {id:'treble',cat:'榮譽',n:'三冠王',d:'同一季拿下頂級聯賽、國內盃、洲際頂級賽事冠軍',r:'e',v:A=>A.treble()},
+  {id:'wcwin',cat:'榮譽',n:'世界之巔',d:'贏得世界盃',r:'e',v:A=>A.has(/世界盃（冠軍/)},
+  {id:'slam',cat:'榮譽',n:'大滿貫',d:'生涯拿過世界盃、洲際頂級俱樂部賽事冠軍與金球獎',r:'l',v:A=>A.has(/世界盃（冠軍/)&&A.has(/(歐冠|亞冠|自由盃|中北美冠軍盃|非洲冠軍聯賽)（冠軍/)&&A.has(/^\d+ 金球獎$/)},
+  {id:'smallwc',cat:'逆襲',n:'小國逆襲',d:'弱國國籍踢上世界盃／打進淘汰賽／4 強',lv:[1,2,3],tn:['小國逆襲','奇蹟之夏','神話'],r:'r',
+    v:A=>A.weak?Math.max(0,...S.honors.filter(h=>/世界盃（/.test(h)).map(h=>/世界盃（(冠軍|亞軍|止步決賽|止步4 強)/.test(h)?3:/止步小組賽/.test(h)?1:2)):0},
+  {id:'pioneer',cat:'逆襲',n:'開疆拓土',d:'弱國國籍登上五大聯賽',r:'r',v:A=>A.weak&&A.pro.some(r=>LV[r.lv].top5)},
+  {id:'asia',cat:'逆襲',n:'亞洲之光',d:'亞洲國籍拿下金球獎、五大聯賽冠軍或歐冠',r:'e',v:A=>A.cf==='AFC'&&A.elite()},
+  {id:'africa',cat:'逆襲',n:'非洲之星',d:'非洲國籍拿下金球獎、五大聯賽冠軍或歐冠',r:'e',v:A=>A.cf==='CAF'&&A.elite()},
+  {id:'world',cat:'逆襲',n:'環遊世界',d:'在 4 個洲的聯賽踢過球',r:'e',v:A=>new Set(A.pro.map(r=>LV[r.lv].eu?'UEFA':((NATS[LV[r.lv].cty]||{}).cf||'AFC'))).size>=4},
+  {id:'natural',cat:'逆襲',n:'歸化之路',d:'歸化後代表新國家踢世界盃',r:'e',v:A=>!!S.natFrom&&A.has(/世界盃（/)},
+  {id:'onecity',cat:'軌跡',n:'一人一城',d:'職業生涯 12 季以上只效力一支球隊',r:'r',v:A=>A.pro.length>=12&&new Set(A.pro.filter(r=>!r.loan).map(r=>r.tm)).size===1},
+  {id:'climb',cat:'軌跡',n:'從谷底爬起',d:'從第三級聯賽一路踢上五大聯賽',r:'r',v:A=>{ const i=A.pro.findIndex(r=>{ const L=LV[r.lv]; return L.up&&LV[L.up].up; }); return i>=0&&A.pro.slice(i).some(r=>LV[r.lv].top5); }},
+  {id:'miracle',cat:'軌跡',n:'降級隊奇蹟',d:'帶保級檔次的球隊拿下聯賽冠軍',r:'e',v:A=>!!S.miracleT},
+  {id:'unigrad',cat:'軌跡',n:'大學之光',d:'大學出身，拿過五大聯賽冠軍或金球獎',r:'e',v:A=>!!S.uniGrad&&(A.has(/(英超|西甲|德甲|義甲|法甲)冠軍（/)||A.has(/^\d+ 金球獎$/))},
+  {id:'prodigy',cat:'軌跡',n:'神童',d:'19 歲以前拿下聯賽最佳球員',r:'e',v:A=>S.honors.some(h=>/最佳球員$/.test(h)&&!!honorLv(h)&&!/決賽|年輕/.test(h)&&(A.ageAt(yrOf(h))??99)<=18)},
+  {id:'veteran',cat:'軌跡',n:'老而彌堅',d:'38 歲仍是球隊主力',r:'r',v:A=>A.pro.some(r=>r.age>=38&&r.st.role==='主力')},
+  {id:'century',cat:'軌跡',n:'百球俱樂部',d:'職業生涯 100／200／300 球',lv:[100,200,300],r:'r',v:A=>A.gk?0:A.tot.G},
+  {id:'wall',cat:'軌跡',n:'零封之牆',d:'門將職業生涯零封 100／200／300 場',lv:[100,200,300],r:'r',v:A=>A.gk?A.tot.CS:0},
+  {id:'natlegend',cat:'軌跡',n:'國家隊傳奇',d:'國家隊出場榜或射手榜歷史第一',r:'r',v:A=>(A.hb||[]).some(x=>/國家隊/.test(x.sec)&&x.b.some(b=>b.rk===1))},
+  {id:'nemesis',cat:'軌跡',n:'宿敵終結者',d:'與宿敵交手 5 勝以上、一場沒輸',r:'r',v:A=>{ const R=S.arcs&&S.arcs.rival; return !!R&&R.w>=5&&R.l===0; }},
+  {id:'redking',cat:'趣味',n:'紅牌之王',d:'職業生涯 10 張紅牌',r:'r',v:A=>A.tot.R>=10},
+  {id:'bench',cat:'趣味',n:'板凳哲學家',d:'職業生涯有 5 季坐板凳',r:'c',v:A=>A.pro.filter(r=>r.st.role==='板凳').length>=5},
+  {id:'traveler',cat:'趣味',n:'環球旅行家',d:'效力 8 支以上球隊',r:'r',v:A=>new Set(A.pro.map(r=>baseTm(r.tm))).size>=8},
+  {id:'family',cat:'趣味',n:'足球世家',d:'生了 4 個孩子',r:'r',v:A=>S.love.kids>=4},
+  {id:'casanova',cat:'趣味',n:'浪子',d:'離過 3 次婚',r:'r',v:A=>S.love.exes.length>=3}];
+function achCtx(hb){
+  const pro=S.log.filter(r=>r.lv), tot=pro.reduce((a,r)=>{ ['G','CS','R'].forEach(k=>a[k]+=r.st[k]||0); return a; },{G:0,CS:0,R:0}), N=NATS[S.nat];
+  const A={pro,tot,hb,gk:isGK(),weak:N.tier>=4,cf:N.cf||'AFC',
+    cnt:f=>S.honors.filter(f).length, has:re=>S.honors.some(h=>re.test(h)),
+    ageAt:y=>{ const r=S.log.find(x=>x.y===y); return r?r.age:null; },
+    elite:()=>A.has(/^\d+ 金球獎$/)||A.has(/(英超|西甲|德甲|義甲|法甲)冠軍（/)||A.has(/歐冠（冠軍/),
+    treble:()=>{ const by={}; S.honors.forEach(h=>{ const y=h.split(' ')[0], k=honorLv(h), b=by[y]||(by[y]={});
+        if(/冠軍（[^・）]*）$/.test(h)&&k&&!LV[k].up)b.lg=1; else if(/冠軍（[^）]*・[^）]*）$/.test(h)&&!/（冠軍/.test(h))b.cup=1;
+        if(/(歐冠|亞冠|自由盃|中北美冠軍盃|非洲冠軍聯賽)（冠軍・/.test(h))b.cl=1; });
+      return Object.values(by).some(b=>b.lg&&b.cup&&b.cl); }};
+  return A;
+}
+/* 這段生涯達成的等級:0＝未達成;分級成就 1～3 */
+function achLevel(a,A){ let v; try{ v=a.v(A); }catch(e){ v=0; } v=+v||0; return a.lv?a.lv.filter(t=>v>=t).length:(v>0?1:0); }
+const achName=(a,l)=>a.tn?a.tn[l-1]:a.n+(a.lv?`（${ACH_TIER[l-1]}）`:'');
+function achLoad(){ try{ return JSON.parse(localStorage.getItem('fl-ach')||'{}')||{}; }catch(e){ return {}; } }
+function achSave(o){ try{ localStorage.setItem('fl-ach',JSON.stringify(o)); }catch(e){} }
+/* 結算時呼叫:回傳本次達成清單,並寫入收藏(只升不降) */
+function achRecord(hb){
+  const A=achCtx(hb), saved=achLoad(), got=[];
+  ACH.forEach(a=>{ const l=achLevel(a,A); if(!l)return; const old=(saved[a.id]&&saved[a.id].l)||0;
+    got.push({a,l,isNew:l>old}); saved[a.id]={l:Math.max(l,old),n:((saved[a.id]&&saved[a.id].n)||0)+1}; });
+  saved._runs=(saved._runs||0)+1; achSave(saved); return got;
+}
+function achCard(got){
+  if(!got.length)return card('info','成就','這段生涯沒有解鎖成就。收藏櫃裡還有很多空位。');
+  const c=card('gold','成就',`<div class="achs">${got.map(({a,l,isNew},i)=>`<span class="ach r-${a.r}" style="animation-delay:${i*120}ms"><b>${achName(a,l)}</b><small>${a.d}・${ACH_RAR[a.r]}</small>${isNew?'<em>NEW</em>':''}</span>`).join('')}</div>`);
+  return c;
+}
+/* 成就收藏櫃(首頁與結算都能開) */
+function openAch(){
+  const saved=achLoad(), done=ACH.filter(a=>saved[a.id]).length, cats=[...new Set(ACH.map(a=>a.cat))];
+  $('ach-body').innerHTML=`<p class="hint">已解鎖 <b class="hl">${done}</b> / ${ACH.length}・玩過 ${saved._runs||0} 段生涯（存在這個瀏覽器裡）</p>`+
+    cats.map(c=>`<h5>${c}</h5>`+ACH.filter(a=>a.cat===c).map(a=>{ const l=(saved[a.id]&&saved[a.id].l)||0;
+      return `<div class="ach-row${l?'':' locked'} r-${a.r}"><span class="ach-n">${l?achName(a,l):a.n}</span><span class="ach-d">${a.d}</span>`+
+        `<span class="ach-t">${a.lv?ACH_TIER.map((t,i)=>`<i class="${i<l?'on':''}"></i>`).join(''):''}${ACH_RAR[a.r]}</span></div>`; }).join('')).join('');
+  $('achp').classList.add('open');
 }
 
 /* ================= 開場設定 ================= */
@@ -4193,6 +4315,8 @@ function renderPrefs(){ const cur=document.documentElement.dataset.theme||'soft'
   $('calm-ck').checked=document.documentElement.classList.contains('calm'); }
 function openPrefs(){ renderPrefs(); $('prefs').classList.add('open'); }
 $('btn-prefs').onclick=openPrefs; $('start-prefs').onclick=openPrefs;
+$('start-ach').onclick=openAch; $('achp-x').onclick=()=>$('achp').classList.remove('open');
+$('achp').onclick=e=>{ if(e.target.id==='achp')$('achp').classList.remove('open'); };
 $('prefs-x').onclick=()=>$('prefs').classList.remove('open');
 $('prefs').onclick=e=>{ if(e.target.id==='prefs')$('prefs').classList.remove('open'); };
 $('calm-ck').onchange=e=>{ document.documentElement.classList.toggle('calm',e.target.checked); try{ localStorage.setItem('fl-calm',e.target.checked?'1':'0'); }catch(_){} };
