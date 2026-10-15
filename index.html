@@ -65,6 +65,23 @@ table.fin td:first-child,table.fin th:first-child{text-align:left}
 .yr-block.collapsed .yr-head::after{content:' ▸'}
 .yr-block:not(.collapsed) .yr-head.has-body::after{content:' ▾'}
 .divider::before,.divider::after{content:'———'}
+/* ---------- 一次一個畫面 ---------- */
+.scr{display:none;flex-direction:column;gap:10px}
+.scr.cur,#log.review .scr{display:flex}
+#log:not(.review) .scr .yr-head{display:none}
+#log.review .scr:not(.cur){opacity:.82}
+#log.review .scr.cur{border-top:1px dashed #3a4470;padding-top:8px}
+.scr-head{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.12em;color:#8b93b0;padding:2px 2px 0;flex-wrap:wrap}
+.scr-head b{color:var(--amber);letter-spacing:.2em}
+.scr-head .dots{display:inline-flex;gap:4px;margin-left:auto}
+.scr-head .dots i{width:16px;height:4px;border-radius:2px;background:#2a3354}
+.scr-head .dots i.d{background:#6b5bff}.scr-head .dots i.c{background:var(--amber)}
+#log.review .scr-head{display:none}
+/* 有決定要做的畫面:上方的資訊卡縮成通知條 */
+.scr.dec>.card:not(.moment):not(.talk){padding:8px 12px;font-size:13px;border-radius:10px;box-shadow:none}
+.scr.dec>.card:not(.moment):not(.talk) h4{margin-bottom:3px;font-size:11px}
+.scr.dec>.card:not(.moment):not(.talk) p{font-size:13px}
+#act .nextbtn{width:100%;grid-column:1/-1;padding:14px;font-size:16px;letter-spacing:.08em;text-align:center}
 /* ---------- 操作區 ---------- */
 #act{position:sticky;bottom:0;z-index:20;background:linear-gradient(#121630ee,#0c0f1d);border-top:2px solid var(--edge);
   padding:12px 14px calc(12px + env(safe-area-inset-bottom));backdrop-filter:blur(6px)}
@@ -154,26 +171,26 @@ table.awd td{text-align:left!important}
 .card.story{border-color:#7a6cff;box-shadow:0 0 0 1px #7a6cff33 inset}
 .card.story h4{color:#b7adff}
 .sd.story{border-left-color:#7a6cff}
-#btn-side{background:none;border:1px solid #2a3354;color:#8b93b0;border-radius:8px;font:700 11px var(--sans);padding:4px 7px;cursor:pointer;margin-right:6px;white-space:nowrap}
+#btn-rev,#btn-side{background:none;border:1px solid #2a3354;color:#8b93b0;border-radius:8px;font:700 11px var(--sans);padding:4px 7px;cursor:pointer;margin-right:6px;white-space:nowrap}
 #side-x{background:none;border:1px solid var(--edge);color:var(--dim);border-radius:6px;padding:0 8px;cursor:pointer;font-size:12px}
 @media (max-width:1099px){
   #side.open{display:block;position:fixed;inset:0;z-index:60;background:var(--bg);overflow-y:auto;padding:calc(14px + env(safe-area-inset-top)) 14px 24px}
 }
 @media (max-width:480px){ .abrow .nm{width:44px} .abrow .val{width:72px} .abrow{gap:6px;padding:6px 8px} }
 @media (min-width:1100px){
-  #app{max-width:1400px;display:grid;grid-template-columns:340px minmax(0,1fr) 300px;grid-template-rows:1fr auto auto;column-gap:18px;padding:0 16px}
-  #board{grid-column:1;grid-row:1/4;align-self:start;max-height:100vh;max-height:100dvh;overflow-y:auto;
+  #app{max-width:1400px;display:grid;grid-template-columns:340px minmax(0,1fr) 300px;grid-template-rows:auto auto auto 1fr;column-gap:18px;padding:0 16px}
+  #board{grid-column:1;grid-row:1/5;align-self:start;max-height:100vh;max-height:100dvh;overflow-y:auto;
     border:1px solid var(--edge);border-top:none;border-radius:0 0 12px 12px;padding:14px 16px 12px}
   #bd-ab{grid-template-columns:repeat(2,1fr);gap:6px 14px}
   .abc{font-size:12px}
   #log{grid-column:2;grid-row:1;padding:16px 4px 20px}
   #act-toggle{grid-column:2;grid-row:2}
-  #act{grid-column:2;grid-row:3;border:1px solid var(--edge);border-bottom:none;border-radius:12px 12px 0 0;
+  #act{grid-column:2;grid-row:3;align-self:start;border:1px solid var(--edge);border-radius:12px;
     display:grid;grid-template-columns:1fr 1fr;column-gap:10px;align-content:start}
   #act>*:not(.btn){grid-column:1/-1}
   #act>.btn:last-child:nth-child(even){grid-column:1/-1}
   #btn-side,#side-x{display:none}
-  #side{display:block;grid-column:3;grid-row:1/4;align-self:start;position:sticky;top:0;max-height:100vh;max-height:100dvh;overflow-y:auto;padding:16px 2px 24px}
+  #side{display:block;grid-column:3;grid-row:1/5;align-self:start;position:sticky;top:0;max-height:100vh;max-height:100dvh;overflow-y:auto;padding:16px 2px 24px}
 }
 /* 開場 */
 #start{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;
@@ -436,7 +453,7 @@ svg.scene{max-width:520px;margin-left:auto;margin-right:auto}
 </div>
 <div id="app">
   <header id="board" style="display:none">
-    <div id="bd-top"><span id="bd-num">7</span><div id="bd-name"></div><button id="btn-side" title="生涯大事記">大事記</button><button id="btn-restart" title="重新開始">↺</button></div>
+    <div id="bd-top"><span id="bd-num">7</span><div id="bd-name"></div><button id="btn-rev" title="回顧之前的畫面">回顧</button><button id="btn-side" title="生涯大事記">大事記</button><button id="btn-restart" title="重新開始">↺</button></div>
     <div id="bd-bug"><span id="bd-lg">青訓</span><span id="bd-team"></span><span id="bd-clock">0'</span></div>
     <div id="bd-grid">
       <div class="bd-cell"><b id="bd-age">15</b><span>年齡</span></div>
@@ -475,7 +492,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.13.0';
+const APP_VER='v0.14.0';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -649,9 +666,38 @@ const seasonLabel=y=>`${y}/${String((y+1)%100).padStart(2,'0')}`;
 
 /* ================= UI 基礎 ================= */
 const $=id=>document.getElementById(id);
-var _curYearBody=null; /* 當前年度的內容容器 */
-var MAX_YEARS=8;         /* DOM 最多保留幾個年度區塊 */
-function logTarget(){ return _curYearBody || $('log'); }
+/* 一次一個畫面:#log 裡每個 .scr 是一個畫面,平常只顯示目前畫面(.cur);「回顧」模式顯示保留的全部畫面
+   每次玩家操作(step)後產生的卡片都進新畫面;舊畫面有寫入結果時先停在結果,按「下一步」才換 */
+var SCR=null, TGT=null, PROG=null, HDR=null, HDR_PREV=null; /* HDR:季末結算畫面沿用上一季的標頭 */
+var MAX_YEARS=8;         /* DOM 最多保留幾個年度的畫面 */
+function newScreen(){ const d=document.createElement('div'); d.className='scr'; d.dataset.y=typeof S!=='undefined'&&S?S.year:0; $('log').appendChild(d); return d; }
+function logTarget(){ if(!TGT){ TGT=newScreen(); showScreen(TGT); } return TGT; }
+function scrHead(){ if(typeof S==='undefined'||!S)return '';
+  const ph=['季前','季中','季末'][S.ph||0], pg=PROG&&S.ph===1?PROG:null;
+  const dots=pg?`<span class="dots">${Array.from({length:pg.n},(_,i)=>`<i class="${i<pg.i-1?'d':i===pg.i-1?'c':''}"></i>`).join('')}</span>`:'';
+  return `<span>${HDR||`${seasonLabel(S.year)} 賽季・${S.age} 歲・${stageLabel()}`}</span><b>${ph}${pg?` ${pg.i}/${pg.n}`:''}</b>${dots}`; }
+function showScreen(sc){
+  if(SCR&&SCR!==sc)SCR.classList.remove('cur');
+  SCR=sc; sc.classList.add('cur'); $('log').classList.remove('review'); syncRev();
+  sc.classList.toggle('dec',!!sc.querySelector('.card.moment,.card.talk'));
+  let h=sc.querySelector(':scope>.scr-head'); if(!h){ h=document.createElement('div'); h.className='scr-head'; sc.prepend(h); }
+  h.innerHTML=scrHead(); scrollBottom(); }
+/* 玩家操作:fn 期間產生的卡片進新畫面 */
+let STEPPING=false;
+function step(fn){
+  if(STEPPING){ fn(); return; }
+  const old=SCR, before=old?old.textContent.length:0, np=newScreen(); TGT=np; STEPPING=true;
+  try{ fn(); } finally{ STEPPING=false; }
+  if(!np.children.length){ np.remove(); TGT=old; return; }   /* 沒有新卡片:同一個畫面繼續(例如談判的下一層選單) */
+  if(!old||old.textContent.length===before){ showScreen(np); return; } /* 舊畫面沒有新結果:直接換 */
+  const a=$('act'), saved=[...a.childNodes]; saved.forEach(n=>n.remove()); a.classList.remove('collapsed');
+  const b=document.createElement('button'); b.className='btn main nextbtn'; b.innerHTML='下一步 ▶';
+  b.onclick=()=>{ b.remove(); saved.forEach(n=>a.appendChild(n)); showScreen(np); actToggleSync(); };
+  a.appendChild(b); actToggleSync(); scrollBottom();
+}
+function syncRev(){ const b=$('btn-rev'); if(b)b.textContent=$('log').classList.contains('review')?'回到目前':'回顧'; }
+function toggleReview(){ const L=$('log'); L.classList.toggle('review'); syncRev();
+  if(L.classList.contains('review')&&SCR)SCR.scrollIntoView({block:'start'}); else scrollBottom(); }
 function card(cls,title,html){ const d=document.createElement('div');
   /* 嚴重的壞事用紅牌;關鍵時刻與對話卡翻牌進場;大喜事放彩帶 */
   if(/\bbad\b/.test(cls)&&/重傷|降級|道歉無效|離婚|拒絕放人|落選/.test(title||''))cls+=' red';
@@ -669,22 +715,13 @@ function sideAdd(title,cls,el,txt){
   const t=(txt||'').replace(/\s+/g,' ').trim();
   b.innerHTML=`<small>${S.year}・${S.age} 歲</small><b>${title}</b>${t?`<span>${t.length>44?t.slice(0,44)+'…':t}</span>`:''}`;
   b.onclick=()=>{ $('side').classList.remove('open'); if(!el.isConnected){ b.title='這一年的紀錄已經清掉了'; b.style.opacity='.5'; return; }
-    const blk=el.closest('.yr-block'); if(blk)blk.classList.remove('collapsed');
+    const sc=el.closest('.scr'); if(sc&&!sc.classList.contains('cur')){ $('log').classList.add('review'); syncRev(); }
     el.scrollIntoView({block:'center'}); el.classList.add('ping'); setTimeout(()=>el.classList.remove('ping'),1400); };
   L.prepend(b); $('side-n').textContent=++SIDE_N;
 }
-function divider(t){ /* 每個 divider 開啟新的年度摺疊區塊 */
-  const log=$('log'); const blocks=log.querySelectorAll('.yr-block');
-  const prev=blocks[blocks.length-1];
-  if(prev){ const h=prev.querySelector('.yr-head'); if(h&&prev.querySelector('.yr-body').children.length)h.classList.add('has-body'); }
-  const prevPrev=blocks[blocks.length-2]; if(prevPrev)prevPrev.classList.add('collapsed');
-  const block=document.createElement('div'); block.className='yr-block';
-  const head=document.createElement('div'); head.className='yr-head'; head.textContent=t;
-  const body=document.createElement('div'); body.className='yr-body';
-  head.onclick=()=>block.classList.toggle('collapsed');
-  block.appendChild(head); block.appendChild(body); log.appendChild(block); _curYearBody=body;
-  const newBlocks=log.querySelectorAll('.yr-block');
-  if(newBlocks.length>MAX_YEARS){ for(let i=0;i<newBlocks.length-MAX_YEARS;i++)newBlocks[i].remove(); }
+function divider(t){ /* 新賽季:畫面裡加一條年度標記(回顧模式才顯示),並清掉太舊的畫面 */
+  const h=document.createElement('div'); h.className='yr-head'; h.textContent=t; logTarget().appendChild(h);
+  if(typeof S!=='undefined'&&S)$('log').querySelectorAll('.scr').forEach(sc=>{ if(+sc.dataset.y&&+sc.dataset.y<S.year-MAX_YEARS&&sc!==SCR&&sc!==TGT)sc.remove(); });
 }
 function teamLabel(){
   if(S.stage==='YOUTH')return S.team+'（青訓第'+['一','二','三'][S.stageYr-1]+'年）';
@@ -730,7 +767,7 @@ function choose(title,opts){
   opts.forEach(o=>{ const b=document.createElement('button');
     b.className='btn'+(o.main?' main':'')+(o.warn?' warn':'');
     b.innerHTML=o.t+(o.s?`<small>${o.s}</small>`:'');
-    b.onclick=()=>{ actClear(); CUR_OPT=o; o.f(); }; a.appendChild(b); });
+    b.onclick=()=>{ actClear(); CUR_OPT=o; step(o.f); }; a.appendChild(b); });
   actToggleSync(); scrollBottom();
 }
 /* 加點介面:mode {pool:n, spec:{k:n}};每項能力 −/＋,點數用完才能確認
@@ -762,7 +799,7 @@ function allocUI(mode,label,done){
     btm.appendChild(u);
     const allCap=keys.every(k=>S.ab[k]>=80), c=document.createElement('button'); c.className='btn main';
     if(pool>0&&!allCap){ c.disabled=true; c.style.opacity='.5'; c.textContent=`還有 ${pool} 點可分配`; }
-    else { c.textContent=pool>0?'能力已達上限，捨棄剩餘點數 ▸':'確認 ▸'; c.onclick=()=>{ actClear(); done(); }; }
+    else { c.textContent=pool>0?'能力已達上限，捨棄剩餘點數 ▸':'確認 ▸'; c.onclick=()=>{ actClear(); step(done); }; }
     btm.appendChild(c); actToggleSync(); }
   render(); scrollBottom();
 }
@@ -1705,7 +1742,7 @@ function trainUI(hand,need,done){
     const tb=$('tb'); tb.innerHTML=''; const fat=clamp(20+sel.reduce((s,i)=>s+hand[i].f,0),0,100), pts=sel.reduce((s,i)=>s+hand[i].p+(hand[i].x?1:0),0);
     const c=document.createElement('button'); c.className='btn main';
     if(sel.length<need){ c.disabled=true; c.style.opacity='.5'; c.textContent=`再選 ${need-sel.length} 堂`; }
-    else { c.innerHTML=`確認訓練 ▸<small>訓練點數 ${pts}｜預估疲勞 ${fat}${fat>=55?'（受傷風險上升）':''}</small>`; c.onclick=()=>{ actClear(); done(sel); }; }
+    else { c.innerHTML=`確認訓練 ▸<small>訓練點數 ${pts}｜預估疲勞 ${fat}${fat>=55?'（受傷風險上升）':''}</small>`; c.onclick=()=>{ actClear(); step(()=>done(sel)); }; }
     tb.appendChild(c); actToggleSync(); }
   render(); scrollBottom();
 }
@@ -1779,8 +1816,10 @@ function stageLabel(){
   if(S.stage==='UNI')return '大學'+UNI_YR[S.stageYr-1]+'年級';
   return LV[S.lv].n;
 }
-function startYear(){ stepQ=[phasePre,phaseMid,phaseEnd]; divider(`${seasonLabel(S.year)} 賽季 · ${S.age} 歲 · ${stageLabel()}`); nextStep(); }
-function advance(){ S.age++; S.year++; if(S.stage==='YOUTH'||S.stage==='UNI')S.stageYr++; startYear(); }
+function startYear(){ const go=()=>{ HDR=null; stepQ=[phasePre,phaseMid,phaseEnd]; divider(`${seasonLabel(S.year)} 賽季 · ${S.age} 歲 · ${stageLabel()}`); nextStep(); };
+  /* 季末結算自成一個畫面,按了才進下一季 */
+  if(S.log.length){ HDR=HDR_PREV; HDR_PREV=null; } if(S.log.length)choose('',[{t:`▸ 進入 ${seasonLabel(S.year)} 賽季（${S.age} 歲）`,main:true,f:go}]); else go(); }
+function advance(){ HDR_PREV=`${seasonLabel(S.year)} 賽季・${S.age} 歲・${stageLabel()}`; S.age++; S.year++; if(S.stage==='YOUTH'||S.stage==='UNI')S.stageYr++; startYear(); }
 
 /* ---------- 季前 ---------- */
 function phasePre(){
@@ -1979,8 +2018,8 @@ function loveCaught(next,dating){
 function phaseMid(){
   board(1);
   if(S.skipMid){ logSeason({App:0,Min:0,G:0,A:0,Rt:0,CS:0,GA:0,role:'—',d:0},'復健年・全年報銷',true); nextStep(); return; }
-  const q=midSchedule();
-  const run=()=>{ const f=q.shift(); if(f){ f(run); return; }
+  const q=midSchedule(), tot=q.length; let qi=0;
+  const run=()=>{ const f=q.shift(); if(f){ PROG={i:++qi,n:tot}; f(run); return; } PROG=null;
     choose('',[{t:'▸ 季中健康檢查',main:true,f:()=>{ rollInjury();
       choose('',[{t:'▸ 查看賽季表現',main:true,f:seasonResult}]); }}]); };
   loveEvent(run);
@@ -2870,7 +2909,7 @@ function shareImage(ev,out){
 $('bd-abt').onclick=function(){ const on=$('bd-ab').classList.toggle('open'); /* 預設展開,只記住「收起」 */
   this.textContent=on?'收起能力 ▴':'展開全部能力 ▾'; try{localStorage.setItem('fl_abshut',on?'':'1');}catch(e){} };
 try{ if(localStorage.getItem('fl_abshut')){ $('bd-ab').classList.remove('open'); $('bd-abt').textContent='展開全部能力 ▾'; } }catch(e){}
-$('btn-side').onclick=()=>$('side').classList.add('open'); $('side-x').onclick=()=>$('side').classList.remove('open');
+$('btn-rev').onclick=toggleReview; $('btn-side').onclick=()=>$('side').classList.add('open'); $('side-x').onclick=()=>$('side').classList.remove('open');
 $('btn-restart').onclick=function(){ if(confirm('確定要放棄這段人生，從頭開始嗎？'))location.href=location.pathname; };
 let selGrp='FW', selNat='TW';
 function natDesc(){ const n=NATS[selNat]; $('nat-desc').textContent=`國家隊實力：${NAT_TIERN[n.tier]}｜世界盃基準出線率 ${n.wc}%｜本土聯賽：${n.home.map(k=>LV[k].n).join('、')}${n.mil?'｜有兵役':''}`; }
