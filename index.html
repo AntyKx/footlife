@@ -781,7 +781,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.23.1';
+const APP_VER='v0.23.2';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -3853,6 +3853,14 @@ function hRng(str){ let h=hashStr(str)||1; return ()=>{ h^=h<<13; h^=h>>>17; h^=
 const rpick=a=>a[Math.floor(Math.random()*a.length)];
 const baseTm=t=>(t||'').replace('（租）','');
 const yrOf=h=>+(h.match(/^(\d{4})/)||[0,0])[1];
+/* 精華挑選(v0.23.2):依重要程度排序,同一年只取一則,再照時間排列 */
+function hlScore(h){ const t=h.t;
+  return /決賽最佳球員|點球大戰/.test(t)?100:/(金球獎|金靴|金手套|最佳球員|最佳年輕球員)$/.test(t)?85:/決賽/.test(t)?80:
+    /世界盃|歐冠|亞冠|自由盃|中北美冠軍盃|非洲冠軍聯賽|歐洲國家盃|美洲盃|亞洲盃|非洲國家盃|金盃賽|奧運/.test(t)?70:/宿命對決/.test(t)?65:
+    /絕殺時刻|延長賽英雄|扳平時刻/.test(t)?60:/傷癒復出/.test(t)?55:/爭冠|保級|德比|對決|Fla-Flu|Gre-Nal|克拉西科/.test(t)?50:h.big?30:10; }
+function hlPick(list,n){ const out=[], yrs=new Set();
+  [...list].map((h,i)=>({h,i,sc:hlScore(h)})).sort((a,b)=>b.sc-a.sc||b.i-a.i).forEach(x=>{ if(out.length<n&&!yrs.has(x.h.y)){ yrs.add(x.h.y); out.push(x); } });
+  return out.sort((a,b)=>a.i-b.i).map(x=>x.h); }
 /* 依效力球隊分章:連續同一隊算一章;租借、大學、青訓各自成章 */
 function careerChapters(){
   const ch=[];
@@ -4017,7 +4025,7 @@ function endGameFinal(reason){
     const hm={}; c.honors.forEach(h=>{ const n=h.replace(/^\S+ /,''); hm[n]=(hm[n]||0)+1; });
     const hon=c.honors.length?`<div class="ch-hon">🏆 ${Object.keys(hm).map(n=>hm[n]>1?`${n} ×${hm[n]}`:n).join('、')}</div>`:'';
     const loan=c.loans.length?`<div class="ch-stat">租借：${c.loans.map(r=>`${baseTm(r.tm)}（${seasonLabel(r.y)}・出場 ${r.st.App}）`).join('、')}</div>`:'';
-    const hl=[...c.hl.filter(h=>h.big),...c.hl.filter(h=>!h.big)].slice(0,2).map(h=>`<div class="hlrow"><b>${seasonLabel(h.y)}</b>｜${h.t}</div>`).join('');
+    const hl=hlPick(c.hl,c.kind==='youth'||c.kind==='uni'?1:clamp(Math.ceil(c.rs.length/3),1,4)).map(h=>`<div class="hlrow"><b>${seasonLabel(h.y)}</b>｜${h.t}</div>`).join('');
     const cc=c.kind==='pro'||c.kind==='loan'?`hsl(${hashStr(c.club)%360} 62% 55%)`:'var(--dim)';
     card(c.honors.some(h=>/冠軍（/.test(h))?'gold chap':'info chap',`第${cn(i+1)}章　${c.club}${kn?`（${kn}）`:''}`,
       `<div class="ch-meta">${yrs}・${c.a0}${c.a1!==c.a0?`–${c.a1}`:''} 歲${c.lvs.length?`・${c.lvs.map(k=>LV[k].n).join('、')}`:''}${c.no?`・${c.no} 號`:''}</div>`+
