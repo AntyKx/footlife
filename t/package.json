@@ -1,0 +1,7 @@
+{
+  "name": "footlife-tests",
+  "private": true,
+  "description": "足球人生模擬器測試腳本",
+  "scripts": { "smoke": "node smoke.js" },
+  "devDependencies": { "jsdom": "^24.1.3" }
+}
