@@ -615,7 +615,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.17.0';
+const APP_VER='v0.18.0';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -941,6 +941,7 @@ function metersSeason(st){
   if(st.App>0){ meter('trust',st.Rt>=7.3?6:st.Rt>=6.9?2:st.Rt<6.5?-6:0);
     if(S.stage==='PRO')meter('fans',clamp((st.Rt-6.6)*15,-6,10)+(S.ntOn?3:0)); }
   meter('trust',(50-S.trust)*0.15); if(S.stage==='PRO')meter('fans',(30-S.fans)*0.08);
+  if(S.traits.gent&&S.stage==='PRO')meter('fans',3);
 }
 
 /* ================= 關鍵時刻(取代事件卡) ================= */
@@ -1333,6 +1334,7 @@ function leagueMoment(last,i,tot,done){
     return {t:o.t,main:o.m==='norm',warn:o.m==='bold',s:momentSub(o,p),
       f:()=>resolveMoment(sc,o,j===tell.o,p,el,ok=>{ const M=S.lgMo||(S.lgMo={ok:0,ng:0,stk:null}); ok?M.ok++:M.ng++; if(STK==='爭冠關鍵戰'||STK==='保級生死戰')M.stk={t:STK,ok}; STK=null; board(); done(); })}; }));
 }
+const FOUL_RE=/鏟|犯規|上搶|斷球|出腳|撲搶|硬吃|貼上去|撲向腳下|撲向持球者|衝出去封堵/;
 function resolveMoment(sc,o,read,p,el,next){
   const ok=chance(clamp(p+(read?18:0),5,97)), m=o.m;
   const mag=momentMag(o);
@@ -1340,7 +1342,8 @@ function resolveMoment(sc,o,read,p,el,next){
   if(m==='bold'){ if(ok)S.cntBoldWin++; else S.cntBoldFail++; }
   if(sc.set&&ok&&++S.setPieceWin>=4&&S.ab.pas>=55&&!S.traits.setpiece)S.pendTrait='setpiece';
   const out=[];
-  if(ok){ momentSplit(o,mag).forEach(([k,v])=>out.push(loveGainTxt(k,v))); out.push(meter('form',mag*4)); out.push(meter('fans',o.k==='G'?(m==='bold'?6:3):1));
+  if(ok){ momentSplit(o,mag).forEach(([k,v])=>out.push(loveGainTxt(k,v))); out.push(meter('form',mag*4)); out.push(meter('fans',o.k==='G'?(m==='bold'?6:3):['S','D'].includes(o.k)?(m==='bold'?4:2):1));
+    if(['S','D'].includes(o.k))S.mDef=(S.mDef||0)+1;
     if(m==='bold')out.push(meter('trust',3));
     if(STK)out.push(meter('fans',3));
     const cl=MCTX.clutch&&o.k!=='K'?MCTX.clutch:null;
@@ -1349,6 +1352,11 @@ function resolveMoment(sc,o,read,p,el,next){
     if(m!=='safe'||MTAG||cl)S.hl.push({y:S.year,age:S.age,t:`${MTAG?MTAG.replace(/^\S+ /,'')+'・':STK?STK+'・':''}${cl?cl+'・':''}${sc.t}：${o.ok}`,big:m==='bold'||!!MTAG||!!STK||!!cl}); }
   else { out.push(meter('form',m==='bold'?-6:-3)); if(m==='bold')out.push(meter('trust',-4));
     if(m!=='safe'&&abLose(o.ab[0],1))out.push(`<span class="dn">${ABL[o.ab[0]]} −1</span>`); }
+  /* 發牌:鏟球、犯規、上搶類的選項。成功的戰術犯規多半吃黃牌;失敗的冒險動作可能直接紅牌(停賽 2 場) */
+  if(FOUL_RE.test(o.t)){ const C=S.mCards||(S.mCards={y:0,r:0});
+    if(ok){ if(/犯規/.test(o.t)&&chance(70)){ C.y++; out.push('<span class="hl">🟨 黃牌</span>'); } }
+    else if(chance((m==='bold'?20:8)*(S.traits.redcard?2:1))){ C.r++; out.push('<span class="dn">🟥 紅牌！停賽 2 場</span>'); out.push(meter('trust',-3)); }
+    else if(chance(45)){ C.y++; out.push('<span class="hl">🟨 黃牌</span>'); } }
   /* 動畫:球飛向落點;失敗時進球場景偏出、防守場景失球 */
   const svg=el.querySelector('svg'), ball=svg.querySelector('.ballp'), P=sc.pos;
   const def=['S','D'].includes(o.k)||sc.g.includes('GK');
@@ -1586,6 +1594,71 @@ const DIALOGS=[
   {t:'回國出席發表會',m:'norm',s:'收入↑、狀態小幅↓',ok:{pay:1,fans:4,form:-2},okt:'發表會現場擠滿了人，連警察都來維持秩序'},
   {t:'穿傳統服飾拍廣告',m:'bold',p:60,s:'可能大受歡迎',ok:{fans:10,pay:1},ng:{fans:-2},okt:'照片在泰國社群瘋傳',ngt:'造型被網友拿去做梗圖'},
   {t:'只授權照片',m:'safe',s:'收入小幅↑',ok:{pay:0.5},okt:'看板上的你笑得很燦爛'}]},
+ /* ---- v0.18 位置專屬對話 ---- */
+ {n:'致命失誤之後',st:'PRO',c:()=>S.grp==='GK',d:'上週你在補時漏接一記平淡的傳中，球隊因此丟了三分。今天走進訓練場，大家都刻意不提這件事。',o:[
+  {t:'主動在更衣室道歉',m:'norm',s:'教練信任↑、狀態↑',ok:{trust:5,form:3},okt:'隊長拍拍你：「誰沒失誤過？下一場幫我們撲回來。」'},
+  {t:'加練高空球到天黑',m:'safe',s:'指揮↑',ok:{ab:['cmd',1],form:2},okt:'守門員教練陪你練了兩百次傳中'},
+  {t:'看心理師',m:'bold',p:60,s:'可能徹底放下，也可能越想越多',ok:{form:8},ng:{form:-4},okt:'你學會把每一球當成第一球',ngt:'那一球還是在你腦海裡重播'}]},
+ {n:'守門員教練',st:'PRO',c:()=>S.grp==='GK'&&S.age<=28,d:'新來的守門員教練看了你十場比賽的錄影：「你的反應很好，但站位全靠直覺。」',o:[
+  {t:'從頭調整站位',m:'norm',s:'站位↑、狀態小幅↓',ok:{ab:['gkp',2],form:-2},okt:'一個月後，你發現很多球不用飛撲就能接住'},
+  {t:'「直覺就是我的風格。」',m:'bold',p:45,s:'可能說服他，也可能被冷落',ok:{trust:4,form:5},ng:{trust:-6},okt:'他想了想：「好，那我們把直覺練得更準。」',ngt:'他在報告上寫：「不受教。」'},
+  {t:'只改腳步',m:'safe',s:'反應小幅↑',ok:{ab:['ref',1]},okt:'小小的調整，大大的差別'}]},
+ {n:'一號門將之爭',st:'PRO',c:()=>S.grp==='GK'&&S.rivals.length>0,mk:()=>{ const r=S.rivals[0]; return {n:'一號門將之爭',d:`球隊只能有一個一號門將。教練說這個月要在你和 <b class="hl">${r.name}</b>（綜合 ${r.ovr}）之間做決定。`,o:[
+  {t:'在訓練賽撲出所有點球',m:'bold',p:clamp(45+(ovr()-r.ovr)*3,15,85),s:'成功＝教練信任大幅↑',ok:{trust:10},ng:{trust:-5},okt:'教練當場宣布：一號門將是你',ngt:'他在訓練賽撲得比你好'},
+  {t:'跟他一起練，良性競爭',m:'norm',s:'教練信任↑、狀態↑',ok:{trust:4,form:4},okt:'你們互相餵球，兩個人都進步了'},
+  {t:'專心做好自己',m:'safe',s:'狀態↑',ok:{form:5},okt:'你沒去看名單，只看下一場的對手'}]}; }},
+ {n:'門將的腳下功夫',st:'PRO',c:()=>S.grp==='GK'&&S.clubTier===1,d:'教練要打控球戰術，要求門將當第十一個傳球點：「我需要你在壓迫下也能短傳。」',o:[
+  {t:'每天加練腳下傳球',m:'norm',s:'腳下技術↑',ok:{ab:['kic',2],form:-2},okt:'三週後，你在壓迫下一腳挑傳，看台響起掌聲'},
+  {t:'「我的工作是撲球。」',m:'bold',p:35,s:'可能被接受，也可能被換掉',ok:{form:5},ng:{trust:-10},okt:'教練決定讓後衛多回來接應你',ngt:'下一場，教練換上了腳下技術更好的替補'},
+  {t:'請中衛多回來接應',m:'safe',s:'教練信任小幅↑',ok:{trust:2},okt:'後防線多了一點默契'}]},
+ {n:'盯防世界級前鋒',st:'PRO',c:()=>S.grp==='DF'&&(S.clubTier===3||!!LV[S.lv].top5),d:'下一場的對手，有一位身價一億歐元的前鋒。教練說：「整場比賽，他去哪你就去哪。」',o:[
+  {t:'研究他所有的比賽錄影',m:'norm',s:'防守↑、狀態↑',ok:{ab:['def',1],form:4},okt:'你發現他轉身前總會先看一眼右邊'},
+  {t:'賽前在媒體上嗆他',m:'bold',p:40,s:'可能讓他亂了陣腳，也可能被打爆',ok:{fans:10,form:5},ng:{fans:-8,form:-6},okt:'他整場被你激怒，吃了一張黃牌',ngt:'他進了兩球，每一球都對著你慶祝'},
+  {t:'聽教練的，簡單踢',m:'safe',s:'教練信任↑',ok:{trust:4},okt:'他整場只碰了二十次球'}]},
+ {n:'三中衛',st:'PRO',c:()=>S.grp==='DF',d:'新戰術改打三中衛，你被安排在不熟悉的左中衛位置。',o:[
+  {t:'全力適應新位置',m:'norm',s:'教練信任↑、狀態小幅↓',ok:{trust:8,form:-3},okt:'你成了這套戰術最穩的一環'},
+  {t:'要求打回原本的位置',m:'bold',p:45,s:'可能被接受，也可能坐板凳',ok:{form:5},ng:{trust:-8},okt:'教練把你換回熟悉的位置',ngt:'教練說：「那你先坐著看。」'},
+  {t:'加練左腳傳球',m:'safe',s:'傳球↑',ok:{ab:['pas',1]},okt:'你的左腳不再只是用來站著的'}]},
+ {n:'後防領袖',st:'PRO',c:()=>S.grp==='DF'&&S.age>=26,d:'後防線新來了兩個年輕人，連續兩場在定位球漏人。教練看著你：「後防線要有人說話。」',o:[
+  {t:'場上大聲指揮',m:'norm',s:'教練信任↑',ok:{trust:8},okt:'你喊到聲音沙啞，但後防線再也沒有漏人'},
+  {t:'賽後當眾罵人',m:'bold',p:45,s:'可能立威，也可能讓年輕人失去信心',ok:{trust:6,form:4},ng:{trust:-6},okt:'年輕人紅著眼眶點頭，下一場踢得特別專注',ngt:'其中一個年輕人去找了經紀人'},
+  {t:'私下帶他們看錄影',m:'safe',s:'教練信任小幅↑、視野↑',ok:{trust:3,ab:['vis',1]},okt:'你們在錄影室待到很晚'}]},
+ {n:'後衛也想進球',st:'PRO',c:()=>S.grp==='DF',d:'教練在定位球戰術會議上說：「這季我們需要更多後衛的進球。」',o:[
+  {t:'加練頭球搶點',m:'norm',s:'頭球↑',ok:{ab:['hea',2],form:-2},okt:'角球的時候，對方開始派兩個人盯你'},
+  {t:'主動要求罰點球',m:'bold',p:30,s:'成功＝射門↑、球迷↑',ok:{ab:['sho',1],fans:5},ng:{trust:-3},okt:'教練笑著把你排進點球名單第三順位',ngt:'隊上的前鋒們用很奇怪的眼神看你'},
+  {t:'專心防守就好',m:'safe',s:'防守小幅↑',ok:{ab:['def',1]},okt:'你的工作是不讓對方進球'}]},
+ {n:'戰術大腦',st:'PRO',c:()=>S.grp==='MF'&&S.trust>=55,d:'教練把你叫進辦公室，攤開戰術板：「我想讓你在場上幫我調整陣型。」',o:[
+  {t:'接下這個責任',m:'norm',s:'教練信任大幅↑、狀態小幅↓',ok:{trust:10,form:-3},okt:'你在場上比手勢的次數，比觸球還多'},
+  {t:'提出自己的戰術想法',m:'bold',p:45,s:'可能被採用，也可能越權',ok:{trust:8,ab:['vis',2]},ng:{trust:-6},okt:'教練把你的想法用在下一場比賽，結果大勝',ngt:'教練冷冷地說：「戰術由我決定。」'},
+  {t:'先把自己的位置踢好',m:'safe',s:'狀態↑',ok:{form:5},okt:'教練點點頭：「也好，慢慢來。」'}]},
+ {n:'防守任務',st:'PRO',c:()=>S.grp==='MF',d:'球隊連續失球，教練要你多做防守工作：「我需要你拿球前先想想怎麼搶球。」',o:[
+  {t:'全力執行',m:'norm',s:'防守↑、教練信任↑',ok:{ab:['def',1],trust:5},okt:'你的搶斷次數變成了全隊第一'},
+  {t:'「我是組織者，不是工兵。」',m:'bold',p:40,s:'可能說服教練，也可能被冷凍',ok:{form:5,trust:2},ng:{trust:-10},okt:'教練找來一個後腰來保護你',ngt:'教練說：「那就讓願意的人上。」'},
+  {t:'加練體能',m:'safe',s:'體能↑',ok:{ab:['sta',1]},okt:'你發現自己可以跑得更多'}]},
+ {n:'中場的節拍器',st:'PRO',c:()=>S.grp==='MF'&&S.fans>=40,d:'媒體分析你的數據：傳球成功率全聯盟第一，但「幾乎不往前傳」。',o:[
+  {t:'多嘗試威脅性傳球',m:'bold',p:50,s:'可能創造更多助攻，也可能失誤變多',ok:{ab:['vis',2],fans:5},ng:{form:-5},okt:'你的直塞開始撕開對手防線',ngt:'失誤變多，看台開始出現噓聲'},
+  {t:'穩定才是我的價值',m:'safe',s:'教練信任↑',ok:{trust:4},okt:'教練說：「我就是需要你這樣踢。」'},
+  {t:'找前鋒討論跑位',m:'norm',s:'傳球↑、教練信任小幅↑',ok:{ab:['pas',1],trust:2},okt:'你們在訓練後多練了半小時的配合'}]},
+ {n:'隊長的人選',st:'PRO',c:()=>S.grp==='MF'&&S.age>=24&&!(S.mem&&S.mem.captain),d:'副隊長要轉隊了，更衣室在傳：下一個副隊長可能是你。',o:[
+  {t:'主動跟教練爭取',m:'bold',p:45,s:'成功＝教練信任、球迷↑',ok:{trust:8,fans:4},ng:{trust:-3},okt:'教練說：「我正在等你開口。」',ngt:'教練選了另一位老將'},
+  {t:'用場上表現說話',m:'norm',s:'狀態↑',ok:{form:6},okt:'更衣室的票，慢慢往你這邊集中'},
+  {t:'「我還年輕，不急。」',m:'safe',s:'教練信任小幅↑',ok:{trust:2},okt:'老將們聽了都笑了'}]},
+ {n:'進球荒',st:'PRO',c:()=>S.grp==='FW',d:'已經連續七場沒有進球了。賽後記者問你：「你覺得問題出在哪裡？」',o:[
+  {t:'「球會來的。」',m:'safe',s:'狀態↑',ok:{form:5},okt:'你笑著走過混合區'},
+  {t:'每天加練射門到天黑',m:'norm',s:'射門↑、狀態小幅↓',ok:{ab:['sho',1],form:-2},okt:'訓練場的燈每晚都為你多開一小時'},
+  {t:'換一雙新球鞋',m:'bold',p:50,s:'迷信，但有時候有用',ok:{form:10,fans:3},ng:{form:-5},okt:'換鞋後的第一場就梅開二度，球鞋品牌立刻發了新聞稿',ngt:'新鞋把你的腳磨破了'}]},
+ {n:'點球主罰權',st:'PRO',c:()=>S.grp==='FW'&&!isGK(),d:'隊上另一位前鋒在記者會上說：「點球應該由狀態最好的人主罰，也就是我。」',o:[
+  {t:'在訓練中證明自己',m:'norm',p:60,s:'成功＝教練信任↑',ok:{trust:6,ab:['sho',1]},ng:{trust:-2},okt:'訓練點球大賽，你十罰十中',ngt:'他罰得比你準'},
+  {t:'公開回應',m:'bold',p:40,s:'可能贏得球迷，也可能讓更衣室分裂',ok:{fans:8},ng:{trust:-8,mem:'feud'},okt:'球迷站在你這邊',ngt:'教練把你們兩個都叫進辦公室'},
+  {t:'讓給他',m:'safe',s:'教練信任小幅↑',ok:{trust:3},okt:'「團隊比數據重要。」更衣室記住了這句話'}]},
+ {n:'中鋒的身體對抗',st:'PRO',c:()=>S.grp==='FW'&&LV[S.lv].eu,d:'歐洲的中衛比你高半個頭、重十公斤。上一場你整場都被撞得站不穩。',o:[
+  {t:'增肌三公斤',m:'norm',s:'對抗↑、速度可能↓',ok:{ab:['phy',2],form:-2},okt:'你在球衣下多了一圈肌肉'},
+  {t:'改打靈活的跑位',m:'bold',p:55,s:'成功＝盤帶↑、教練信任↑',ok:{ab:['dri',1],trust:5},ng:{form:-4},okt:'中衛再也抓不到你的位置',ngt:'跑了一整場，球都沒到你腳下'},
+  {t:'學他們的小動作',m:'safe',s:'對抗小幅↑',ok:{ab:['phy',1]},okt:'你學會了在跳起來之前先用手肘找位置'}]},
+ {n:'前鋒的自私',st:'PRO',c:()=>S.grp==='FW'&&S.fans>=35,d:'上一場你有一次明明可以傳給空檔的隊友，卻選擇自己起腳，結果打飛了。隊友在場上攤手。',o:[
+  {t:'賽後主動跟隊友道歉',m:'norm',s:'教練信任↑',ok:{trust:5},okt:'他說：「下次記得看我一眼。」'},
+  {t:'「前鋒就是要自私。」',m:'bold',p:45,s:'可能被認同，也可能被孤立',ok:{fans:6,form:5},ng:{trust:-8},okt:'下一場你又自己起腳——這次進了',ngt:'接下來兩場，隊友都不太傳球給你'},
+  {t:'加練傳球',m:'safe',s:'視野↑',ok:{ab:['vis',1]},okt:'你開始學會抬頭'}]},
 ];
 /* key = 目前位置權重最高的能力;'a|b' = 場上球員 a、門將 b */
 function dKey(k){ const keys=Object.keys(DP_W[S.dpos]);
@@ -2047,7 +2120,7 @@ function advance(){ HDR_PREV=`${seasonLabel(S.year)} 賽季・${S.age} 歲・${s
 
 /* ---------- 季前 ---------- */
 function phasePre(){
-  arcSeason(); board(0); S.tmpInj=S.nextInj||0; S.nextInj=0; S.seasonFactor=1; S.skipMid=false; S.mG=0; S.mA=0; S.lgMo={ok:0,ng:0,stk:null}; /* 帶傷踢大賽的後遺症延到本季 */
+  arcSeason(); board(0); S.tmpInj=S.nextInj||0; S.nextInj=0; S.seasonFactor=1; S.skipMid=false; S.mG=0; S.mA=0; S.mDef=0; S.mCards={y:0,r:0}; S.lgMo={ok:0,ng:0,stk:null}; /* 帶傷踢大賽的後遺症延到本季 */
   S.form=clamp(50+Math.round((S.form-50)*0.3),0,100); /* 狀態每季重置,保留三成 */
   if(S.age>=(isGK()?42:40)){ endGame(`體能已到極限，${S.year} 年夏天宣布引退。`); return; }
   /* 年齡衰退三段:場上 32/35/37 歲、門將各晚 2 年(自律再晚 2 年)
@@ -2109,7 +2182,8 @@ function awaken(){ const cands=shuffle(GRP_AB[S.grp].filter(k=>S.ab[k]<70)), bl=
 const TRAITN={genius:'天才',late:'大器晚成',iron:'鐵人',glass:'玻璃人',phoenix:'浴火重生',disc:'自律狂',clutch:'大心臟',
   goal:'進球機器',setpiece:'定位球專家',yips:'點球恐懼症',versatile:'全能戰士',franchise:'球隊之子',intlace:'國家隊英雄',
   distract:'外務纏身',cancer:'更衣室毒瘤',scum:'渣男',confidante:'閨中密友',scholar:'學院派'};
-const NEG_TRAITS=['glass','yips','distract','cancer','scum'];
+Object.assign(TRAITN,{gent:'紳士球員',redcard:'紅牌專家'});
+const NEG_TRAITS=['glass','yips','distract','cancer','scum','redcard'];
 function traitCard(key,desc,tone){ S.traits[key]=true; card(tone||'gold','隱藏特質解鎖：'+TRAITN[key],desc); board(); }
 function removeTrait(key){ if(S.traits[key]){ S.traits[key]=false; if(!S.removed.includes(TRAITN[key]))S.removed.push(TRAITN[key]); } }
 /* 事件卡、戀愛之後即時檢查的特質 */
@@ -2312,14 +2386,20 @@ function seasonRole(){
     card('good','季中逆襲',`狀態火燙，教練把你拉上更重要的角色：<b class="up">${ROLES[r][0]}</b>。`); }
   return r;
 }
+const YEL_RATE={GK:.03,CB:.19,FB:.16,DM:.24,CM:.17,AM:.10,W:.10,ST:.12,SS:.10}; /* 每場黃牌率 */
+const DEF_BASE={GK:.30,CB:.25,FB:.22,DM:.24,CM:.16}; /* 防守位置的評分基礎貢獻(對應進攻球員的進球助攻) */
 function simSeason(par,games,r){
   const d=ovr()-par, f=S.seasonFactor;
   const [rn,a,b,m1,m2]=ROLES[r];
-  const app=Math.round(games*(a+R()*(b-a))*f);
+  let app=Math.round(games*(a+R()*(b-a))*f);
+  /* 黃紅牌:每場黃牌率依位置;累積 5 張停賽 1 場,紅牌停賽 2 場 */
+  const MC=S.mCards||{y:0,r:0}, yr=YEL_RATE[S.dpos]*(S.traits.redcard?1.4:S.traits.gent?0.3:1);
+  const yel=Math.round(app*yr*(0.6+R()*0.8))+MC.y, red=MC.r+(chance(app*yr*0.04*(S.traits.redcard?2:1)*100)?1:0), ban=Math.floor(yel/5)+red*2;
+  app=Math.max(0,app-ban);
   let mpg=ri(m1,m2);
   if(isGK())mpg=r<=1?90:mpg; else if(S.ab.sta<45)mpg=Math.round(mpg*0.85);
   const min=app*mpg, n90=min/90;
-  const st={App:app,Min:min,G:0,A:0,Rt:0,CS:0,GA:0,role:rn,d};
+  const st={App:app,Min:min,G:0,A:0,Rt:0,CS:0,GA:0,role:rn,d,Y:yel,R:red,Ban:ban};
   const pend=S.pendStat, fb=(S.form-50)/50; S.pendStat=0; const boost=(1+pend*0.03)*(1+fb*0.12); /* 狀態 0–100 影響進球效率 */
   const dp=S.dpos;
   if(isGK()){
@@ -2336,18 +2416,24 @@ function simSeason(par,games,r){
     if(app>0){ st.G=Math.max(st.G,S.mG); st.A=Math.max(st.A,S.mA); } /* 關鍵時刻的進球與助攻已包含在本季數據裡 */
   }
   const ga=app>0?(st.G+st.A*0.6)/app*0.8:0;
-  st.Rt=app>0?+clamp(6.5+clamp(d,-15,15)*0.04+ga+pend*0.02+fb*0.15-(S.traits.yips?0.2:0)+N0(0.15),5.5,9.0).toFixed(2):0; /* d 的影響封頂,避免碾壓低級別時評分灌水 */
+  /* 防守貢獻(v0.18):門將看零封率與失球、後衛與後腰看零封率,再加關鍵時刻的撲救/解圍;讓各位置平均評分接近 */
+  let dc=DEF_BASE[dp]||0;
+  if(app>0){ if(isGK())dc+=(st.CS/app-0.28)*1.2+(1.3-st.GA/Math.max(1,n90))*0.5;
+    else if(['CB','FB','DM'].includes(dp))dc+=(st.CS/app-0.25)*1.5; }
+  dc+=(S.mDef||0)*0.04;
+  st.Rt=app>0?+clamp(6.5+clamp(d,-15,15)*0.04+ga+dc+pend*0.02+fb*0.15-(S.traits.yips?0.2:0)-red*0.08+(S.traits.gent?0.05:0)+N0(0.15),5.5,9.0).toFixed(2):0; /* d 的影響封頂,避免碾壓低級別時評分灌水 */
   return st;
 }
+const cardTxt=st=>st.Y||st.R?`｜🟨 ${st.Y||0}${st.R?`　🟥 ${st.R}`:''}${st.Ban?`（停賽 ${st.Ban} 場）`:''}`:'';
 function statLine(st){
   const base=`出場 ${st.App}｜${st.role}｜${st.Min} 分鐘`;
-  if(isGK())return `${base}｜失球 ${st.GA}｜零封 ${st.CS}｜評分 ${st.Rt||'—'}`;
-  return `${base}｜進球 ${st.G}｜助攻 ${st.A}${st.CS?`｜零封 ${st.CS}`:''}｜評分 ${st.Rt||'—'}`;
+  if(isGK())return `${base}｜失球 ${st.GA}｜零封 ${st.CS}${cardTxt(st)}｜評分 ${st.Rt||'—'}`;
+  return `${base}｜進球 ${st.G}｜助攻 ${st.A}${st.CS?`｜零封 ${st.CS}`:''}${cardTxt(st)}｜評分 ${st.Rt||'—'}`;
 }
 function logSeason(st,line,inj){
   S.log.push({y:S.year,age:S.age,tm:S.stage==='YOUTH'?S.team:S.stage==='UNI'?S.uni:S.club+(S.loan?'（租）':''),loan:!!S.loan,lv:S.lv,dp:S.dpos,st,line,inj:!!inj});
-  if(S.stage==='PRO'){ const b=S.stats[S.lv]||(S.stats[S.lv]={yr:0,App:0,Min:0,G:0,A:0,CS:0,GA:0});
-    b.yr++; ['App','Min','G','A','CS','GA'].forEach(k=>b[k]+=st[k]); }
+  if(S.stage==='PRO'){ const b=S.stats[S.lv]||(S.stats[S.lv]={yr:0,App:0,Min:0,G:0,A:0,CS:0,GA:0,Y:0,R:0});
+    b.yr++; ['App','Min','G','A','CS','GA','Y','R'].forEach(k=>b[k]=(b[k]||0)+(st[k]||0)); }
 }
 /* 季末媒體標題(純裝飾,用 Math.random) */
 function pressLine(st){ const N=S.name, T=S.stage==='PRO'?S.club:S.stage==='UNI'?S.uni:S.team, R=a=>a[Math.floor(Math.random()*a.length)];
@@ -2366,9 +2452,19 @@ function seasonResult(){
   logSeason(st,statLine(st)); metersSeason(st);
   if(!youth){ if(S.seasonFactor>=0.95&&st.App>=LV[S.lv].g*0.8){ if(++S.ironStreak>=7&&!S.traits.iron)traitCard('iron','連續七年全勤級出賽！鋼鐵般的身體，未來每季受傷機率<b class="hl">不高於 10%</b>。'); }
     else if(S.seasonFactor<0.95)S.ironStreak=0; }
+  if(!youth&&st.App)cardTraits(st);
   card('info',uni?'大學聯賽成績':youth?'青年聯賽成績':`${LV[S.lv].n}成績`,`<div class="statline">${statLine(st)}</div><p class="press">📰 ${pressLine(st)}</p>`);
   leagueAwards(st);
   board(1); nextStep();
+}
+/* 發牌特質:場上球員連兩季出賽 20 場以上零黃紅牌＝紳士球員;28 歲前累積 3 張紅牌＝紅牌專家 */
+function cardTraits(st){
+  if(!isGK()&&st.App>=20&&!st.Y&&!st.R){ if((S.cleanYrs=(S.cleanYrs||0)+1)>=2&&!S.traits.gent&&!S.traits.redcard)
+    traitCard('gent','連續兩季沒有吃過一張牌。裁判喜歡你，球迷也是——<b class="hl">每季球迷人氣 +3、評分 +0.05、黃牌大幅減少</b>。'); }
+  else S.cleanYrs=0;
+  S.redTot=(S.redTot||0)+(st.R||0);
+  if(S.redTot>=3&&S.age<=28&&!S.traits.redcard&&!S.traits.gent)
+    traitCard('redcard',`生涯第 ${S.redTot} 張紅牌。裁判開始特別注意你——<b class="dn">黃牌 ×1.4、紅牌機率 ×2</b>。`,'bad');
 }
 /* ---------- 個人獎項 ---------- */
 /* 聯賽獎項:門檻依輪數換算成 38 輪基準;達標後再擲骰(同季有其他候選人) */
@@ -2469,6 +2565,7 @@ function standingF(){
   const imp=st.App?clamp((st.Rt-6.8)*0.17,-0.06,0.2)*rw:0;
   let f=TIER_F[S.clubTier]-imp-M.ok*0.05+M.ng*0.025-(S.traits.clutch?0.02:0);
   if(M.stk)f+=M.stk.ok?-0.05:0.04;
+  f+=(st.R||0)*0.02; /* 紅牌停賽拖累球隊 */
   return {f:f+N0(0.36),imp,M};
 }
 function teamStanding(){
