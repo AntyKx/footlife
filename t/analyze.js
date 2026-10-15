@@ -26,3 +26,8 @@ Object.entries(nat).sort((a,b)=>pct(b[1].sc,50)-pct(a[1].sc,50)).forEach(([k,x])
 const th=process.env.TH?JSON.parse(process.env.TH):null;
 if(th){ const band=s=>s>=th[0]?0:s>=th[1]?1:s>=th[2]?2:s>=th[3]?3:4, c=[0,0,0,0,0]; sc.forEach(s=>c[band(s)]++);
   console.log(`\n用 TIER_TH=${JSON.stringify(th)}：傳奇 ${fmt(c[0]/n)}、巨星 ${fmt(c[1]/n)}、主力 ${fmt(c[2]/n)}、浮沉 ${fmt(c[3]/n)}、過客 ${fmt(c[4]/n)}`); }
+const ac=rows.filter(r=>r.acad);
+if(ac.length)console.log(`\n學院：${fmt(ac.length/n)}（海外 ${ac.filter(r=>r.acad==='foreign').length}）｜升上母隊 ${fmt(ac.filter(r=>r.acadGrad).length/ac.length)}｜被賣 ${fmt(ac.filter(r=>r.acadOut==='sold').length/ac.length)}｜被釋出 ${fmt(ac.filter(r=>r.acadOut==='released').length/ac.length)}｜買回 ${ac.filter(r=>r.boughtBack).length}`);
+if(rows[0]&&rows[0].clubs!=null)console.log(`效力球隊數 p50：${pct(rows.map(r=>r.clubs),50)}`);
+const achc={}; rows.forEach(r=>(r.ach||[]).forEach(a=>achc[a]=(achc[a]||0)+1));
+if(Object.keys(achc).length)console.log('\n成就（達成生涯比例）：'+Object.entries(achc).sort((a,b)=>b[1]-a[1]).map(([k,c])=>`${k} ${fmt(c/n)}`).join('、'));

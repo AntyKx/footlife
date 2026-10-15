@@ -29,7 +29,7 @@ const R=a=>a[Math.floor(Math.random()*a.length)];
     /* 年輕時不主動引退、不放棄職業 */
     if(S2.age<33){ const keep=bs.filter(b=>!/引退|不踢職業|退出國家隊/.test(b.textContent)); if(keep.length)bs=keep; }
     /* 有成功率的選項:挑期望值最高(成功點數 − 失敗代價) */
-    const withP=bs.map(b=>{ const m=b.textContent.match(/成功率 (\d+)%/); const t=b.textContent; const mag=/冒險/.test(t)?3:/穩健/.test(t)?1:2; return {b,p:m?+m[1]/100:null,mag,bold:/冒險/.test(t)}; });
+    const withP=bs.map(b=>{ const rb=b.querySelector('.ring b'), m=rb?[0,parseInt(rb.textContent)]:b.textContent.match(/成功率 (\d+)%/); /* v0.23 起成功率在戰術卡圓環裡 */ const t=b.textContent; const mag=/冒險/.test(t)?3:/穩健/.test(t)?1:2; return {b,p:m?+m[1]/100:null,mag,bold:/冒險/.test(t)}; });
     if(withP.every(x=>x.p!=null)&&withP.length>1){ withP.sort((a,b)=>(b.p*b.mag-(1-b.p)*(b.bold?1.5:0.5)+Math.random()*0.3)-(a.p*a.mag-(1-a.p)*(a.bold?1.5:0.5)+Math.random()*0.3)); withP[0].b.click(); continue; }
     /* 報價:挑年薪最高 */
     const offers=bs.filter(b=>/年薪約/.test(b.textContent));
@@ -41,6 +41,6 @@ const R=a=>a[Math.floor(Math.random()*a.length)];
     return {k:${k},nat:S.nat,pos:S.grp,age:S.age,done:!!S.done,score:careerScore(),peakOvr:S.peakOvr||ovr(),peakRt:rts.length?Math.max(...rts):0,
       avgRt:rts.length?+(rts.reduce((a,b)=>a+b,0)/rts.length).toFixed(2):0,seasons:pro.length,caps:S.caps,
       traits:Object.keys(S.traits).filter(t=>S.traits[t]),honors:S.honors,top5:pro.filter(r=>LV[r.lv].top5).length,
-      Y:pro.reduce((a,r)=>a+(r.st.Y||0),0),R:pro.reduce((a,r)=>a+(r.st.R||0),0)}; })()`);
+      Y:pro.reduce((a,r)=>a+(r.st.Y||0),0),R:pro.reduce((a,r)=>a+(r.st.R||0),0),acad:S.acad?(S.acad.foreign?'foreign':'home'):null,acadOut:S.acadOut||null,acadGrad:!!S.acadGrad,boughtBack:!!S.boughtBack,clubs:new Set(pro.filter(r=>!r.loan).map(r=>r.tm)).size,ach:(typeof ACH!=='undefined'?ACH.filter(a=>achLevel(a,achCtx([]))).map(a=>a.id):[])}; })()`);
   out.err=err; process.stdout.write(JSON.stringify(out)+'\n');
   w.close(); } })();

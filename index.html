@@ -806,7 +806,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.25.0';
+const APP_VER='v0.25.1';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1694,17 +1694,17 @@ const isDerbySTK=()=>!!STK&&!/爭冠|保級/.test(STK);
 function sceneBonus(sc){ let b=0; const T=S.traits;
   if(T.pkpro&&/點球/.test(sc.t))b+=15;
   if(T.derby&&isDerbySTK())b+=10;
-  if(MTAG&&BIG_RE.test(MTAG)){ if(T.bignight)b+=8; if(T.bigfear)b-=8; }
+  if(MTAG&&BIG_RE.test(MTAG)&&!/資格賽|小組賽|第三輪/.test(MTAG)){ if(T.bignight)b+=8; if(T.bigfear)b-=8; }
   return b; }
 /* 情境特質的累計與解鎖 */
 function trackMomentTraits(sc,ok,sub){ const T=S.traits, inc=k=>(S[k]=(S[k]||0)+1);
-  if(ok&&isDerbySTK()&&inc('cDerby')>=5&&!T.derby)traitCard('derby','第五次在德比裡扛起球隊。看台上的人開始叫你「德比先生」——<b class="hl">德比關鍵時刻成功率 +10%、球迷人氣加倍</b>。');
-  if(MTAG&&BIG_RE.test(MTAG)){
-    if(ok){ S.bigFail=0; if(inc('cBig')>=6&&!T.bignight)traitCard('bignight','燈光越亮，你踢得越好——<b class="hl">洲際賽與大賽淘汰賽成功率 +8%</b>。'); }
+  if(ok&&isDerbySTK()&&inc('cDerby')>=3&&!T.derby)traitCard('derby','第三次在德比裡扛起球隊。看台上的人開始叫你「德比先生」——<b class="hl">德比關鍵時刻成功率 +10%、球迷人氣加倍</b>。');
+  if(MTAG&&BIG_RE.test(MTAG)&&!/資格賽|小組賽|第三輪/.test(MTAG)){
+    if(ok){ S.bigFail=0; if(inc('cBig')>=8&&!T.bignight)traitCard('bignight','燈光越亮，你踢得越好——<b class="hl">洲際賽與大賽淘汰賽成功率 +8%</b>。'); }
     else if(inc('bigFail')>=5&&!T.bigfear&&!T.bignight)traitCard('bigfear','大賽連續失手五次，媒體說你「一到大場面就消失」——<b class="dn">大賽成功率 −8%</b>。（贏下一場決賽可以解除）','bad'); }
   if(ok&&/點球/.test(sc.t)&&inc('cPk')>=5&&!T.pkpro){ traitCard('pkpro','第五個點球得手。站上十二碼，你的心跳比門將還慢——<b class="hl">點球場景成功率 +15%</b>。');
     if(T.yips){ removeTrait('yips'); card('good','心魔解除','點球恐懼症痊癒了。'); } }
-  if(ok&&sub&&inc('cSub')>=5&&!T.supersub)traitCard('supersub','第五次替補登場改變比賽。教練說：「你是我最好的武器。」——<b class="hl">替補身分時賽季評分 +0.2</b>。');
+  if(ok&&sub&&S.age>=20&&inc('cSub')>=8&&!T.supersub)traitCard('supersub','第八次替補登場改變比賽。教練說：「你是我最好的武器。」——<b class="hl">替補身分時賽季評分 +0.2</b>。');
 }
 const FOUL_RE=/鏟|犯規|上搶|斷球|出腳|撲搶|硬吃|貼上去|撲向腳下|撲向持球者|衝出去封堵/;
 function resolveMoment(sc,o,read,p,el,next){
@@ -1744,7 +1744,7 @@ function resolveMoment(sc,o,read,p,el,next){
     setTimeout(()=>{ scEl.classList.add('flip'); setTimeout(()=>{ scEl.textContent=`${A} – ${B}`; },220); },calmFx()?0:700); }
   if(S.pendTrait==='setpiece'){ S.pendTrait=null;
     traitCard('setpiece','角球、自由球，只要球停在地上，就是你的時間——<b class="hl">每季額外貢獻定位球進球與助攻</b>。'); }
-  trackMomentTraits(sc,ok,S.stage==='PRO'&&clamp(roleOf(ovr()-rivalTop()+trustGap())-(S.roleAdj||0),0,3)>=2);
+  trackMomentTraits(sc,ok,S.stage==='PRO'&&!!S.lastSt&&/替補|板凳/.test(S.lastSt.role||'')); /* 上一季實際是替補或板凳 */
   checkTraitsMid(); next(ok);
 }
 
@@ -3899,7 +3899,7 @@ function careerScore(){
   return Math.round(S.log.reduce((s,r)=>s+seasonPts(r)*lgW(r.lv||'TW1'),0)+S.honors.reduce((s,h)=>s+honorPts(h),0));
 }
 /* 五帶門檻(批次模擬校準):傳奇 2%、巨星 8%、主力 25%、浮沉 40%、過客 25% */
-const TIER_TH=[1772,931,538,261]; /* 600 段生涯模擬(v0.21:27 國籍、新評分與名次、大賽決賽)的 p98/p90/p65/p25 */
+const TIER_TH=[1379,734,436,225]; /* 600 段生涯模擬(v0.25.1:學院、新特質、引退與冠軍率調整後)的 p98/p90/p65/p25 */
 const TIERS=['傳奇','巨星','主力','浮沉','過客'];
 const HOF_TH=210; /* 單一聯賽(未加權)生涯分門檻 */
 function mainLeague(){ const m={}; S.log.forEach(r=>{ if(r.lv)m[r.lv]=(m[r.lv]||0)+r.st.Min*lgW(r.lv); }); /* 以加權上場時間選代表聯賽 */
@@ -4260,7 +4260,7 @@ const ACH=[
   {id:'boomerang',cat:'軌跡',n:'回家的路',d:'被學院賣掉後，母隊行使買回條款把你買回來',r:'e',v:A=>!!S.boughtBack},
   {id:'redking',cat:'趣味',n:'紅牌之王',d:'職業生涯 10 張紅牌',r:'r',v:A=>A.tot.R>=10},
   {id:'bench',cat:'趣味',n:'板凳哲學家',d:'職業生涯有 5 季坐板凳',r:'c',v:A=>A.pro.filter(r=>r.st.role==='板凳').length>=5},
-  {id:'traveler',cat:'趣味',n:'環球旅行家',d:'效力 8 支以上球隊',r:'r',v:A=>new Set(A.pro.map(r=>baseTm(r.tm))).size>=8},
+  {id:'traveler',cat:'趣味',n:'環球旅行家',d:'正式效力 10 支以上球隊（不含租借）',r:'r',v:A=>new Set(A.pro.filter(r=>!r.loan).map(r=>r.tm)).size>=10},
   {id:'family',cat:'趣味',n:'足球世家',d:'生了 4 個孩子',r:'r',v:A=>S.love.kids>=4},
   {id:'casanova',cat:'趣味',n:'浪子',d:'離過 3 次婚',r:'r',v:A=>S.love.exes.length>=3}];
 function achCtx(hb){
@@ -4337,7 +4337,7 @@ function acadReview(){
         card('gold','提前升格',`17 歲，你在 ${A.club} 簽下第一份職業合約，成為學院近年最年輕的一隊球員。`); signTo({lv,club:A.club,tier:tierOf(lv,A.club),yrs:5}); advance(); }},
       {t:'留在 U19 再練一年',main:true,s:'穩紮穩打，18 歲再升格',f:advance}]); return; }
     advance(); return; }
-  if(o<par-1&&chance(o<par-4?55:25)){
+  if((o<par+1||rt<6.7)&&chance(o<par-2?55:30)){
     if(chance(50)){ const nt=pick(yName(S.nat,2)); S.acadOut='sold'; S.buyback={club:A.club,y:S.year};
       card('bad','學院考核：被賣',`${S.team}把你賣給了 <b class="hl">${nt}</b>，附帶一條買回條款。總監說：「如果你證明我們錯了，我們會回來找你。」`);
       S.team=nt; S.youthTier=2; }
