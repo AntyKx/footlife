@@ -615,7 +615,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.16.0';
+const APP_VER='v0.17.0';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1329,9 +1329,9 @@ function leagueMoment(last,i,tot,done){
   const dby=derbyOf(); let vs=opp;
   STK=S.stage!=='PRO'?null:dby&&chance(25)?(vs=dby[0],dby[1]):last&&S.clubTier===1&&chance(35)?'爭冠關鍵戰':last&&S.clubTier===3&&chance(35)?'保級生死戰':null;
   const el=momentCard(STK?'關鍵時刻・'+STK:'關鍵時刻',sc,tell,see,min,me,a,b,vs);
-  choose(`關鍵時刻 — 你的選擇？（季中第 ${i}/${tot} 場）`,sc.opts.map((o,j)=>{ const p=momentOdds(o);
+  choose(`關鍵時刻 — 你的選擇？（季中第 ${i}/${tot} 場｜${STK==='爭冠關鍵戰'?'結果直接影響奪冠機率':STK==='保級生死戰'?'結果直接影響降級機率':'成功讓球隊排名往上'}）`,sc.opts.map((o,j)=>{ const p=momentOdds(o);
     return {t:o.t,main:o.m==='norm',warn:o.m==='bold',s:momentSub(o,p),
-      f:()=>resolveMoment(sc,o,j===tell.o,p,el,()=>{ STK=null; board(); done(); })}; }));
+      f:()=>resolveMoment(sc,o,j===tell.o,p,el,ok=>{ const M=S.lgMo||(S.lgMo={ok:0,ng:0,stk:null}); ok?M.ok++:M.ng++; if(STK==='爭冠關鍵戰'||STK==='保級生死戰')M.stk={t:STK,ok}; STK=null; board(); done(); })}; }));
 }
 function resolveMoment(sc,o,read,p,el,next){
   const ok=chance(clamp(p+(read?18:0),5,97)), m=o.m;
@@ -2047,7 +2047,7 @@ function advance(){ HDR_PREV=`${seasonLabel(S.year)} 賽季・${S.age} 歲・${s
 
 /* ---------- 季前 ---------- */
 function phasePre(){
-  arcSeason(); board(0); S.tmpInj=S.nextInj||0; S.nextInj=0; S.seasonFactor=1; S.skipMid=false; S.mG=0; S.mA=0; /* 帶傷踢大賽的後遺症延到本季 */
+  arcSeason(); board(0); S.tmpInj=S.nextInj||0; S.nextInj=0; S.seasonFactor=1; S.skipMid=false; S.mG=0; S.mA=0; S.lgMo={ok:0,ng:0,stk:null}; /* 帶傷踢大賽的後遺症延到本季 */
   S.form=clamp(50+Math.round((S.form-50)*0.3),0,100); /* 狀態每季重置,保留三成 */
   if(S.age>=(isGK()?42:40)){ endGame(`體能已到極限，${S.year} 年夏天宣布引退。`); return; }
   /* 年齡衰退三段:場上 32/35/37 歲、門將各晚 2 年(自律再晚 2 年)
@@ -2458,24 +2458,53 @@ function phaseEndIntl(){
     else go(); });
 }
 /* 球隊戰績:依檔次擲奪冠、升級、降級;租借期間只記冠軍 */
+/* 聯賽名次(v0.17):以「名次比例」f 計算,0 = 第一名、1 = 最後一名
+   球隊基準:豪門 0.15、中游 0.42、保級 0.79;運氣 ±(常態,標準差約 0.2)
+   你的影響力(主力全額、輪替半數、替補 15%):(評分 − 6.8) × 0.17,上限 0.2(評分 8.0 的主力約往上 4 名)
+   20 隊聯賽、普通表現:豪門冠軍約 32%、中游約 4%、保級降級約 30%;評分 8.0 主力:中游冠軍約 21%、保級隊平均第 11 名
+   聯賽關鍵時刻:成功 −0.05(約 1 名)、失敗 +0.025;季末爭冠/保級戰另外 ∓0.05 */
+const TIER_F={1:0.15,2:0.42,3:0.79};
+function standingF(){
+  const st=S.lastSt||{}, M=S.lgMo||{ok:0,ng:0,stk:null}, rw={主力:1,輪替:0.5,替補:0.15}[st.role]||0;
+  const imp=st.App?clamp((st.Rt-6.8)*0.17,-0.06,0.2)*rw:0;
+  let f=TIER_F[S.clubTier]-imp-M.ok*0.05+M.ng*0.025-(S.traits.clutch?0.02:0);
+  if(M.stk)f+=M.stk.ok?-0.05:0.04;
+  return {f:f+N0(0.36),imp,M};
+}
 function teamStanding(){
-  const L=LV[S.lv], t=S.clubTier;
-  if(chance({1:30,2:5,3:0.5}[t]*(S.traits.clutch?1.25:1))){
-    leagueTable('champ');
+  const L=LV[S.lv], n=TEAMS[S.lv].length+(TEAMS[S.lv].includes(S.club)?0:1), zone=n>=16?3:n>=12?2:1;
+  const {f,imp,M}=standingF(), rank=clamp(Math.round(1+clamp(f,0,1)*(n-1)),1,n), frozen=S.loan||S.ct.mil;
+  const why=[]; /* 給玩家看的成因 */
+  if(imp>=0.08)why.push(`你的表現讓球隊多拿了不少分（約往上 ${Math.round(imp*(n-1))} 名）`);
+  if(M.ok)why.push(`聯賽關鍵時刻 ${M.ok} 勝 ${M.ng} 敗`);
+  if(M.stk)why.push(M.stk.ok?`${M.stk.t}的勝利`:`${M.stk.t}失利`);
+  const note=why.length?`<br><span class="fx">${why.join('｜')}</span>`:'';
+  const prevTier=S.clubTier;
+  if(rank===1){
+    leagueTable('champ',1,note);
     S.honors.push(`${seasonLabel(S.year)} ${L.n}冠軍（${S.club}）`); S.champYear=S.year; meter('fans',5);
-    card('gold','聯賽冠軍',`${S.club}奪下 <b class="hl">${L.n}冠軍</b>！`);
-    if(L.up&&!S.loan&&!S.ct.mil)promote();
-    return; }
-  if(S.loan||S.ct.mil){ leagueTable(null); return; } /* 租借、服役期間不影響母隊升降 */
-  if(L.up&&chance({1:45,2:12,3:2}[t])){ leagueTable('up'); promote(); return; }
-  if(L.rel&&chance({1:0,2:8,3:35}[t])){ leagueTable('down'); relegate(); return; }
-  leagueTable(null);
+    card('gold','聯賽冠軍',`${S.club}奪下 <b class="hl">${L.n}冠軍</b>！${S.clubTier===3?'<br>一支被看好降級的球隊，寫下了奇蹟。':S.clubTier===2?'<br>沒有人看好你們，但你們做到了。':''}`);
+    if(L.up&&!frozen){ promote(); return; }
+  } else if(!frozen&&L.up&&rank<=2){ leagueTable('up',rank,note); promote(); return; }
+  else if(!frozen&&L.rel&&rank>n-zone){ leagueTable('down',rank,note); relegate(); return; }
+  else leagueTable(null,rank,note);
+  if(!frozen)tierDrift(rank,n,prevTier);
+}
+/* 球隊檔次隨成績變動:同一隊連兩季達標才升降一檔 */
+function tierDrift(rank,n,t){
+  const q=rank/n, H=S.tierHist&&S.tierHist.club===S.club?S.tierHist:(S.tierHist={club:S.club,up:0,dn:0});
+  const up=t===3?q<=0.5:t===2?rank<=4:false, dn=t===1?q>0.5:t===2?q>0.75:false;
+  H.up=up?H.up+1:0; H.dn=dn?H.dn+1:0;
+  if(H.up>=2){ S.clubTier=t-1; H.up=0;
+    card('good','球隊升格',`${S.club}連續兩季${t===3?'打進前半段':'排名前四'}，外界不再把你們當成${TIERN[t]}球隊——球隊檔次升為 <b class="hl">${TIERN[S.clubTier]}</b>（${TIER_DESC[S.clubTier]}）。`); }
+  else if(H.dn>=2){ S.clubTier=t+1; H.dn=0;
+    card('bad','球隊走下坡',`${S.club}連續兩季${t===1?'掉到後半段':'在下半段掙扎'}，球隊檔次降為 <b class="dn">${TIERN[S.clubTier]}</b>（${TIER_DESC[S.clubTier]}）。`); }
 }
 /* 季末積分榜:依本季結果決定自己的名次,其他球隊依強弱加上隨機 */
-function leagueTable(res){
+function leagueTable(res,rank,note){
   const L=LV[S.lv], g=L.g, n=TEAMS[S.lv].length+(TEAMS[S.lv].includes(S.club)?0:1), zone=n>=16?3:n>=12?2:1, me=S.club, t=S.clubTier;
-  const mine=res==='champ'?1:res==='up'?ri(2,3):res==='down'?ri(n-zone+1,n):
-    t===1?ri(2,Math.min(6,n-zone-1)):t===3?ri(Math.max(2,n-zone-4),n-zone):ri(Math.max(2,Math.round(n*0.3)),Math.round(n*0.7));
+  const mine=rank||(res==='champ'?1:res==='up'?ri(2,3):res==='down'?ri(n-zone+1,n):
+    t===1?ri(2,Math.min(6,n-zone-1)):t===3?ri(Math.max(2,n-zone-4),n-zone):ri(Math.max(2,Math.round(n*0.3)),Math.round(n*0.7)));
   /* 其他球隊:目標名次 = 強弱序換算 ± 隨機,再依序放進空位 */
   const others=TEAMS[S.lv].filter(x=>x!==me), used={[mine]:me};
   others.map((x,i)=>({x,tg:1+i/(Math.max(1,others.length-1))*(n-1)+ri(-2,2)})).sort((a,b)=>a.tg-b.tg).forEach((o,k)=>{ if(k===0&&mine!==1)o.tg=1; /* 冠軍一定是列名的球隊 */
@@ -2490,16 +2519,16 @@ function leagueTable(res){
     const [w,d,l]=wdl(pts[r]), tag=r===1?' 🏆':r>n-zone&&L.rel?' ↓':(res==='up'&&used[r]===me)||(L.up&&r<=2&&r>1)?' ↑':'';
     rows+=`<tr class="${used[r]===me?'me':''}"><td>${r}</td><td>${used[r]}${tag}</td><td>${w}</td><td>${d}</td><td>${l}</td><td><b>${pts[r]}</b></td></tr>`; last=r; });
   if(last<n)rows+=`<tr class="gap"><td colspan="6">⋯</td></tr>`;
-  card('info',`${seasonLabel(S.year)} ${L.n}積分榜`,`${me}最終排名 <b class="hl">第 ${mine} 名</b>（共 ${n} 隊）`+
+  card('info',`${seasonLabel(S.year)} ${L.n}積分榜`,`${me}最終排名 <b class="hl">第 ${mine} 名</b>（共 ${n} 隊）${note||''}`+
     `<div class="tblwrap"><table class="fin ltab"><tr><th>#</th><th>球隊</th><th>勝</th><th>和</th><th>敗</th><th>積分</th></tr>${rows}</table></div>`);
 }
 function promote(){
-  S.lv=LV[S.lv].up; S.clubTier=3;
+  S.lv=LV[S.lv].up; S.clubTier=3; S.tierHist=null;
   if(S.relegated){ S.ct.mult/=0.6; S.relegated=false; } /* 重返頂級,降級條款解除 */
   card('gold','升級！',`${S.club}升上 <b class="hl">${LV[S.lv].n}</b>，下季在頂級聯賽作戰（球隊檔次：保級）。`);
 }
 function relegate(){
-  S.lv=LV[S.lv].rel; S.clubTier=1; S.ct.mult*=0.6; S.relegated=true; S.relY=S.year;
+  S.lv=LV[S.lv].rel; S.clubTier=1; S.tierHist=null; S.ct.mult*=0.6; S.relegated=true; S.relY=S.year;
   card('bad','降級',`${S.club}降至 <b class="dn">${LV[S.lv].n}</b>，降級條款生效：年薪打 6 折。夏窗可能有上級球隊來挖角。`);
 }
 /* 身價 = 聯賽基準 × OVR 係數 × 年齡係數 × 合約剩餘係數 × 位置倍率 */
