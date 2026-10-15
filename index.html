@@ -974,7 +974,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.26.3';
+const APP_VER='v0.26.4';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -2853,7 +2853,7 @@ function phasePre(){
   const declAge=S.age-(S.traits.disc?2:0), declStart=isGK()?34:32;
   if(declAge>=declStart){ const n=declAge-declStart, st=n>=5?3:n>=3?2:1, x=Math.max(0,n-5);
     const phys=isGK()?['sta','ref']:['pac','sta'], mind=isGK()?['gkp']:['pas','vis'];
-    const dP=[0,2,3,4][st]+x, dM=[0,0,1,1][st], dT=[0,1,2,3][st]+x;
+    const dP=Math.max(0,[0,2,3,4][st]+x-(S.conv&&DP_CALM.includes(S.dpos)?1:0)), dM=[0,0,1,1][st], dT=[0,1,2,3][st]+x;
     GRP_AB[S.grp].forEach(k=>{ const d=phys.includes(k)?dP:mind.includes(k)?dM:dT; if(d>0)S.ab[k]=clamp(S.ab[k]-d,1,80); });
     const nm=ks=>ks.map(k=>ABL[k]).join('、');
     card('bad','歲月不饒人',`${['','第一階段','第二階段','第三階段（逐年加劇）'][st]}衰退：${nm(phys)} <b class="dn">−${dP}</b>｜其他能力 <b class="dn">−${dT}</b>｜${nm(mind)} ${dM?`<b class="dn">−${dM}</b>`:'不受影響'}。`); board(0); }
@@ -2914,18 +2914,41 @@ function coachCheck(cont){
       {t:'接受媒體訪問抱怨',warn:true,s:'球迷↑｜信任大幅↓｜想離隊',f:()=>{ S.wantOut=true; card('bad','公開抱怨',`隔天的頭條：「${S.name}：我不知道教練要什麼。」${[meter('fans',6),meter('trust',-15)].join('、')}`); cont(); }}]);
     return; }
   cont(); }
-/* 位置審查:同大類或相鄰位置 OVR 高 4 以上,教練提議轉位 */
+/* 位置審查(v0.26.4 擴充):
+   1) 教練提議:同大類或相鄰位置 OVR 高 4 以上(30 歲後含轉型位置)
+   2) 老將轉型:30 歲起,轉型位置只差 2 以內;轉型營加能力,且身體衰退減輕
+   3) 主動要求:30 歲前,某位置高 1～3,三年問一次,教練不一定答應
+   跨大類(例如前鋒→中場)時,比賽情境與位置競爭跟著換 */
+const DP_GRP={GK:'GK',CB:'DF',FB:'DF',DM:'MF',CM:'MF',AM:'MF',ST:'FW',SS:'FW',W:'FW'};
+const DP_VET={W:['AM','FB','CM'],ST:['SS','AM'],SS:['AM','CM'],AM:['CM'],CM:['DM'],DM:['CB'],FB:['CB','DM']};
+const DP_CALM=['CB','DM','CM','AM']; /* 轉型到這些位置:不靠速度吃飯,身體衰退減一級 */
+function setPos(dp,why){ const old=DPN[S.dpos], og=S.grp; S.dpos=dp; S.rivals=[]; const g=DP_GRP[dp]; if(g&&g!==S.grp&&S.grp!=='GK'){ S.grp=g; S.grpMoved=(S.grpMoved||0)+1; }
+  if(++S.posChanges>=2&&!S.traits.versatile)traitCard('versatile','教練要你踢哪裡，你就能踢哪裡——<b class="hl">拒絕轉位不再影響上場時間</b>。');
+  sideAdd(`轉任${DPN[dp]}`,'gold',card('info','位置調整',`從${old}轉任 <b class="hl">${DPN[dp]}</b>${S.grp!==og?`（${GRPN[og]} → ${GRPN[S.grp]}）`:''}，綜合評價 <b class="up">${ovrAt(dp)}</b>。${why||''}`)); board(0); }
 function posReview(cont){
-  if(S.skipMid||(S.stage==='YOUTH'&&S.stageYr<2)){ cont(); return; }
-  const cur=ovrAt(S.dpos); let best=S.dpos, bv=cur;
-  [...DP_OF[S.grp],...(DP_ADJ[S.dpos]||[])].forEach(dp=>{ const v=ovrAt(dp); if(v>bv){bv=v;best=dp;} });
-  if(best===S.dpos||bv-cur<4){ cont(); return; }
-  choose(`教練建議轉任${DPN[best]}（綜合 ${cur} → ${bv}）`,[
-    {t:`接受，改踢${DPN[best]}`,main:true,f:()=>{ const old=DPN[S.dpos]; S.dpos=best; S.rivals=[]; /* 換位置就換一批競爭者 */
-      if(++S.posChanges>=2&&!S.traits.versatile)traitCard('versatile','教練要你踢哪裡，你就能踢哪裡——<b class="hl">拒絕轉位不再影響上場時間</b>。');
-      card('info','位置調整',`從${old}轉任 <b class="hl">${DPN[best]}</b>，綜合評價 ${cur} → <b class="up">${bv}</b>。`); board(0); cont(); }},
-    {t:`堅持踢${DPN[S.dpos]}`,warn:true,s:S.traits.versatile?'全能戰士：不影響教練信任':'教練信任 −12',f:()=>{ const tx=S.traits.versatile?'':meter('trust',-12);
-      card('bad','堅持己見',`你拒絕轉位，教練不太高興。${tx}`); cont(); }}]);
+  if(S.skipMid||(S.stage==='YOUTH'&&S.stageYr<2)||isGK()){ cont(); return; }
+  const cur=ovrAt(S.dpos), vet=S.age>=30&&S.stage==='PRO', cand=[...new Set([...DP_OF[S.grp],...(DP_ADJ[S.dpos]||[]),...(vet?DP_VET[S.dpos]||[]:[])])].filter(d=>d!==S.dpos);
+  let best=S.dpos, bv=cur; cand.forEach(dp=>{ const v=ovrAt(dp); if(v>bv){bv=v;best=dp;} });
+  if(best!==S.dpos&&bv-cur>=4){
+    choose(`教練建議轉任${DPN[best]}（綜合 ${cur} → ${bv}）`,[
+      {t:`接受，改踢${DPN[best]}`,main:true,f:()=>{ setPos(best); cont(); }},
+      {t:`堅持踢${DPN[S.dpos]}`,warn:true,s:S.traits.versatile?'全能戰士：不影響教練信任':'教練信任 −12',f:()=>{ const tx=S.traits.versatile?'':meter('trust',-12);
+        card('bad','堅持己見',`你拒絕轉位，教練不太高興。${tx}`); cont(); }}]); return; }
+  /* 老將轉型 */
+  if(vet&&!S.conv&&(S.posAsk||0)<=S.year-2&&DP_VET[S.dpos]){ const vs=DP_VET[S.dpos].map(d=>[d,ovrAt(d)]).filter(([d,v])=>v>=cur-2).sort((a,b)=>b[1]-a[1]);
+    if(vs.length){ S.posAsk=S.year; const [to,tv]=vs[0], top=Object.entries(DP_W[to]).sort((a,b)=>b[1]-a[1]).map(x=>x[0]).filter(k=>S.ab[k]<80).slice(0,2);
+      card('talk','轉型的十字路口',`${S.age} 歲了。體能教練拿著測試報告找你：「你的速度在掉，但你的閱讀比賽是全隊最好的。」<br>改踢 <b class="hl">${DPN[to]}</b>，綜合評價 ${cur} → ${tv}。${DP_CALM.includes(to)?'這個位置不靠速度吃飯，可以踢得更久。':''}`);
+      choose('老將轉型 — 你的決定？',[
+        {t:`轉型為${DPN[to]}`,main:true,s:`轉型訓練營：${top.map(k=>ABL[k]).join('、')}↑${DP_CALM.includes(to)?'｜之後身體衰退減輕':''}`,f:()=>{ const out=top.map(k=>loveGainTxt(k,4)); S.conv={y:S.year,from:S.dpos,to};
+          setPos(to,`<br>夏天的轉型訓練營：${out.filter(Boolean).join('、')}`); cont(); }},
+        {t:`繼續踢${DPN[S.dpos]}`,s:'維持原本的位置',f:cont}]); return; } }
+  /* 主動要求轉位 */
+  if(!vet&&S.stage==='PRO'&&(S.posAsk||0)<=S.year-3&&best!==S.dpos&&bv-cur>=1){ S.posAsk=S.year; const p=clamp(55+(S.trust-50)*0.6,20,90);
+    card('talk','新的位置？',`訓練賽裡，你被臨時調到 ${DPN[best]}，踢得意外順手——綜合評價 ${cur} → ${bv}。`);
+    choose('要不要跟教練提？',[
+      {t:`主動要求改踢${DPN[best]}`,s:`成功率 ${p}%｜失敗：信任 −5`,f:()=>{ if(chance(p))setPos(best,'<br>教練想了兩天：「好，就給你試試看。」'); else card('bad','教練拒絕',`「你在原本的位置還有用。」${meter('trust',-5)}`); cont(); }},
+      {t:`留在${DPN[S.dpos]}`,main:true,s:'維持現狀',f:cont}]); return; }
+  cont();
 }
 /* ---------- 隊內競爭:同位置 1–2 名虛擬隊友,OVR 落在球隊 par −6～+10 ---------- */
 function curPar(){ return S.stage==='YOUTH'?YOUTH_PAR[S.youthTier]:S.stage==='UNI'?UNI_PAR[S.uniTier]:LV[S.lv].par+TIER_PAR[S.clubTier]; }
@@ -4606,6 +4629,8 @@ const ACH=[
   {id:'nemesis',cat:'軌跡',n:'宿敵終結者',d:'與宿敵交手 5 勝以上、一場沒輸',r:'r',v:A=>{ const R=S.arcs&&S.arcs.rival; return !!R&&R.w>=5&&R.l===0; }},
   {id:'acadstar',cat:'軌跡',n:'學院之光',d:'學院出身升上母隊一隊，並為母隊踢滿 5 季',r:'r',v:A=>!!S.acadGrad&&!!S.acad&&A.pro.filter(r=>!r.loan&&r.tm===S.acad.club).length>=5},
   {id:'comeback',cat:'軌跡',n:'被放走的那個人',d:'被學院釋出，後來拿到頂級聯賽冠軍或踢上五大聯賽',r:'e',v:A=>S.acadOut==='released'&&(A.pro.some(r=>LV[r.lv].top5)||S.honors.some(h=>{ const k=honorLv(h); return /冠軍（[^・）]*）$/.test(h)&&k&&!LV[k].up; }))},
+  {id:'reinvent',cat:'軌跡',n:'第二春',d:'30 歲後轉型新位置，並在新位置再踢 3 個職業賽季',r:'e',v:A=>!!S.conv&&A.pro.filter(r=>r.y>=S.conv.y&&r.dp===S.conv.to).length>=3},
+  {id:'allpos',cat:'軌跡',n:'全場通吃',d:'職業生涯在後衛、中場、前鋒三條線都踢過完整賽季',r:'e',v:A=>new Set(A.pro.map(r=>DP_GRP[r.dp]).filter(g=>g&&g!=='GK')).size>=3},
   {id:'boomerang',cat:'軌跡',n:'回家的路',d:'被學院賣掉後，母隊行使買回條款把你買回來',r:'e',v:A=>!!S.boughtBack},
   {id:'redking',cat:'趣味',n:'紅牌之王',d:'職業生涯 10 張紅牌',r:'r',v:A=>A.tot.R>=10},
   {id:'bench',cat:'趣味',n:'板凳哲學家',d:'職業生涯有 5 季坐板凳',r:'c',v:A=>A.pro.filter(r=>r.st.role==='板凳').length>=5},
