@@ -27,7 +27,7 @@ body{background:var(--bg);color:var(--chalk);font-family:var(--sans);font-size:1
   border-bottom:2px solid var(--edge);padding:10px 14px 8px;box-shadow:0 6px 18px #0009}
 #bd-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 #bd-name{font-weight:900;font-size:17px;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#bd-name small{color:var(--dim);font-weight:500;font-size:12px;margin-left:6px}
+#bd-name small{display:block;color:var(--dim);font-weight:500;font-size:11.5px;letter-spacing:.03em;margin-top:1px;overflow:hidden;text-overflow:ellipsis} /* 國籍・位置・類型換到第二行,不被按鈕擠掉 */
 #bd-team{color:var(--amber);font-size:12.5px;font-weight:700;letter-spacing:.06em;white-space:nowrap}
 #bd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
 .bd-cell{background:#0e1226;border:1px solid var(--edge);border-radius:6px;padding:4px 6px 3px;text-align:center}
@@ -492,7 +492,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.14.0';
+const APP_VER='v0.14.1';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
