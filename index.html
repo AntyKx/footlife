@@ -615,7 +615,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.15.0';
+const APP_VER='v0.16.0';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1145,6 +1145,107 @@ const MOMENTS=[
   opts:[{t:'反向飛撲',m:'bold',ab:['ref'],to:[132,-2],k:'S',ok:'重心已經偏了，你還是反向把球撲出！',ng:'重心來不及調整，球滾進網'},
    {t:'調整步伐再撲',m:'norm',ab:['ref','gkp'],to:[140,6],k:'S',ok:'小碎步調整，把球擋出',ng:'差了幾公分'},
    {t:'用腳擋',m:'safe',ab:['gkp','sta'],to:[146,8],k:'S',ok:'伸腳一擋，化解危機',ng:'球從腳邊彈進'}]},
+ /* ---- v0.16 新增場景 ---- */
+ {t:'凌空抽射',g:['FW'],d:'隊友從中場吊過來一記長傳，球直直落向你胸前。',pos:{me:[150,56],ball:[150,40],gk:[150,12],opp:[[132,62],[176,50]],mate:[[110,120]]},
+  tells:[{h:'門將站位太靠前',o:0},{h:'中衛正從背後貼上來',o:1},{h:'後插上的中場完全空檔',o:2}],
+  opts:[{t:'不停球直接凌空',m:'bold',ab:['sho','dri'],to:[164,-4],k:'G',ok:'一腳凌空抽射，球像子彈一樣飛進網窩！',ng:'凌空抽射打飛，球越過橫樑'},
+   {t:'胸部停球再射',m:'norm',ab:['sho','phy'],to:[138,-4],k:'G',ok:'胸部卸球、轉身低射，一氣呵成！',ng:'停球太大，被中衛搶先一步'},
+   {t:'頭球擺渡給中場',m:'safe',ab:['hea','vis'],to:[110,92],k:'A',ok:'輕輕一擺，中場隊友插上推射破門',ng:'擺渡太輕，被對方攔截'}]},
+ {t:'禁區內一對一',g:['FW'],d:'禁區右側拿球，面前只剩一名中衛。',pos:{me:[196,48],ball:[192,52],gk:[150,12],opp:[[176,44],[130,40]],mate:[[130,60]]},
+  tells:[{h:'中衛重心很低，很怕被過',o:0},{h:'中衛已經吃過一張黃牌',o:1},{h:'後點隊友跑出了空檔',o:2}],
+  opts:[{t:'連續變向晃開射門',m:'bold',ab:['dri','sho'],to:[136,-4],k:'G',ok:'左右晃動兩次，中衛坐倒在地，你冷靜推射！',ng:'變向被中衛讀到，球被鏟走'},
+   {t:'倚住中衛造點球',m:'norm',ab:['phy','dri'],to:[176,44],k:'F',ok:'中衛伸腳，你應聲倒地——裁判指向點球點！',ng:'裁判示意沒有犯規，還給了你一個眼神'},
+   {t:'倒三角回傳',m:'safe',ab:['pas','vis'],to:[130,60],k:'A',ok:'倒三角傳中，隊友一腳推射空門',ng:'回傳被回追的後腰攔截'}]},
+ {t:'吊射空門',g:['FW','MF'],d:'對方門將衝出禁區解圍失誤，球彈到你腳下——球門就在三十公尺外！',pos:{me:[150,100],ball:[150,94],gk:[150,58],opp:[[118,80],[186,76]],mate:[[200,60]]},
+  tells:[{h:'門將還在往回跑',o:0},{h:'後衛已經退到門線',o:1},{h:'邊路隊友正在插上',o:2}],
+  opts:[{t:'直接吊射',m:'bold',ab:['sho','vis'],to:[148,-4],k:'G',ok:'一記高吊越過門將頭頂，球緩緩滾進空門！',ng:'吊射力量太大，球越過橫樑'},
+   {t:'帶球推進再射',m:'norm',ab:['dri','pac'],to:[160,-4],k:'G',ok:'帶到禁區弧頂，從容推進空門',ng:'回追的後衛從背後把球捅走'},
+   {t:'分給插上的隊友',m:'safe',ab:['pas'],to:[200,60],k:'A',ok:'傳到隊友腳下，他輕鬆打進空門',ng:'傳球被門將撲住'}]},
+ {t:'前鋒回追',g:['FW'],d:'我方角球被斷，對方發動反擊，你是離得最近的人。',pos:{me:[150,40],ball:[150,70],opp:[[150,76],[200,96]],mate:[[100,60],[150,170]]},
+  tells:[{h:'對方持球者速度不快',o:0},{h:'他習慣往右側分球',o:1},{h:'我方後衛已經退好位置',o:2}],
+  opts:[{t:'衝刺回追鏟斷',m:'bold',ab:['pac','def'],to:[170,90],k:'D',ok:'追了四十公尺，從背後乾淨地把球鏟走！全場起立鼓掌',ng:'鏟晚了，吃到一張黃牌'},
+   {t:'封住分球路線',m:'norm',ab:['vis','sta'],to:[200,96],k:'D',ok:'卡住他的傳球路線，反擊被拖慢了',ng:'他直接自己帶到底'},
+   {t:'回到中場待命',m:'safe',ab:['sta'],to:[150,120],k:'K',ok:'保持體力，等待下一次反擊',ng:'對方打出一波威脅射門'}]},
+ {t:'前點掠射',g:['FW'],set:1,d:'我方角球，你在前點準備搶位。',pos:{me:[132,30],ball:[292,6],gk:[150,8],opp:[[140,24],[168,32]],mate:[[176,40],[190,56]]},
+  tells:[{h:'前點盯人的後衛個子不高',o:0},{h:'對方只顧著盯中路高中鋒',o:1},{h:'角球會開向後點',o:2}],
+  opts:[{t:'前點甩頭掠射',m:'norm',ab:['hea','pac'],to:[164,-4],k:'G',ok:'前點一蹭，球改變方向飛進遠角！',ng:'掠射偏出遠柱'},
+   {t:'假跑前點、實插中路',m:'bold',ab:['hea','phy'],to:[148,-4],k:'G',ok:'甩開盯防，在中路力壓頭槌！',ng:'被兩名後衛夾住，頭球無力'},
+   {t:'把防守者拉走',m:'safe',ab:['phy','vis'],to:[176,40],k:'A',ok:'你拉走兩名防守者，隊友在後點頭槌破門',ng:'對方門將出擊沒收來球'}]},
+ {t:'長途奔襲',g:['MF'],d:'在自家半場斷下球，前方一片開闊。',pos:{me:[150,150],ball:[150,142],gk:[150,12],opp:[[130,110],[176,90],[150,60]],mate:[[90,100],[214,96]]},
+  tells:[{h:'對方後腰轉身很慢',o:0},{h:'兩翼都有隊友在衝刺',o:1},{h:'對方中衛已經站好位置',o:2}],
+  opts:[{t:'一路帶到底',m:'bold',ab:['dri','pac'],to:[156,-4],k:'G',ok:'連過三人殺進禁區，推射破門！這球可以放進年度十佳球',ng:'過到第三個人時被斷下'},
+   {t:'帶過半場再分邊',m:'norm',ab:['dri','pas'],to:[214,60],k:'A',ok:'吸引兩人包夾後分邊，邊鋒內切破門',ng:'分邊的時機慢了一步'},
+   {t:'穩住節奏等隊友',m:'safe',ab:['pas'],to:[150,120],k:'K',ok:'球隊順勢整體壓上',ng:'被對方中場搶斷'}]},
+ {t:'丟球後反搶',g:['MF'],d:'你的傳球被攔截，對方正要發動反擊。',pos:{me:[150,96],ball:[146,88],opp:[[146,88],[110,120],[200,124]],mate:[[100,90],[200,86],[150,160]]},
+  tells:[{h:'攔截的那名球員第一下停球很差',o:0},{h:'對方前鋒已經全速衝刺',o:1},{h:'隊友正在回收補位',o:2}],
+  opts:[{t:'立刻反搶',m:'bold',ab:['def','sta'],to:[150,70],k:'K',ok:'五秒內把球搶回來，對方防線還沒站好！',ng:'反搶撲空，對手打穿中路'},
+   {t:'戰術犯規',m:'norm',ab:['def','phy'],to:[146,88],k:'D',ok:'聰明的犯規，反擊被扼殺',ng:'裁判掏出黃牌，還判了危險位置的自由球'},
+   {t:'退回中場保護',m:'safe',ab:['vis','sta'],to:[150,140],k:'D',ok:'退得及時，封住了中路',ng:'退得太慢，對方從容推進'}]},
+ {t:'定位球戰術',g:['MF'],set:1,d:'禁區前四十碼的間接自由球，隊友們看著你等暗號。',pos:{me:[150,110],ball:[150,104],gk:[150,10],opp:[[130,62],[150,60],[170,62]],mate:[[110,72],[190,70],[150,40]]},
+  tells:[{h:'對方防線站得很高',o:0},{h:'對方人牆後面有空檔',o:1},{h:'對方很怕高球',o:2}],
+  opts:[{t:'挑傳防線身後',m:'norm',ab:['pas','vis'],to:[190,30],k:'A',ok:'精準的挑傳，隊友插上凌空破門',ng:'挑傳太深，門將出擊沒收'},
+   {t:'練好的假動作戰術',m:'bold',ab:['vis','pas'],to:[150,40],k:'A',ok:'兩人假跑、一人回撥，全隊練了一整週的戰術完美執行！',ng:'戰術被看穿，對方輕鬆解圍'},
+   {t:'高吊禁區',m:'safe',ab:['pas'],to:[150,30],k:'K',ok:'製造一波混戰，贏得角球',ng:'高球被門將拍出'}]},
+ {t:'控制節奏',g:['MF'],d:'球隊領先一球，對手壓得很前，全隊都看著你。',pos:{me:[150,140],ball:[150,134],opp:[[130,120],[170,118],[150,96]],mate:[[90,150],[210,150],[150,180]]},
+  tells:[{h:'對方壓上後身後空檔很大',o:0},{h:'對方體能明顯下降',o:1},{h:'對方急著搶球，犯規很多',o:2}],
+  opts:[{t:'找空檔打反擊',m:'bold',ab:['vis','pas'],to:[150,40],k:'A',ok:'一腳長傳打穿防線，前鋒單刀鎖定勝局！',ng:'長傳被截，對方反撲'},
+   {t:'傳控消耗時間',m:'norm',ab:['pas','sta'],to:[90,150],k:'K',ok:'連續二十腳傳球，看台響起「Olé」',ng:'回傳失誤，對手形成射門'},
+   {t:'護球造犯規',m:'safe',ab:['phy','dri'],to:[150,134],k:'F',ok:'護住球，被對手放倒，又消耗了一分鐘',ng:'被對手乾淨地搶走'}]},
+ {t:'弧頂假射',g:['MF','FW'],d:'禁區弧頂拿球，對方中衛衝出來封堵。',pos:{me:[150,72],ball:[150,66],gk:[150,12],opp:[[150,54],[120,44],[184,44]],mate:[[96,40],[204,38]]},
+  tells:[{h:'中衛封堵時會整個人撲出來',o:0},{h:'中衛速度很快',o:1},{h:'兩翼都有隊友插上',o:2}],
+  opts:[{t:'假射晃開再射',m:'bold',ab:['dri','sho'],to:[164,-4],k:'G',ok:'一個假射讓中衛飛身撲空，你從容推射！',ng:'假動作沒騙到，射門被封堵'},
+   {t:'直接起腳',m:'norm',ab:['sho'],to:[138,-4],k:'G',ok:'起腳又快又低，球從人縫中鑽進球門',ng:'射門打在中衛身上'},
+   {t:'分給邊路',m:'safe',ab:['pas','vis'],to:[204,38],k:'A',ok:'分邊時機完美，隊友低射破門',ng:'分球被對方邊後衛斷下'}]},
+ {t:'門線救險',g:['DF'],d:'對方射門已經越過門將，球滾向空門！',pos:{me:[176,30],ball:[160,20],opp:[[180,50]],mate:[[130,24]]},
+  tells:[{h:'球速不快，追得到',o:0},{h:'對方前鋒正在跟進補射',o:1},{h:'門將已經起身',o:2}],
+  opts:[{t:'飛身鏟到門線',m:'bold',ab:['pac','def'],to:[220,40],k:'D',ok:'在門線上把球鏟出！整座球場都在尖叫',ng:'差了一步，球滾進網'},
+   {t:'用身體擋在門前',m:'norm',ab:['def','phy'],to:[160,6],k:'D',ok:'站在門線上，用胸口把球擋出',ng:'球從你腳邊彈進'},
+   {t:'先封住補射者',m:'safe',ab:['vis','def'],to:[180,50],k:'D',ok:'球打中門柱彈出，補射被你卡住',ng:'球直接滾進了球門'}]},
+ {t:'邊後衛插上',g:['DF'],d:'邊鋒內切吸引防守，邊路空出一整條走廊。',pos:{me:[260,110],ball:[200,80],gk:[150,12],opp:[[190,70],[240,60],[150,40]],mate:[[200,80],[150,50]]},
+  tells:[{h:'對方邊後衛跟著邊鋒內收',o:0},{h:'禁區裡我方中鋒占了身位',o:1},{h:'對方準備打反擊',o:2}],
+  opts:[{t:'接球直接傳中',m:'norm',ab:['pas','pac'],to:[150,50],k:'A',ok:'一腳弧線傳中，中鋒頭槌破門！',ng:'傳中被前點的後衛頂出'},
+   {t:'帶球殺進禁區',m:'bold',ab:['dri','pac'],to:[170,-4],k:'G',ok:'邊後衛殺到底線，自己小角度打進！',ng:'突破被斷，身後空出一大片'},
+   {t:'回傳保持控球',m:'safe',ab:['pas'],to:[200,110],k:'K',ok:'穩穩回傳，球隊重新組織',ng:'回傳太慢，被對方搶斷'}]},
+ {t:'二打一防守',g:['DF'],d:'對方兩名前鋒打出二打一，只剩你一個人防守。',pos:{me:[150,70],ball:[120,100],opp:[[120,104],[184,96]],mate:[[150,10]]},
+  tells:[{h:'持球者很自私',o:0},{h:'持球者習慣橫傳',o:1},{h:'隊友正在全速回追',o:2}],
+  opts:[{t:'上搶持球者',m:'bold',ab:['def','pac'],to:[124,96],k:'D',ok:'果斷上搶，把球從他腳下捅走！',ng:'他輕鬆橫傳，隊友推空門'},
+   {t:'站中間封傳球',m:'norm',ab:['vis','def'],to:[168,96],k:'D',ok:'讀到橫傳，伸腳斷下！',ng:'他直接起腳打近角'},
+   {t:'後退拖延',m:'safe',ab:['pac','vis'],to:[150,40],k:'D',ok:'拖住時間，隊友回追成功',ng:'退得太深，對方從容射門'}]},
+ {t:'站人牆',g:['DF'],set:1,d:'對方在禁區前獲得自由球，你站在人牆中間。',pos:{me:[150,72],ball:[140,96],opp:[[140,100]],mate:[[138,72],[162,72],[150,10]]},
+  tells:[{h:'主罰者喜歡從人牆上方吊',o:0},{h:'主罰者喜歡從人牆底下踢',o:1},{h:'他們可能打戰術配合',o:2}],
+  opts:[{t:'起跳封高球',m:'norm',ab:['hea','phy'],to:[150,60],k:'D',ok:'起跳時機完美，球打在你頭上彈出',ng:'球從你頭頂越過，鑽進死角'},
+   {t:'不跳、守住下方',m:'bold',ab:['def','vis'],to:[150,80],k:'D',ok:'對手果然踢地滾球，被你擋個正著！',ng:'對手踢了高球，人牆整排都沒跳'},
+   {t:'衝出去封堵',m:'safe',ab:['pac','def'],to:[140,90],k:'D',ok:'搶在主罰前衝出去，干擾了射門',ng:'被裁判警告，自由球重踢'}]},
+ {t:'長傳找前鋒',g:['DF'],d:'解圍後球落在你腳下，前鋒在中線舉手要球。',pos:{me:[150,40],ball:[150,46],opp:[[130,70],[180,64]],mate:[[150,130],[230,110],[80,80]]},
+  tells:[{h:'對方防線站得很高',o:0},{h:'右邊鋒身邊沒人',o:1},{h:'對方正在全面壓迫',o:2}],
+  opts:[{t:'一腳長傳打身後',m:'bold',ab:['pas','vis'],to:[150,130],k:'A',ok:'六十公尺長傳精準落點，前鋒單刀破門！',ng:'長傳太長，直接出底線'},
+   {t:'轉移到右路',m:'norm',ab:['pas'],to:[230,110],k:'K',ok:'轉移到位，右路形成一波攻勢',ng:'轉移被攔截'},
+   {t:'短傳給後腰',m:'safe',ab:['pas'],to:[80,80],k:'K',ok:'穩穩交給後腰，化解壓迫',ng:'短傳被對方逼搶斷下'}]},
+ {t:'吊射回追',g:['GK'],d:'你站得太前，對方中場在中線看到了，起腳吊門！',pos:{me:[150,40],ball:[150,120],opp:[[150,126]],mate:[[120,70],[180,70]]},
+  tells:[{h:'球的弧度很高，還有時間',o:0},{h:'球速很快、弧度很低',o:1},{h:'後衛離門線比較近',o:2}],
+  opts:[{t:'倒退飛身托出',m:'bold',ab:['ref','gkp'],to:[150,-4],k:'S',ok:'邊退邊跳，指尖把球托出橫樑！',ng:'球越過你的指尖，掉進球門'},
+   {t:'轉身衝回門線',m:'norm',ab:['sta','gkp'],to:[150,8],k:'S',ok:'衝回門線，穩穩把球抱住',ng:'衝回去時球已經進了'},
+   {t:'喊後衛回防',m:'safe',ab:['cmd'],to:[136,10],k:'S',ok:'後衛在門線上把球頂出',ng:'後衛沒聽到，球進了'}]},
+ {t:'近距離頭槌',g:['GK'],d:'對方傳中，中鋒在小禁區前沿高高躍起！',pos:{me:[150,10],ball:[160,28],opp:[[160,32]],mate:[[136,30]]},
+  tells:[{h:'中鋒習慣頂向下角',o:0},{h:'中鋒會頂向你身後的遠角',o:1},{h:'後衛干擾了他的起跳',o:2}],
+  opts:[{t:'往下撲',m:'norm',ab:['ref'],to:[150,16],k:'S',ok:'球往地上砸，你在反彈前把它撲住！',ng:'球從上角飛進'},
+   {t:'等他頂了再反應',m:'bold',ab:['ref','gkp'],to:[170,4],k:'S',ok:'極限反應！單手把球撈出',ng:'距離太近，來不及反應'},
+   {t:'站好位置封角度',m:'safe',ab:['gkp'],to:[154,10],k:'S',ok:'頭球被干擾後無力，你穩穩接住',ng:'頭球擦著你的手套進網'}]},
+ {t:'貼地勁射',g:['GK'],d:'對方在禁區邊緣一腳貼地勁射，直奔你的右下角！',pos:{me:[150,10],ball:[176,64],opp:[[176,70]],mate:[[140,40],[196,46]]},
+  tells:[{h:'草皮很快，球會加速',o:0},{h:'球被後衛擋了一下，速度變慢',o:1},{h:'對方前鋒在等補射',o:2}],
+  opts:[{t:'飛身側撲',m:'bold',ab:['ref'],to:[172,4],k:'S',ok:'貼地飛撲，單掌把球托出立柱！',ng:'球貼著指尖滑進網'},
+   {t:'倒地封堵',m:'norm',ab:['gkp','ref'],to:[166,12],k:'S',ok:'倒地封住下角，球打在你身上彈出',ng:'球從你腋下鑽過'},
+   {t:'撲住不給補射',m:'safe',ab:['gkp','cmd'],to:[160,14],k:'S',ok:'穩穩把球壓在身下',ng:'球脫手，被補射得手'}]},
+ {t:'指揮人牆',g:['GK'],set:1,d:'對方在禁區弧頂獲得自由球，你要排人牆。',pos:{me:[150,8],ball:[150,92],opp:[[150,98]],mate:[[134,70],[146,70],[158,70]]},
+  tells:[{h:'主罰者習慣打人牆外側',o:0},{h:'主罰者喜歡打門將這一邊',o:1},{h:'他們準備打戰術配合',o:2}],
+  opts:[{t:'四人牆、站另一側',m:'norm',ab:['cmd','gkp'],to:[168,0],k:'S',ok:'人牆封住一邊，你撲出另一邊！',ng:'球繞過人牆直掛死角'},
+   {t:'兩人牆、自己顧全場',m:'bold',ab:['ref','cmd'],to:[136,0],k:'S',ok:'大膽的安排，你飛身撲出射門！',ng:'人牆太少，球直接從縫裡穿過'},
+   {t:'五人牆加一人蹲地',m:'safe',ab:['cmd'],to:[150,60],k:'D',ok:'密不透風，球打在人牆上彈出',ng:'對方打戰術配合，後點無人防守'}]},
+ {t:'球門球組織',g:['GK'],d:'球門球，對方三名前鋒在禁區外壓迫。',pos:{me:[150,12],ball:[150,18],opp:[[110,50],[150,56],[190,50]],mate:[[100,30],[200,30],[150,90],[150,160]]},
+  tells:[{h:'對方後腰沒有跟上',o:0},{h:'對方壓迫只是做做樣子',o:1},{h:'對方中場站位很高',o:2}],
+  opts:[{t:'穿過壓迫短傳',m:'bold',ab:['kic','gkp'],to:[150,90],k:'K',ok:'一腳穿越三人的地面球，後腰轉身帶起反擊！',ng:'傳球被前鋒截下，差點丟球'},
+   {t:'短傳給中衛',m:'norm',ab:['kic'],to:[100,30],k:'K',ok:'短傳配合化解壓迫',ng:'中衛被逼得只能大腳'},
+   {t:'大腳開到前場',m:'safe',ab:['kic'],to:[150,160],k:'K',ok:'大腳開到前場，前鋒爭到第一點',ng:'大腳被對方中衛頂回來'}]},
 ];
 const BIGFX={G:'GOAL!',A:'ASSIST!',S:'SAVE!',D:'CLEARED!'};
 /* 成功率:風險基準 + 相關能力與球隊 par 的差 + 特質;讀對對手習慣的 +18 不顯示 */
@@ -1214,13 +1315,13 @@ const CALL={G:['球進了！整座球場都在搖晃！','這腳射門可以放�
   X:['可惜！就差那麼一點點！','機會溜走了，他抱著頭不敢相信。','這球處理得太急了。','對手讀懂了他的意圖。','教練在場邊攤開雙手。','看台上傳來一陣嘆息。']};
 const callLine=k=>{ const a=CALL[k]||CALL.X; return a[Math.floor(Math.random()*a.length)]; };
 /* 單次大舞台關鍵時刻(國際賽淘汰賽、盃賽決賽):done(ok) */
-function bigMoment(tag,me,opp,par,done){
-  const sc=pickScene(), tell=pick(sc.tells), see=chance(scoutSee());
-  const min=ri(55,118), a=ri(0,1), el=momentCard(tag,sc,tell,see,min>90?`延長 ${min}`:min,me,a,a,opp);
-  MTAG=tag;
-  choose(`${tag} — 你的選擇？`,sc.opts.map((o,i)=>{ const p=momentOdds(o,par);
+function bigMoment(tag,me,opp,par,done,fx){ fx=fx||{}; /* fx:min/a/b 指定時間與比分、see 必看出對手、bonus 成功率加成、boldB 冒險加成、half 點數減半 */
+  const sc=pickScene(), tell=pick(sc.tells), see=chance(scoutSee())||!!fx.see;
+  const min=fx.min??ri(55,118), a=fx.a??ri(0,1), b=fx.b??a, el=momentCard(tag,sc,tell,see,min>90?`延長 ${min}`:min,me,a,b,opp);
+  MTAG=tag; MHALF=!!fx.half;
+  choose(`${tag} — 你的選擇？`,sc.opts.map((o,i)=>{ const p=clamp(momentOdds(o,par)+(fx.bonus||0)+(o.m==='bold'?(fx.boldB||0):0),5,95);
     return {t:o.t,main:o.m==='norm',warn:o.m==='bold',s:momentSub(o,p),
-      f:()=>resolveMoment(sc,o,i===tell.o,p,el,ok=>{ MTAG=null; board(); done(ok); })}; }));
+      f:()=>resolveMoment(sc,o,i===tell.o,p,el,ok=>{ MTAG=null; MHALF=false; board(); done(ok); })}; }));
 }
 function leagueMoment(last,i,tot,done){
   const sc=pickScene(), tell=pick(sc.tells), see=chance(scoutSee());
@@ -2722,6 +2823,119 @@ function u23Cycle(T,Y,isAG,next){
     return; }
   playTourney(T,Y,false,!u23,next);
 }
+/* ================= 大賽淘汰賽之路、決賽、點球大戰、大賽個人獎項(v0.16) ================= */
+const TROPHY={世界盃:'大力神盃',歐冠:'大耳朵盃',亞冠:'亞冠獎盃',亞洲盃:'亞洲盃',奧運:'奧運金牌'};
+const WDL={W:'勝',D:'和',L:'負'};
+function scoreFor(r){ if(r==='D'){ const n=ri(0,2); return [n,n]; } const a=ri(1,3), b=ri(0,a-1); return r==='W'?[a,b]:[b,a]; }
+/* 國家隊小組賽:三場比分與積分 */
+function groupCard(title,me,opps,adv){
+  const rs=adv?pick([['W','W','D'],['W','D','W'],['W','W','L'],['D','W','W'],['W','D','D'],['W','W','W']]):pick([['L','D','L'],['W','L','L'],['D','L','D'],['L','L','W'],['D','D','L']]);
+  const os=shuffle(opps.slice()).slice(0,3), pts=rs.reduce((s,r)=>s+(r==='W'?3:r==='D'?1:0),0);
+  const lines=rs.map((r,i)=>{ const [x,y]=scoreFor(r); return `${me} ${x}–${y} ${os[i]}　<b class="${r==='W'?'up':r==='L'?'dn':'hl'}">${WDL[r]}</b>`; });
+  card(adv?'good':'bad',title,`<div class="statline">${lines.join('<br>')}</div>小組積分 <b class="hl">${pts}</b> 分，${adv?'<b class="up">晉級淘汰賽</b>':'<b class="dn">小組出局</b>'}。`);
+  return `小組賽 ${rs.map(r=>WDL[r]).join('')}（${pts} 分）`;
+}
+/* 俱樂部洲際賽小組賽:六場 */
+function groupCard6(title,adv){
+  const w=adv?ri(3,5):ri(0,2), d=ri(0,Math.min(2,6-w)), l=6-w-d, pts=w*3+d;
+  card(adv?'good':'bad',title,`小組賽 6 戰 <b class="up">${w} 勝</b> ${d} 和 <b class="dn">${l} 負</b>，積 ${pts} 分——${adv?'<b class="up">晉級淘汰賽</b>':'<b class="dn">小組出局</b>'}。`);
+  return `小組賽 ${w} 勝 ${d} 和 ${l} 負`;
+}
+/* 淘汰賽單輪結果(lg2 = 兩回合) */
+function koCard(title,stage,me,opp,adv,lg2){
+  const pk=chance(18); let x,y;
+  if(pk){ x=y=ri(1,2); } else { [x,y]=scoreFor(adv?'W':'L'); if(lg2){ x+=ri(0,2); y+=ri(0,1); if(adv&&x<=y)x=y+1; if(!adv&&y<=x)y=x+1; } }
+  const pks=pk?(adv?`（PK ${ri(4,5)}–${ri(2,3)}）`:`（PK ${ri(2,3)}–${ri(4,5)}）`):'';
+  const sc=`${me} ${x}–${y} ${opp}${pks}`;
+  card(adv?'good':'bad',`${title}｜${stage}`,`${lg2?'兩回合總比分 ':''}${sc}——${adv?'<b class="up">晉級</b>':'<b class="dn">淘汰</b>'}。`);
+  return `${stage}：${sc}　${adv?'晉級':'淘汰'}`;
+}
+/* 決賽:前夜 → 上半場 → 下半場 →(延長、點球大戰)→ 捧盃或落敗。done({win,mvp}) */
+function finalSeries(c,done){
+  const tr=TROPHY[c.comp]||'冠軍獎盃';
+  card('gold story',`${c.Y} ${c.comp}決賽`,`<b class="hl">${c.me}</b> vs <b class="hl">${c.opp}</b>${c.path.length?`<div class="statline">${c.path.join('<br>')}</div>`:''}<p>一路走到這裡了。${tr}就放在球員通道口的展示台上，你經過時忍不住看了一眼。決賽前夜，飯店房間裡很安靜。</p>`);
+  const mn=S.arcs&&S.arcs.mentor&&S.arcs.mentor.n;
+  choose('決賽前夜 — 你怎麼度過？',[
+    {t:'早早上床睡覺',s:'狀態↑｜決賽關鍵時刻成功率 +4%',f:()=>{ meter('form',5); go({bonus:4}); }},
+    {t:'跟教練組再看一次對手錄影',main:true,s:'決賽中一定看得出對手的意圖',f:()=>go({see:true})},
+    {t:mn?`打電話給恩師 ${mn}`:'打電話回家',s:'冒險選擇成功率 +10%',f:()=>go({boldB:10})}]);
+  function go(fx){
+    bigMoment(`${c.Y} ${c.comp}決賽・上半場`,c.me,c.opp,c.par,ok1=>{
+      bigMoment(`${c.Y} ${c.comp}決賽・下半場`,c.me,c.opp,c.par,ok2=>settle(ok1,ok2),{...fx,min:ri(80,89),a:ok1?1:0,b:ok1?0:1});
+    },{...fx,min:ri(18,44),a:0,b:0});
+  }
+  function settle(ok1,ok2){ const n=(ok1?1:0)+(ok2?1:0);
+    if(n===2&&chance(clamp(Math.round(70+c.base*30),55,92)))return finish(true,ri(2,3),ri(0,1),false,true);
+    if(n===0&&!chance(clamp(Math.round(c.base*30),5,25)))return finish(false,ri(0,1),ri(2,3),false,false);
+    if(n===0)return finish(true,2,1,false,false,'你下場後，替補上陣的隊友在延長賽打進致勝球。');
+    const s=n===2?2:1;
+    card('talk',`${c.Y} ${c.comp}決賽｜延長賽`,`九十分鐘戰成 ${s}–${s}。延長賽三十分鐘，雙方都跑到抽筋，誰也沒能再破門——<b class="hl">點球大戰</b>。`);
+    pkShootout(c,(win,mine)=>finish(win,s,s,true,mine));
+  }
+  function finish(win,x,y,pk,star,note){
+    const sc=`${c.me} ${x}–${y} ${c.opp}${pk?'（點球大戰）':''}`, mvp=win&&!!star;
+    if(win){
+      const cheer={世界盃:`你把${tr}高高舉過頭頂。${NATS[S.nat].n}的街頭，此刻一定已經瘋了。`,歐冠:`隊長把${tr}交到你手上，你轉身面向看台，彩帶從天而降。`,
+        亞冠:`${tr}在燈光下閃閃發亮，你把它抱在胸前，久久不肯放下。`,亞洲盃:`${tr}的重量比想像中更重，那是整個國家的期待。`,奧運:'國歌響起，你低頭看著胸前的金牌，眼淚止不住。'}[c.comp]||`你捧起了${tr}。`;
+      if(mvp){ S.honors.push(`${c.Y} ${c.comp}決賽最佳球員`); S.hl.push({y:S.year,age:S.age,t:`${c.Y} ${c.comp}決賽最佳球員`,big:true}); }
+      card('gold',`${c.Y} ${c.comp}冠軍！`,`終場哨響——<b class="hl">${sc}</b>。${note?`<br>${note}`:''}<br>${cheer}${mvp?`<br>★ 你獲選為 <b class="hl">決賽最佳球員</b>！`:''}`);
+      bigText('CHAMPIONS!'); meter('fans',6);
+    } else {
+      card('bad',`${c.Y} ${c.comp}決賽落敗`,`終場哨響——${sc}。<br>你走上頒獎台領取亞軍獎牌，沒有看那座${tr}一眼。對手在你面前捧盃，彩帶落在你的肩上。${pk&&star===false?'<br>那一球，你會記很久。':''}`);
+      if(pk&&star===false&&!S.traits.yips&&!S.traits.clutch&&!S.traits.intlace&&chance(30))
+        traitCard('yips',`${c.comp}決賽的點球大戰，那一球一直在你腦海裡重播——<b class="dn">評分 −0.2、關鍵時刻成功率 −10%，直到拿下聯賽個人獎項或大賽金牌才會痊癒</b>。`,'bad');
+    }
+    board(); done({win,mvp});
+  }
+}
+/* 點球大戰:場上球員主罰第五球、門將撲對方第五球。cb(win, 自己那一球是否成功) */
+function pkShootout(c,cb){
+  const gk=isGK(), n=ri(2,4), see=chance(scoutSee());
+  const tells=gk?['主罰者習慣射左邊','主罰者助跑時身體朝右','主罰者以勺子點球聞名']:['門將每次都往右撲','門將身材矮小，上角是死角','門將總是提早移動重心'];
+  const ti=ri(0,2);
+  const el=card('moment',`${c.Y} ${c.comp}決賽｜點球大戰`,`前四輪雙方都罰進 ${n} 球，比分 ${n}–${n}。${gk?`對方第五位主罰者站上點球點——撲出這一球，${c.me} 就離冠軍只差一步。`:`你是 ${c.me} 的第五位主罰者。整座球場安靜得聽得見自己的心跳。`}
+    <div class="mtell">${see?'🔍 球探情報：'+tells[ti]:'🔍 看不出對方的意圖'}</div><div class="mres"></div>`);
+  const opts=gk?[['撲向左邊','norm',['ref'],32],['撲向右邊','norm',['ref'],32],['站在中間不動','bold',['gkp','ref'],24]]
+              :[['推左下角','norm',['sho'],76],['大力抽右上死角','bold',['sho','phy'],64],['勺子吊中路','bold',['sho','vis'],60]];
+  choose('點球大戰 — 你的選擇？',opts.map(([t,m,ab,b0],i)=>{
+    const a=ab.reduce((s,k)=>s+S.ab[k],0)/ab.length;
+    const p=clamp(Math.round(b0+clamp((a-c.par)*1.5,-15,15)+(S.traits.clutch?8:0)-(S.traits.yips?15:0)+(see&&i===ti?18:0)),5,95);
+    return {t,main:m==='norm'&&i===0,warn:m==='bold',s:`${MODEN[m]}｜成功率 ${p}%`,f:()=>{
+      const mine=chance(p), other=chance(76); /* 場上球員:對方第五球;門將:我方第五位主罰者 */
+      let win, seq;
+      if(gk){ const ourK=other, theirK=!mine;
+        if(ourK&&!theirK){ win=true; seq='我方第五球罰進，你撲出對方第五球！'; }
+        else if(!ourK&&theirK){ win=false; seq='我方第五球被撲出，對方第五球你沒能撲到。'; }
+        else { win=chance(50); seq=`${ourK?'雙方第五球都罰進':'雙方第五球都沒進'}，進入驟死賽……${win?'對手在第七輪射失！':'我方在第七輪被撲出。'}`; } }
+      else { const theirK=other;
+        if(mine&&!theirK){ win=true; seq='你罰進了！對方第五球打中門柱！'; }
+        else if(!mine&&theirK){ win=false; seq='你的點球沒進。對方第五球冷靜罰進。'; }
+        else { win=chance(50); seq=`${mine?'你罰進了，但對方也罰進':'你沒罰進，但對方也射失了'}，進入驟死賽……${win?'對手在第七輪射失！':'我方在第七輪被撲出。'}`; } }
+      el.querySelector('.mres').innerHTML=`<b class="${mine?'up':'dn'}">${mine?'✔ ':'✘ '}${gk?(mine?'你撲出了這一球！':'撲錯方向，球進了。'):(mine?'球應聲入網！':'球被撲出／打偏了……')}</b><br>${seq}`;
+      el.classList.add(mine?'won':'lost'); if(mine)bigText(gk?'SAVE!':'GOAL!',gk?'cool':'');
+      if(mine)S.hl.push({y:S.year,age:S.age,t:`${c.Y} ${c.comp}決賽點球大戰：${gk?'撲出關鍵點球':'罰進第五球'}`,big:true});
+      board(); cb(win,mine); }}; }));
+}
+/* 大賽個人獎項:kind WC 世界盃、AC 亞洲盃、CL 歐冠、ACL 亞冠;info {i 到達輪次, n 總輪數, win, mvp, tg 進球, okc 關鍵時刻成功數} */
+function tourneyAwards(kind,Y,info){
+  const comp={WC:'世界盃',AC:'亞洲盃',CL:'歐冠',ACL:'亞冠'}[kind], champ=info.win, fin=info.i>=info.n-1, deep=info.i>=info.n-2;
+  const club=kind==='CL'||kind==='ACL';
+  const who=()=>{ if(club){ const o=awardee(pick(kind==='CL'?CL_EU:CL_AS)); return `${o.n}（${o.c}）`; }
+    const ctry=pick((kind==='WC'?OPP_WC:OPP_AS).filter(x=>x!==NATS[S.nat].n)), N=NAMES[{日本:'JP',韓國:'KR',澳洲:'AU',中國:'CN',越南:'VN',泰國:'TH'}[ctry]]||NAMES.EU;
+    return `${pick(N[0])+pick(N[1])}（${ctry}）`; };
+  const me=`<b class="hl">${S.name}</b>（${club?S.club:NATS[S.nat].n}）`, got=[], rows=[];
+  const add=(k,mine,txt)=>{ if(mine){ got.push(k); S.honors.push(`${Y} ${comp}${k}`); } rows.push(`<tr><td>${k}</td><td>${mine?me:who()}${txt?'・'+txt:''}</td></tr>`); };
+  const bestK=club?'最佳球員':kind==='WC'?'金球獎':'最佳球員';
+  add(bestK,(champ&&info.okc>=2&&chance(55))||(fin&&info.okc>=3&&chance(25)),'');
+  const bootK=club?'射手王':'金靴', other=club?ri(kind==='CL'?8:7,kind==='CL'?13:11):ri(kind==='WC'?5:4,kind==='WC'?8:7);
+  const myBoot=!isGK()&&info.tg>=other&&deep&&chance(70); add(bootK,myBoot,`${myBoot?info.tg:other} 球`);
+  if(kind==='WC')add('金手套',isGK()&&fin&&chance(50),'');
+  if(kind!=='AC')add('最佳年輕球員',S.age<=21&&info.i>=3&&chance(45),'');
+  card(got.length?'gold':'info',`${Y} ${comp}個人獎項`,(got.length?`你拿下 ${got.map(x=>`<b class="hl">${comp}${x}</b>`).join('、')}！`:`${comp}個人獎項揭曉。`)+`<div class="tblwrap"><table class="fin awd">${rows.join('')}</table></div>`);
+  if(got.length){ meter('fans',got.length*4); got.forEach(k=>S.hl.push({y:S.year,age:S.age,t:`${Y} ${comp}${k}`,big:true})); }
+  if(got.length&&S.traits.yips){ removeTrait('yips'); card('good','走出陰影','拿下大賽個人獎項的那一刻，腦海裡的雜音消失了——<b class="hl">點球恐懼症痊癒</b>。'); }
+}
+
 /* 國際賽對手(真實國名);排除自己的國家 */
 const OPP_WC=['巴西','法國','阿根廷','英格蘭','西班牙','德國','葡萄牙','荷蘭','克羅埃西亞','烏拉圭','墨西哥','美國','摩洛哥','塞內加爾','比利時','瑞士'];
 const OPP_AS=['日本','韓國','澳洲','伊朗','沙烏地阿拉伯','卡達','伊拉克','烏茲別克','阿聯','中國','越南','泰國','約旦','阿曼'];
@@ -2730,24 +2944,36 @@ const TOUR_PAR={世界盃:57,亞洲盃:50,亞運:44,奧運:50,東亞錦標賽:46
 function playTourney(T,Y,senior,overage,done){
   const t=NATS[S.nat].tier; let b=ntBonus()+(S.traits.intlace?0.05:0)+(S.traits.clutch?0.03:0)+(S.tourPen||0); S.tourPen=0;
   const me=NATS[S.nat].n+(T.u23?' U23':''), opps=(T.opp||(T===T_WC?OPP_WC:T===T_OLY?OPP_OLY:OPP_AS)).filter(x=>x!==NATS[S.nat].n);
-  let i=0, mo=false, moOk=null;
-  const fin=()=>{ playTourneyEnd(T,Y,senior,overage,i,moOk); done(); };
+  const deep=T===T_WC, bigF=T===T_WC||T===T_AC||T===T_OLY, g0=S.mG, path=[], used=new Set(), title=`${Y} ${T.n}`;
+  const opp=()=>{ const a=opps.filter(x=>!used.has(x)), o=pick(a.length?a:opps); used.add(o); return o; };
+  let i=0, mo=false, moOk=null, okc=0, fr=null;
+  const fin=()=>{ playTourneyEnd(T,Y,senior,overage,i,moOk,{path,mg:S.mG-g0,okc,fr,deep}); done(); };
   const step=()=>{
     while(i<T.st.length){
-      /* 淘汰賽第一場:大賽關鍵時刻,成功直接晉級並 +6% 後續勝率,失敗該場勝率減半 */
-      if(i===1&&!mo){ mo=true;
-        bigMoment(`${Y} ${T.n}${T.st[1]}`,me,pick(opps),TOUR_PAR[T.n],ok=>{ moOk=ok;
-          if(ok){ i++; b+=0.06; S.pool+=2; } else if(chance(T.k[t-1]*50+b*100))i++; else { fin(); return; }
-          step(); });
+      const st=T.st[i], last=i===T.st.length-1, p=(i===0?T.g:T.k)[t-1]+b;
+      if(i===0){ const adv=chance(p*100); path.push(groupCard(`${title}｜${st}`,me,opps,adv)); if(!adv)break; i++; continue; }
+      /* 決賽:完整流程 */
+      if(last&&bigF){ fr=null; finalSeries({comp:T.n,Y,me,opp:opp(),par:TOUR_PAR[T.n]+2,base:p,path:path.slice()},r=>{ fr=r; if(r.win)i++; fin(); }); return; }
+      /* 世界盃:每一輪淘汰賽都是關鍵時刻(點數減半),成功晉級率 +15%、失敗 ×0.75 */
+      if(deep){ const o=opp();
+        bigMoment(`${title}・${st}`,me,o,TOUR_PAR[T.n],ok=>{ if(moOk===null)moOk=ok; okc+=ok?1:0;
+          const adv=chance(clamp(ok?p+0.15:p*0.75,0.03,0.92)*100); path.push(koCard(title,st,me,o,adv,false)); if(adv){ i++; step(); } else fin(); },{half:true});
         return; }
-      if(chance(((i===0?T.g:T.k)[t-1]+b)*100))i++; else break;
+      /* 其他大賽:淘汰賽第一場關鍵時刻,成功直接晉級並 +6% 後續勝率,失敗該場勝率減半 */
+      if(i===1&&!mo){ mo=true; const o=opp();
+        bigMoment(`${title}・${st}`,me,o,TOUR_PAR[T.n],ok=>{ moOk=ok; okc+=ok?1:0; let adv;
+          if(ok){ adv=true; b+=0.06; S.pool+=2; } else adv=chance(T.k[t-1]*50+b*100);
+          path.push(koCard(title,st,me,o,adv,false)); if(adv){ i++; step(); } else fin(); });
+        return; }
+      const o=opp(), adv=chance(p*100); const [x,y]=scoreFor(adv?'W':'L'); path.push(`${st}：${me} ${x}–${y} ${o}　${adv?'晉級':'淘汰'}`);
+      if(!adv)break; i++;
     }
     fin();
   };
   step();
 }
-function playTourneyEnd(T,Y,senior,overage,i,moOk){
-  const apps=3+Math.min(i,T.st.length-1), g=isGK()?0:Math.round(apps*GOAL_BASE[S.dpos]*0.8*(0.6+R()*0.8));
+function playTourneyEnd(T,Y,senior,overage,i,moOk,info){ info=info||{path:[],mg:0,okc:0};
+  const apps=3+Math.min(i,T.st.length-1), g=(isGK()?0:Math.round(apps*GOAL_BASE[S.dpos]*0.6*(0.6+R()*0.8)))+(info.mg||0);
   if(senior){ S.caps+=apps; S.compCaps+=apps; S.intlG+=g; if(T.reg)S.regCaps=(S.regCaps||0)+apps; }
   let res, medal=null;
   if(i===T.st.length){ res='冠軍'; medal='金牌'; }
@@ -2758,7 +2984,9 @@ function playTourneyEnd(T,Y,senior,overage,i,moOk){
   S.honors.push(`${Y} ${T.n}（${label}${overage?'・超齡':''}）`);
   S.pool+=Math.max(S.traits.intlace?2:0,Math.min(4,i));
   if(!T.reg){ S.intlCount++; if(i>=T.st.length-2)S.intlDeep++; } /* 區域賽事不算進國家隊英雄 */
-  card(i>=T.st.length-2?'gold':'info',`${Y} ${T.n}`,`代表${NATS[S.nat].n}${T.u23?' U23':''}${overage?'（超齡球員）':''}出賽 ${apps} 場${g?`、進 ${g} 球`:''}，最終 <b class="hl">${label}</b>。${i>0?`<br>大賽經驗帶來 <b class="up">${Math.min(4,i)+(moOk?2:0)}</b> 點能力點${moOk?'（含淘汰賽關鍵表現 +2）':''}。`:''}`);
+  const bonus2=moOk&&!info.deep;
+  card(i>=T.st.length-2?'gold':'info',`${Y} ${T.n}｜總結`,`代表${NATS[S.nat].n}${T.u23?' U23':''}${overage?'（超齡球員）':''}出賽 ${apps} 場${g?`、進 ${g} 球`:''}，最終 <b class="hl">${label}</b>。${info.path.length?`<div class="statline">${info.path.join('<br>')}</div>`:''}${i>0?`大賽經驗帶來 <b class="up">${Math.min(4,i)+(bonus2?2:0)}</b> 點能力點${bonus2?'（含淘汰賽關鍵表現 +2）':''}。`:''}`);
+  if(senior&&(T===T_WC||(T===T_AC&&i>=1)))tourneyAwards(T===T_WC?'WC':'AC',Y,{i,n:T.st.length,win:i===T.st.length,tg:g,okc:info.okc||0});
   if(medal==='金牌'||i>=T.st.length-1){ meter('fans',T===T_WC?12:6); if(medal==='金牌')confetti(); }
   /* 韓國兵役:亞運金牌或奧運獎牌免役 */
   if(NATS[S.nat].mil==='KR'&&S.mil==='none'&&((T===T_AG&&medal==='金牌')||(T===T_OLY&&medal))){
@@ -2854,7 +3082,28 @@ function clubCups(cont){
       if(chance(p[1]*100+b*100))i=2; end(); }); }
   /* 洲際 */
   const clName=S.contPlan&&S.contPlan.y===S.year&&S.contPlan.club===S.club?S.contPlan.n:contComp();
-  if(clName){
+  if(clName==='歐冠'||clName==='亞冠'){
+    q.push(()=>{ const P=CL_P[S.lv], C=CONT[clName]; let i=0, b=rel+role+(S.clubTier===1?0.05:0)+C.b+cb.cont, okc=0, fr=null;
+      const pool=C.pool.filter(k=>k!==S.lv), used=new Set(), path=[], g0=S.mG, title=`${Y} ${clName}`;
+      const opp=()=>{ let o; for(let k=0;k<6;k++){ o=pick(TEAMS[pick(pool)].slice(0,8)); if(!used.has(o))break; } used.add(o); return o; };
+      const end=()=>{ const label=i===5?'冠軍':i===4?'亞軍':i===3?'4 強':`止步${CL_ST[i]}`;
+        const cp=i===5?3:i===4?2:i===3?1:0; S.pool+=cp;
+        if(i>=3){ S.honors.push(`${Y} ${clName}（${label}・${S.club}）`); S.cups++; }
+        if(i===5){ meter('fans',10); meter('trust',5); S.cwc={y:S.year+1,club:S.club,eu:clName==='歐冠'}; }
+        const apps=6+Math.max(0,Math.min(i,4)-1)*2+(i>=4?1:0), tg=(isGK()?0:Math.round(apps*GOAL_BASE[S.dpos]*0.55*(0.6+R()*0.8)))+(S.mG-g0);
+        card(i>=3?'gold':'info',`${title}｜總結`,`${S.club}在${clName}的旅程：<b class="hl">${label}</b>。出賽 ${apps} 場${tg?`、進 ${tg} 球`:''}。<div class="statline">${path.join('<br>')}</div>${cp?`賽事成果 <b class="up">+${cp}</b> 點（季末自由分配）`:''}`);
+        if(i>=1)tourneyAwards(clName==='歐冠'?'CL':'ACL',Y,{i,n:5,win:i===5,tg,okc});
+        board(); next(); };
+      const go=()=>{ while(i<5){ const pr=(i===0?P[0]:P[1])+b;
+          if(i===0){ const adv=chance(pr*100); path.push(groupCard6(`${title}｜小組賽`,adv)); if(!adv)break; i++; continue; }
+          usedMoment=true; const o=opp();
+          if(i===4){ finalSeries({comp:clName,Y,me:S.club,opp:o,par:L.par+C.par+2,base:pr,path:path.slice()},r=>{ fr=r; okc+=r.mvp?1:0; if(r.win)i++; end(); }); return; }
+          bigMoment(`${title}・${CL_ST[i]}`,S.club,o,L.par+C.par,ok=>{ okc+=ok?1:0;
+            const adv=chance(clamp(ok?pr+0.15:pr*0.75,0.03,0.92)*100); path.push(koCard(title,CL_ST[i],S.club,o,adv,i<4)); if(adv){ i++; go(); } else end(); },{half:true});
+          return; }
+        end(); };
+      go(); }); }
+  else if(clName){
     q.push(()=>{ const P=CL_P[S.lv], C=CONT[clName]; let i=0, b=rel+role+(S.clubTier===1?0.05:0)+C.b+cb.cont;
       const pool=C.pool.filter(k=>k!==S.lv), opp=()=>pick(TEAMS[pick(pool)]);
       const end=()=>{ const label=i===5?'冠軍':i===4?'亞軍':i===3?'4 強':`止步${CL_ST[i]}`;
@@ -2885,7 +3134,8 @@ const ASIA_TOP=['J1','K1','CSL','AUS'], ASIA_2=['J2','K2'];
 const lgW=k=>LV[k].top5?1:LV[k].eu?0.6:ASIA_TOP.includes(k)?0.5:ASIA_2.includes(k)?0.3:0.2;
 const seasonPts=r=>r.lv&&r.st.App?Math.max(0,r.st.Rt-6.0)*r.st.Min/90:0;
 /* 榮譽加分:由上往下取第一個符合的規則 */
-const HONOR_PTS=[[/世俱盃（冠軍/,60],[/世俱盃（亞軍/,25],[/歐霸（冠軍/,70],[/歐霸（亞軍/,35],[/歐霸（4 強/,15],[/歐協聯（冠軍/,40],[/歐協聯（亞軍/,20],[/歐協聯（4 強/,8],
+const HONOR_PTS=[[/世界盃金球獎/,150],[/世界盃(金靴|金手套)/,80],[/世界盃最佳年輕球員/,40],[/歐冠最佳球員/,100],[/歐冠(射手王|最佳年輕球員)/,50],
+  [/亞冠最佳球員/,40],[/亞冠(射手王|最佳年輕球員)/,20],[/亞洲盃(最佳球員|金靴)/,40],[/決賽最佳球員/,25],[/世俱盃（冠軍/,60],[/世俱盃（亞軍/,25],[/歐霸（冠軍/,70],[/歐霸（亞軍/,35],[/歐霸（4 強/,15],[/歐協聯（冠軍/,40],[/歐協聯（亞軍/,20],[/歐協聯（4 強/,8],
   [/亞冠二級（冠軍/,30],[/亞冠二級（亞軍/,15],[/亞冠二級（4 強/,6],[/東協錦標賽（冠軍/,40],[/東亞錦標賽（冠軍/,25],[/(東協|東亞)錦標賽/,5],[/歐冠（冠軍/,150],[/歐冠（亞軍/,70],[/歐冠（4 強/,35],[/亞冠（冠軍/,60],[/亞冠（亞軍/,30],[/亞冠（4 強/,15],[/盃冠軍（/,30],[/金球獎/,300],[/世界盃（(冠軍|亞軍)/,200],[/世界盃（止步(8 強|4 強)/,100],[/世界盃/,40],
   [/亞洲足球先生/,80],[/最佳球員/,60],[/(英超|西甲|德甲|義甲|法甲)冠軍/,60],[/金靴|金手套/,40],
   [/亞洲盃（冠軍/,60],[/奧運（(金牌|銀牌|銅牌)/,40],[/亞運（金牌/,30],[/亞洲盃（亞軍/,30],
