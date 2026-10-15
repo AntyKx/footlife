@@ -3,7 +3,7 @@
 const {JSDOM}=require('jsdom'); const fs=require('fs'), path=require('path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const N=+process.argv[2]||20, SEEDP=process.argv[3]||'cal', K0=+process.argv[4]||0;
-const pos=['GK','DF','MF','FW'], nats=['TW','JP','KR','AU','CN','VN','TH','EN','ES','FR','DE','IT','PT','NL','HR','BR','AR','UY','CO','US','MX','CA','MA','SN','NG','EG','CV'];
+const pos=['GK','DF','MF','FW'], nats=['TW','JP','KR','AU','CN','VN','TH','EN','ES','FR','DE','IT','PT','NL','HR','BR','AR','UY','CO','US','MX','CA','MA','SN','NG','EG','CV','ID','SA'];
 const R=a=>a[Math.floor(Math.random()*a.length)];
 (async()=>{ for(let k=K0;k<K0+N;k++){
   const dom=new JSDOM(html,{runScripts:'dangerously',url:'https://x.test/?seed='+SEEDP+k,pretendToBeVisual:true});
