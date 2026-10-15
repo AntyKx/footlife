@@ -974,7 +974,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.26.2';
+const APP_VER='v0.26.3';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1366,7 +1366,7 @@ function sideDash(){ const D=$('side-dash'); if(!D||typeof S==='undefined'||!S)r
     const LL=S.lastLg&&S.lastLg.y===last.y&&S.lastLg.club===baseTm(last.tm)?S.lastLg:null;
     h+=sec(`上季 ${seasonLabel(last.y)}・${baseTm(last.tm)}`,`<div class="dk">${kp.map(([n,v])=>`<span><b>${v}</b><small>${n}</small></span>`).join('')}</div>${LL?`<p>聯賽第 <b>${LL.rank}</b> 名${LL.q?`・取得${LL.q}資格`:''}</p>`:''}`); }
   if(S.stage==='PRO'&&S.ct&&S.lv){ const sal=salaryFor(S.lv,ovr()-LV[S.lv].par,S.ct.mult);
-    h+=sec('合約與國家隊',`<p>${S.club}${S.loan?'（租借）':''}・合約剩 <b>${S.ct.yrs}</b> 年</p><p>年薪約 <b>${fmtMoney(sal)}</b>・身價約 ${fmtMoney(marketValue())}</p><p>${flagSVG(S.nat)}${S.ntOn?'<b class="up">國家隊入選中</b>':'國家隊未入選'}${S.caps?`・${S.caps} 場${gk?'':` ${S.intlG} 球`}`:''}</p>`); }
+    h+=sec('合約與國家隊',`<p>${S.club}${S.loan?'（租借）':''}・合約剩 <b>${S.ct.yrs}</b> 年</p><p>年薪約 <b>${fmtMoney(sal)}</b>・身價約 ${fmtMoney(marketValue())}</p>${S.coach?`<p>${coachLine()}</p>`:''}<p>${flagSVG(S.nat)}${S.ntOn?'<b class="up">國家隊入選中</b>':'國家隊未入選'}${S.caps?`・${S.caps} 場${gk?'':` ${S.intlG} 球`}`:''}</p>`); }
   else h+=sec(S.stage==='UNI'?'大學':'青訓',`<p>${S.stage==='UNI'?S.uni:S.team}${S.acad&&!S.acadOut?`・${S.acad.club}學院`:''}</p>`);
   if(pro.length){ const t=pro.reduce((a,r)=>{ a.G+=r.st.G||0; a.CS+=r.st.CS||0; a.App+=r.st.App||0; return a; },{G:0,CS:0,App:0});
     h+=sec('生涯',`<p>職業 <b>${pro.length}</b> 季・${new Set(pro.filter(r=>!r.loan).map(r=>r.tm)).size} 隊・出場 ${t.App}・${gk?`零封 ${t.CS}`:`進球 ${t.G}`}</p><p>榮譽 <b>${S.honors.length}</b> 項${S.honors.filter(x=>/冠軍（/.test(x)).length?`・冠軍 ${S.honors.filter(x=>/冠軍（/.test(x)).length} 座`:''}</p>`); }
@@ -2864,11 +2864,56 @@ function phasePre(){
   /* 身體警訊(v0.21.1):35 歲(門將 37)以上、能力已跟不上球隊水準,有機會在季前就決定引退 */
   if(S.stage==='PRO'&&!S.loan&&!S.skipMid&&S.age>=(isGK()?37:35)&&ovr()<curPar()-2&&chance(60)){
     card('bad','身體警訊',`季前體測，你的數據是全隊倒數。隊醫看著報告沉默了很久：「${S.name}，你的身體在跟你說話。」<br>綜合能力 ${ovr()}，球隊水準約 ${curPar()}。`);
-    choose('身體警訊 — 你的決定？',[{t:'再拚一季',main:true,s:'狀態小幅↓',f:()=>{ meter('form',-4); posReview(()=>squadReview(training)); }},
+    choose('身體警訊 — 你的決定？',[{t:'再拚一季',main:true,s:'狀態小幅↓',f:()=>{ meter('form',-4); posReview(()=>squadReview(()=>coachCheck(training))); }},
       {t:'就在這裡畫下句點',warn:true,s:'季前宣布引退',f:()=>endGame(`季前體測後，在 ${S.year} 年夏天宣布引退。`)}]);
     return; }
-  posReview(()=>squadReview(training));
+  posReview(()=>squadReview(()=>coachCheck(training)));
 }
+
+/* ================= 教練(v0.26.3):每支職業球隊有一位主帥,戰術風格決定你適不適合;換帥、冷板凳都要你做選擇 ================= */
+const COACH_ST={
+  press:{n:'高位壓迫',ab:['pac','sta','phy'],gk:['kic','sta'],d:'全場緊逼，跑不動的人沒有位置'},
+  possess:{n:'控球體系',ab:['pas','vis','dri'],gk:['kic','gkp'],d:'每一腳傳球都要有目的'},
+  counter:{n:'防守反擊',ab:['def','pac','sho'],gk:['ref','gkp'],d:'先守住，再一刀致命'},
+  direct:{n:'長傳衝吊',ab:['hea','phy','sho'],gk:['cmd','kic'],d:'把球送到禁區，剩下的交給身體'},
+  youth:{n:'重用新人',ab:null,gk:null,d:'年輕人只要敢踢，就有機會'}};
+function newCoach(){ const L=nameSet(S.stage==='PRO'&&S.lv?LV[S.lv].cty:S.nat); return {n:pick(L[0])+pick(L[1]),st:pick(Object.keys(COACH_ST)),y:S.year}; }
+/* 適配度 −2～+2:風格看重的能力和你的綜合能力相比;重用新人看年齡 */
+function coachFit(c){ c=c||S.coach; if(!c)return 0; const st=COACH_ST[c.st];
+  if(c.st==='youth')return S.age<=21?2:S.age<=24?1:S.age>=31?-2:S.age>=28?-1:0;
+  const ks=(isGK()?st.gk:st.ab).filter(k=>k in S.ab), v=ks.reduce((a,k)=>a+S.ab[k],0)/ks.length;
+  return clamp(Math.round((v-ovr())/3),-2,2); }
+const FIT_N=f=>['很不適合','不太適合','普通','適合','非常適合'][f+2];
+function coachLine(c){ c=c||S.coach; const f=coachFit(c); return `主帥 <b class="hl">${c.n}</b>（${COACH_ST[c.st].n}）・戰術適配 <b class="${f>0?'up':f<0?'dn':''}">${FIT_N(f)}</b>`; }
+/* 季前:換帥或冷板凳(一季最多一件) */
+function coachCheck(cont){
+  if(S.stage!=='PRO'||S.loan||S.skipMid){ cont(); return; }
+  if(!S.coach){ S.coach=newCoach(); cont(); return; }
+  const f0=coachFit(); if(f0)meter('trust',f0*2); /* 戰術合不合,每季慢慢反映在信任上 */
+  const LL=S.lastLg&&S.lastLg.club===S.club?S.lastLg:null, n=TEAMS[S.lv].length, bad=LL&&LL.rank>n*0.7, flop=LL&&S.clubTier===1&&LL.rank>4;
+  if(!S.newSign&&S.year-S.coach.y>=1&&chance(8+(S.relegated?30:0)+(bad?15:0)+(flop?12:0)+(S.year-S.coach.y>=4?8:0))){
+    const old=S.coach, c=newCoach(); while(c.st===old.st&&chance(50))c.st=pick(Object.keys(COACH_ST)); S.coach=c; const f=coachFit(c);
+    card('talk','換帥',`${old.n} 在 ${S.club} 執教 ${S.year-old.y} 年後下課。新主帥 <b class="hl">${c.n}</b> 上任，主打<b class="hl">${COACH_ST[c.st].n}</b>：「${COACH_ST[c.st].d}。」<br>${coachLine(c)}`);
+    S.trust=clamp(50+f*6,0,100); board();
+    const ks=c.st==='youth'?[]:(isGK()?COACH_ST[c.st].gk:COACH_ST[c.st].ab).filter(k=>k in S.ab&&S.ab[k]<80);
+    choose('新主帥上任 — 你的態度？',[
+      {t:'全力適應新戰術',main:true,s:ks.length?`${ks.slice(0,2).map(k=>ABL[k]).join('、')}小幅↑｜信任↑｜狀態小幅↓`:'信任↑｜狀態小幅↓',f:()=>{ const out=ks.slice(0,2).map(k=>loveGainTxt(k,3)); out.push(meter('trust',6),meter('form',-3)); card('good','適應新戰術',`你每天最早到訓練場，把新戰術一條一條背下來。${out.filter(Boolean).join('、')}`); cont(); }},
+      {t:'堅持自己的踢法',s:f>=0?'你本來就適合：信任↑、球迷↑':'風格不合：信任大幅↓',f:()=>{ const tx=f>=0?[meter('trust',5),meter('fans',2)]:[meter('trust',-10)];
+        card(f>=0?'good':'bad','堅持自我',f>=0?`${c.n} 看了一週訓練：「你不用改，照你的方式踢。」${tx.join('、')}`:`${c.n} 在戰術會議上點名你：「我的球隊不需要個人主義。」${tx.join('、')}`); cont(); }},
+      {t:'要求離隊',warn:true,s:'下次轉會窗更容易離開｜信任大幅↓',f:()=>{ S.wantOut=true; card('bad','要求離隊',`你告訴經紀人：「幫我找下一隊。」${meter('trust',-12)}`); cont(); }}]);
+    return; }
+  /* 冷板凳:信任低、預估角色是替補以下 */
+  const role=clamp(roleOf(ovr()-rivalTop()+trustGap())-S.roleAdj,0,3);
+  if(S.trust<40&&role>=2&&S.coachBench!==S.year&&chance(55)){ S.coachBench=S.year; const c=S.coach, f=coachFit(), p=clamp(40+f*12+(S.fans>=60?10:0),10,85);
+    card('talk','冷板凳',`季前熱身賽，你連續三場坐在板凳上。${c.n} 經過你身邊時沒有看你一眼。<br>${coachLine()}・教練信任 ${S.trust}`);
+    choose('冷板凳 — 你怎麼做？',[
+      {t:'私下找教練談',main:true,s:`成功率 ${p}%｜成功：信任大幅↑、角色升一級`,f:()=>{ if(chance(p)){ S.roleAdj=(S.roleAdj||0)+1; card('good','把話說開',`${c.n} 聽完後點點頭：「好，下週你先發。」${meter('trust',14)}`); }
+        else card('bad','談不攏',`${c.n} 只說了一句：「用訓練說服我。」${meter('trust',-4)}`); cont(); }},
+      {t:'用加練證明自己',s:'能力小幅↑｜信任↑｜疲勞',f:()=>{ const k=pick(GRP_AB[S.grp].filter(x=>S.ab[x]<80)); const out=[k?loveGainTxt(k,4):'',meter('trust',6)]; S.fatigue=clamp((S.fatigue||30)+10,0,100);
+        card('good','加練',`全隊收操後，你一個人留在場上。${out.filter(Boolean).join('、')}`); cont(); }},
+      {t:'接受媒體訪問抱怨',warn:true,s:'球迷↑｜信任大幅↓｜想離隊',f:()=>{ S.wantOut=true; card('bad','公開抱怨',`隔天的頭條：「${S.name}：我不知道教練要什麼。」${[meter('fans',6),meter('trust',-15)].join('、')}`); cont(); }}]);
+    return; }
+  cont(); }
 /* 位置審查:同大類或相鄰位置 OVR 高 4 以上,教練提議轉位 */
 function posReview(cont){
   if(S.skipMid||(S.stage==='YOUTH'&&S.stageYr<2)){ cont(); return; }
@@ -3506,12 +3551,13 @@ function signTo(of){
   const prev=S.club; /* v0.25 修正:原本先改 S.club 才比較,換隊判斷永遠不成立 */
   if(of.club!==prev)S.rivals=[]; /* 換隊就換一批競爭者 */
   S.stage='PRO'; S.lv=of.lv; S.club=of.club; S.clubTier=of.tier; S.loan=null;
-  if(of.club!==prev){ S.newSign=true; S.trust=50; } /* 新加盟第一個夏窗不會被賣、也沒人來談;教練信任重新開始 */
+  if(of.club!==prev){ S.newSign=true; S.coach=null; } /* 新加盟第一個夏窗不會被賣、也沒人來談;教練信任重新開始 */
   if(S.acad&&!S.acadOut&&of.club===S.acad.club&&!S.acadGrad)S.acadGrad=true; /* 學院出身升上一隊 */
   if(S.buyback&&of.club===S.buyback.club){ S.buyback=null; S.boughtBack=true;
     card('gold','回家了',`${of.club}行使當年的買回條款。走進熟悉的訓練基地，青訓教練站在門口等你：「我就知道你會回來。」`); }
   S.ct={yrs:of.yrs,mult:TIER_PAY[of.tier],lv:of.lv}; S.wantOut=false; S.relegated=false;
-  card('gold','簽約',`與 <b class="hl">${of.club}</b>（${LV[of.lv].n}・${TIERN[of.tier]}）簽下 <b class="hl">${of.yrs} 年</b>合約。`);
+  if(!S.coach){ S.coach=newCoach(); S.trust=clamp(50+coachFit()*5,0,100); }
+  card('gold','簽約',`與 <b class="hl">${of.club}</b>（${LV[of.lv].n}・${TIERN[of.tier]}）簽下 <b class="hl">${of.yrs} 年</b>合約。<br>${coachLine()}`);
   board(2);
 }
 /* 大學季末:世大運(奇數年)→ 大二、大三可提前轉職業 → 大四畢業 */
