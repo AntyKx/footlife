@@ -765,7 +765,7 @@ html.calm .htick span,html.calm .btn.shine::after{animation:none} html.calm .hti
 html.calm *,html.calm *::before,html.calm *::after{animation:none!important;transition:none!important}
 html.calm .var{display:none}
 </style>
-<script>(function(){ var t='soft',c=false; try{ t=localStorage.getItem('fl-theme')||'soft'; c=localStorage.getItem('fl-calm')==='1'; }catch(e){}
+<script>(function(){ var t='soft',c=false; try{ if(localStorage.getItem('fl-theme-v')!=='2'){ localStorage.setItem('fl-theme','soft'); localStorage.setItem('fl-theme-v','2'); } /* v0.25.6 所有人先重設為夜賽轉播一次 */ t=localStorage.getItem('fl-theme')||'soft'; c=localStorage.getItem('fl-calm')==='1'; }catch(e){}
   var h=document.documentElement; h.dataset.theme=t; if(t!=='classic')h.classList.add('th'); if(!/^(classic|day|sky)$/.test(t))h.classList.add('glow'); if(c)h.classList.add('calm'); })();</script>
 </head>
 <body>
@@ -868,7 +868,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.25.5';
+const APP_VER='v0.25.6';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
