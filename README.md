@@ -4,7 +4,7 @@
 
 ▶ **線上試玩：** <https://footlife-eta.vercel.app>（Vercel）｜<https://antykx.github.io/footlife/>（GitHub Pages）
 
-目前版本：**v0.26.1**（27 個國籍、48 個聯賽、850 支真實球隊；劇情、大賽決賽、洲際賽事與平衡持續擴充中）。
+目前版本：**v0.26.2**（27 個國籍、48 個聯賽、850 支真實球隊；劇情、大賽決賽、洲際賽事與平衡持續擴充中）。
 
 ## 📄 授權條款 (License)
 本專案採用 [CC BY-NC 4.0](http://creativecommons.org/licenses/by-nc/4.0/) 授權條款。

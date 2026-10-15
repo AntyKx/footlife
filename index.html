@@ -837,6 +837,28 @@ html.calm .hball,html.calm .lower3 .trk i,html.calm .hero-pitch .hp-flash circle
 .rsm-t .flag{width:16px;height:10.67px;vertical-align:-1px;margin-right:6px}
 .rsm>b{display:block;font-size:18px;margin-top:4px} .rsm p{font-size:13px;color:var(--dim);margin:2px 0 10px}
 .rsm-b{display:flex;gap:8px} .rsm-b .btn{flex:1;margin:0} .rsm-h{display:block;font-size:11.5px;color:var(--dim);margin-top:6px}
+/* ---------- v0.26.2 文字轉播 ---------- */
+.card.live{background:linear-gradient(180deg,color-mix(in srgb,var(--panel2) 70%,#000),var(--panel));border-color:var(--edge)}
+.lv-h{display:flex;align-items:center;gap:10px;margin:2px 0 8px}
+.lv-b{display:inline-flex;align-items:center;gap:5px;background:var(--bad);color:#fff;font:700 10.5px var(--num);letter-spacing:.15em;padding:1px 7px;border-radius:4px}
+.lv-b i{width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 1.4s steps(2) infinite}
+.lv-sc{display:flex;align-items:center;gap:8px;flex:1;min-width:0;font-size:13px} .lv-sc b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lv-sc em{font:800 17px var(--num);font-style:normal;color:var(--amber);background:var(--sub);border-radius:6px;padding:0 8px;white-space:nowrap}
+.lv-l p{display:grid;grid-template-columns:44px 1fr;gap:6px;font-size:13px;line-height:1.55;padding:4px 0;border-top:1px dashed color-mix(in srgb,var(--edge) 70%,transparent);opacity:0;animation:lvIn .35s ease forwards}
+.lv-l p:first-child{border-top:none} .lv-l p>span{font:700 13px var(--num);color:var(--dim);text-align:right}
+.lv-l p.g{background:color-mix(in srgb,var(--amber) 9%,transparent);border-radius:6px;padding-left:4px;padding-right:4px} .lv-l p.g.opp{background:color-mix(in srgb,var(--bad) 9%,transparent)}
+.lv-l p.g>span{color:var(--amber)} .lv-l p.g.opp>span{color:var(--bad)} .lv-l p.k>span{color:var(--amber)} .lv-l p.k{color:var(--amber)}
+@keyframes lvIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+html.calm .lv-l p{opacity:1;animation:none}
+.ft-sc{display:flex;align-items:center;justify-content:center;gap:12px;margin:4px 0 12px;font-size:14px;text-align:center} .ft-sc b{flex:1}
+.ft-sc em{font:800 30px var(--num);font-style:normal;color:var(--chalk);background:var(--sub);border-radius:8px;padding:0 14px;white-space:nowrap}
+.fts .st{display:grid;grid-template-columns:42px 1fr 42px;align-items:center;gap:8px;font-size:12px;margin:5px 0;position:relative;padding-top:13px}
+.fts .st em{position:absolute;top:0;left:0;right:0;text-align:center;font-style:normal;color:var(--dim);font-size:11.5px}
+.fts .st b{font:700 14px var(--num);text-align:center} .fts .st span{height:6px;border-radius:3px;background:color-mix(in srgb,var(--bad) 55%,var(--edge));overflow:hidden}
+.fts .st i{display:block;height:100%;background:var(--amber)}
+.ft-me{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:10px;border-top:1px solid var(--edge);font-size:13.5px}
+.ft-me b{margin-left:auto;font:800 24px var(--num);background:var(--sub);border-radius:8px;padding:0 10px} .ft-me b.up{color:var(--good)} .ft-me b.dn{color:var(--bad)}
+.ft-me em{font-style:normal;font-size:11.5px;background:var(--amber);color:var(--on-amber);border-radius:4px;padding:1px 7px;font-weight:700}
 html.calm *,html.calm *::before,html.calm *::after{animation:none!important;transition:none!important}
 html.calm .var{display:none}
 </style>
@@ -952,7 +974,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.26.1';
+const APP_VER='v0.26.2';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1843,24 +1865,86 @@ const CALL={G:['球進了！整座球場都在搖晃！','這腳射門可以放�
   O:['漂亮！這就是他的價值！','教練在場邊用力鼓掌！','不華麗，但非常聰明的處理！'],
   X:['可惜！就差那麼一點點！','機會溜走了，他抱著頭不敢相信。','這球處理得太急了。','對手讀懂了他的意圖。','教練在場邊攤開雙手。','看台上傳來一陣嘆息。']};
 const callLine=k=>{ const a=CALL[k]||CALL.X; return a[Math.floor(Math.random()*a.length)]; };
+/* ================= 比賽文字轉播(v0.26.2):大場面的逐分鐘直播、全場數據與評分;內容純裝飾(Math.random),比分與結果由原本的種子邏輯決定 ================= */
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1)), rpk=a=>a[Math.floor(Math.random()*a.length)];
+const LIVE_FLAV={
+  any:['{opp} 右路傳中，被 {me} 的後衛頂出底線，角球。','雙方在中場反覆爭奪，比賽節奏非常快。','{opp} 禁區外遠射，偏出右側立柱。','{me} 連續傳遞超過二十腳，看台響起「Olé」。',
+    '{opp} 的 10 號倒地，隊醫進場。','看台上的 {me} 球迷唱起隊歌，聲音蓋過了整座球場。','裁判吹罰越位，{opp} 的反擊被打斷。','{opp} 一次犯規吃到黃牌，教練在場邊抗議。',
+    '{me} 的角球被門將雙拳擊出。','{opp} 換人，派上一名速度型邊鋒。','VAR 檢查一次禁區內的接觸，判定不構成犯規。','{opp} 的自由球直接打在人牆上。','{me} 教練在場邊大聲指揮，要求壓上逼搶。','雨越下越大，草皮開始打滑。'],
+  out:['{you}在中場轉身擺脫兩人，被對手拉倒，對方吃到黃牌。','{you}的射門被後衛用身體擋出。','{you}和隊友踢牆配合，最後一傳稍微大了。','{you}一次長途奔襲，看台上響起掌聲。','{you}的頭球攻門被門將沒收。','{you}送出一記直塞，隊友單刀打偏。'],
+  gk:['{you}出擊沒收對方傳中，指揮後衛壓上。','{you}伸腳擋出近距離射門，觀眾倒吸一口氣。','{you}大腳開出，直接找到前場的隊友。','{you}對著後衛大喊，重新排好防線。'],
+  def:['{you}一記乾淨的鏟斷，教練在場邊握拳。','{you}頭球解圍，把球頂出禁區。','{you}貼身盯住對方前鋒，對方整個上半場沒摸到幾次球。']};
+function liveSay(t,c){ return t.replace(/\{me\}/g,c.me).replace(/\{opp\}/g,c.opp).replace(/\{you\}/g,`<b class="hl">${S.name}</b>`); }
+function liveMate(c){ const L=nameSet(c&&c.nt||S.stage!=='PRO'?S.nat:LV[S.lv].cty); return rpk(L[0])+rpk(L[1]); }
+/* 一段直播:從 c.t 到 to 分鐘,夾帶這段期間的進球 gl=[[分鐘,'me'|'opp',文字]] */
+function liveLines(c,to,gl){ const out=[], n=Math.max(1,Math.min(4,Math.round((to-c.t)/12))), used=new Set(), pool=isGK()?['any','any','gk']:S.grp==='DF'?['any','any','def','out']:['any','any','out'];
+  const ms=[...Array(n)].map(()=>rnd(c.t+1,Math.max(c.t+1,to-1))).sort((a,b)=>a-b);
+  ms.forEach(m=>{ let t; for(let k=0;k<6;k++){ t=rpk(LIVE_FLAV[rpk(pool)]); if(!used.has(t)&&!c.seen.has(t))break; } used.add(t); c.seen.add(t); out.push([m,'',liveSay(t,c)]); });
+  (gl||[]).forEach(g=>out.push(g)); out.sort((a,b)=>a[0]-b[0]); c.t=to; return out; }
+function liveCard(c,title,rows,sub){ const fm=m=>m>120?`120+${m-120}`:m>90&&!c.et?`90+${m-90}`:m;
+  return card('live',title,`<div class="lv-h"><span class="lv-b"><i></i>LIVE</span><span class="lv-sc"><b>${c.me}</b><em>${c.a} – ${c.b}</em><b>${c.opp}</b></span></div>`+
+    `<div class="lv-l">${rows.map(([m,k,t],i)=>`<p class="${k?'g '+k:''}" style="animation-delay:${(i*0.28).toFixed(2)}s"><span>${m==='HT'?'HT':m==='FT'?'FT':fm(m)+"'"}</span>${t}</p>`).join('')}</div>${sub?`<div class="lv-s">${sub}</div>`:''}`); }
+function liveFix(c,gl){ gl.sort((p,q)=>p[0]-q[0]); let sa=c.a-gl.filter(g=>g[1]==='me').length, sb=c.b-gl.filter(g=>g[1]==='opp').length; c.a0=sa; c.b0=sb;
+  gl.forEach(g=>{ if(g[1]==='me')sa++; else sb++; g[2]=g[2].replace(/<b>\d+–\d+<\/b>$/,`<b>${sa}–${sb}</b>`); }); }
+function liveAt(c,gl,m){ return `${c.a0+gl.filter(g=>g[1]==='me'&&g[0]<=m).length}–${c.b0+gl.filter(g=>g[1]==='opp'&&g[0]<=m).length}`; }
+function liveStart(tag,me,opp){ return {tag,me,opp,nt:me===NATS[S.nat].n,a:0,b:0,t:0,seen:new Set(),goals:[],ok:0,n:0,et:false}; }
+/* 關鍵時刻前的直播(由 bigMoment 的 fx.pre 呼叫) */
+function livePre(c,min,a,b){ const rows=[];
+  if(c.t===0)rows.push([1,'',`開球！${c.tag.replace(/・.*$/,'')}，<b>${c.me}</b> 對上 <b>${c.opp}</b>。${rpk(['看台座無虛席。','整座球場的閃光燈同時亮起。','兩隊球員在通道口互相擊掌。'])}`]);
+  const mins=typeof min==='number'?min:parseInt(String(min).replace(/\D/g,''))||60, hi=Math.max(c.t+1,Math.min(mins-2,90)), gl=[];
+  while(c.a<a)gl.push(liveGoal(c,'me',c.t+1,hi)); while(c.b<b)gl.push(liveGoal(c,'opp',c.t+1,hi)); c.last=null;
+  liveFix(c,gl);
+  if(c.t<45&&mins>46){ rows.push(...liveLines(c,45,gl.filter(g=>g[0]<=45))); rows.push(['HT','',`中場休息，<b>${liveAt(c,gl,45)}</b>。`]); c.t=46; }
+  if(mins>90&&c.t<90){ rows.push(...liveLines(c,90,gl.filter(g=>g[0]>c.t-1&&g[0]<=90))); c.et=true; rows.push([90,'',`九十分鐘結束，<b>${liveAt(c,gl,90)}</b>，進入延長賽。`]); c.t=91; }
+  rows.push(...liveLines(c,mins,gl.filter(g=>g[0]>=c.t)));
+  rows.push([mins,'k',`<b>關鍵時刻</b>——球來到了 ${S.name} 腳下……`]);
+  liveCard(c,`${c.tag}｜文字轉播`,rows); }
+/* 關鍵時刻的結果寫進直播(下一段開頭) */
+function liveMark(c,min,ok){ c.n++; if(ok)c.ok++; c.t=Math.max(c.t,typeof min==='number'?min:parseInt(String(min).replace(/\D/g,''))||c.t); c.last={ok,min:c.t,k:LAST_MO&&LAST_MO.k}; }
+/* 關鍵時刻之後的第一個進球:成功就記在你身上(或你發動的反擊),失手就是對手抓住機會 */
+function liveAfter(c,side){ const L=c.last; if(!L)return null; c.last=null;
+  if(side==='me'&&L.ok){ const t=L.k==='G'?`⚽ GOAL！<b class="hl">${S.name}</b> 把握住了！`:L.k==='A'?`⚽ GOAL！<b class="hl">${S.name}</b> 的妙傳，${liveMate(c)}推射破門！`:/^[SD]$/.test(L.k)?`⚽ GOAL！<b class="hl">${S.name}</b> 的${L.k==='S'?'撲救':'防守'}發動反擊，${liveMate(c)}破門！`:`⚽ GOAL！<b class="hl">${S.name}</b> 突破後橫傳，${liveMate(c)}推射破門！`; return [L.min+1,'me',t]; }
+  if(side==='opp'&&!L.ok)return [L.min+rnd(1,4),'opp',`⚽ <b>${c.opp}</b> 抓住機會進球。`];
+  c.last=L; return null; }
+function liveGoal(c,side,lo,hi){ const f=liveAfter(c,side); if(side==='me'){ c.a++; return f?[f[0],'me',f[2]+` <b>${c.a}–${c.b}</b>`]:[rnd(lo,hi),'me',`⚽ GOAL！<b>${c.me}</b> 進球，${liveMate(c)}破門。<b>${c.a}–${c.b}</b>`]; }
+  c.b++; return f?[f[0],'opp',f[2]+` <b>${c.a}–${c.b}</b>`]:[rnd(lo,hi),'opp',`⚽ <b>${c.opp}</b> 進球。<b>${c.a}–${c.b}</b>`]; }
+/* 終場:補齊到最終比分 x–y,出全場數據與評分 */
+function liveEnd(c,x,y,o){ o=o||{}; const rows=[], gl=[], end=o.et&&!o.pk?120:89;
+  while(c.a<x)gl.push(liveGoal(c,'me',c.t+1,Math.max(c.t+1,end))); while(c.b<y)gl.push(liveGoal(c,'opp',c.t+1,Math.max(c.t+1,end))); c.last=null;
+  liveFix(c,gl);
+  if(o.et){ c.et=true; rows.push(...liveLines(c,90,gl.filter(g=>g[0]<=90))); rows.push([90,'',`九十分鐘結束，<b>${liveAt(c,gl,90)}</b>，進入延長賽。`]); rows.push(...liveLines(c,120,gl.filter(g=>g[0]>90))); }
+  else rows.push(...liveLines(c,90,gl));
+  rows.push(['FT','',o.pk?`延長賽結束，雙方 ${c.a}–${c.b}，<b>點球大戰</b>決勝負。`:`終場哨響！<b>${c.me} ${c.a}–${c.b} ${c.opp}</b>`]);
+  liveCard(c,`${c.tag}｜下半場與終場`,rows);
+  if(o.pk)return; liveStats(c,o); }
+function liveStats(c,o){ const win=o.win, pos=clamp(50+(win?rnd(2,12):rnd(-12,2)),32,68), sh=[rnd(9,17)+c.a*2,rnd(6,14)+c.b*2], so=[Math.max(c.a,rnd(3,7)),Math.max(c.b,rnd(2,6))], co=[rnd(3,9),rnd(2,8)];
+  const rt=clamp(6.2+c.ok*0.85-(c.n-c.ok)*0.35+(win?0.4:-0.2)+(o.mvp?0.5:0)+(o.star?0.3:0),5.2,10).toFixed(1);
+  const bar=(n,l,r,u='')=>`<div class="st"><b>${l}${u}</b><span><i style="width:${Math.round(l/(l+r||1)*100)}%"></i></span><b>${r}${u}</b><em>${n}</em></div>`;
+  card('live fts',`${c.tag}｜全場數據`,`<div class="ft-sc"><b>${c.me}</b><em>${c.a} – ${c.b}</em><b>${c.opp}</b></div>`+
+    bar('控球率',pos,100-pos,'%')+bar('射門',sh[0],sh[1])+bar('射正',so[0],so[1])+bar('角球',co[0],co[1])+
+    `<div class="ft-me"><span>${S.name}・${DPN[S.dpos]}</span><b class="${rt>=7.5?'up':rt<6.3?'dn':''}">${rt}</b>${o.mvp?'<em>全場最佳</em>':''}</div>`); }
 /* 單次大舞台關鍵時刻(國際賽淘汰賽、盃賽決賽):done(ok) */
 function bigMoment(tag,me,opp,par,done,fx){ fx=fx||{}; /* fx:min/a/b 指定時間與比分、see 必看出對手、bonus 成功率加成、boldB 冒險加成、half 點數減半 */
   const sc=pickScene(), tell=pick(sc.tells), see=chance(scoutSee())||!!fx.see;
-  const min=fx.min??ri(55,118), a=fx.a??ri(0,1), b=fx.b??a, el=momentCard(tag,sc,tell,see,min>90?`延長 ${min}`:min,me,a,b,opp);
+  const min=fx.min??ri(55,118), a=fx.a??ri(0,1), b=fx.b??a, LC=fx.live||liveStart(tag,me,opp); livePre(LC,min,a,b);
+  const el=momentCard(tag,sc,tell,see,min>90?`延長 ${min}`:min,me,a,b,opp);
   MTAG=tag; MHALF=!!fx.half;
   choose(`${tag} — 你的選擇？`,sc.opts.map((o,i)=>{ const p=clamp(momentOdds(o,par)+(fx.bonus||0)+(o.m==='bold'?(fx.boldB||0):0)+sceneBonus(sc),5,95);
     return {t:o.t,main:o.m==='norm',warn:o.m==='bold',s:momentSub(o,p),
-      f:()=>resolveMoment(sc,o,i===tell.o,p,el,ok=>{ MTAG=null; MHALF=false; board(); done(ok); })}; }));
+      f:()=>resolveMoment(sc,o,i===tell.o,p,el,ok=>{ MTAG=null; MHALF=false; liveMark(LC,min,ok); board(); done(ok); })}; }));
 }
 function leagueMoment(last,i,tot,done){
   const sc=pickScene(), tell=pick(sc.tells), see=chance(scoutSee());
   const min=ri(8,90), a=ri(0,2), b=ri(0,2), opp=oppName(), me=S.stage==='PRO'?S.club:S.stage==='UNI'?S.uni:S.team;
   const dby=derbyOf(); let vs=opp;
   STK=S.stage!=='PRO'?null:dby&&chance(25)?(vs=dby[0],dby[1]):last&&S.clubTier===1&&chance(35)?'爭冠關鍵戰':last&&S.clubTier===3&&chance(35)?'保級生死戰':null;
+  const LC=STK?liveStart(STK,me,vs):null; if(LC)livePre(LC,min,a,b);
   const el=momentCard(STK?'關鍵時刻・'+STK:'關鍵時刻',sc,tell,see,min,me,a,b,vs);
   choose(`關鍵時刻 — 你的選擇？（季中第 ${i}/${tot} 場｜${STK==='爭冠關鍵戰'?'結果直接影響奪冠機率':STK==='保級生死戰'?'結果直接影響降級機率':'成功讓球隊排名往上'}）`,sc.opts.map((o,j)=>{ const p=clamp(momentOdds(o)+sceneBonus(sc),5,95);
     return {t:o.t,main:o.m==='norm',warn:o.m==='bold',s:momentSub(o,p),
-      f:()=>resolveMoment(sc,o,j===tell.o,p,el,ok=>{ const M=S.lgMo||(S.lgMo={ok:0,ng:0,stk:null}); ok?M.ok++:M.ng++; if(STK==='爭冠關鍵戰'||STK==='保級生死戰')M.stk={t:STK,ok}; STK=null; board(); done(); })}; }));
+      f:()=>resolveMoment(sc,o,j===tell.o,p,el,ok=>{ const M=S.lgMo||(S.lgMo={ok:0,ng:0,stk:null}); ok?M.ok++:M.ng++; if(STK==='爭冠關鍵戰'||STK==='保級生死戰')M.stk={t:STK,ok};
+        if(LC){ liveMark(LC,min,ok); const up=Math.random()<.5?1:0, x=ok?Math.max(a+1,b+up):a, y=ok?b:Math.max(b+up,a===b?b+1:b); liveEnd(LC,Math.max(x,a),Math.max(y,b),{win:x>y}); }
+        STK=null; board(); done(); })}; }));
 }
 /* v0.24 情境特質加成:點球專家、德比之王、歐戰之夜、大賽恐懼 */
 const BIG_RE=/歐冠|歐霸|歐協聯|亞冠|自由盃|南美盃|中北美冠軍盃|非洲冠軍聯賽|非洲聯合會盃|世界盃|國家盃|美洲盃|亞洲盃|金盃賽|世俱盃|奧運/;
@@ -1881,8 +1965,9 @@ function trackMomentTraits(sc,ok,sub){ const T=S.traits, inc=k=>(S[k]=(S[k]||0)+
   if(ok&&sub&&S.age>=20&&inc('cSub')>=8&&!T.supersub)traitCard('supersub','第八次替補登場改變比賽。教練說：「你是我最好的武器。」——<b class="hl">替補身分時賽季評分 +0.2</b>。');
 }
 const FOUL_RE=/鏟|犯規|上搶|斷球|出腳|撲搶|硬吃|貼上去|撲向腳下|撲向持球者|衝出去封堵/;
+let LAST_MO=null;
 function resolveMoment(sc,o,read,p,el,next){
-  const ok=chance(clamp(p+(read?18:0),5,97)), m=o.m;
+  const ok=chance(clamp(p+(read?18:0),5,97)), m=o.m; LAST_MO={k:o.k,ok};
   const mag=momentMag(o);
   if(m==='safe'&&ok)S.cntSaveWin++;
   if(m==='bold'){ if(ok)S.cntBoldWin++; else S.cntBoldFail++; }
@@ -3740,7 +3825,8 @@ function finalSeries(c,done){
     {t:'早早上床睡覺',s:'狀態↑｜決賽關鍵時刻成功率 +4%',f:()=>{ meter('form',5); go({bonus:4}); }},
     {t:'跟教練組再看一次對手錄影',main:true,s:'決賽中一定看得出對手的意圖',f:()=>go({see:true})},
     {t:mn?`打電話給恩師 ${mn}`:'打電話回家',s:'冒險選擇成功率 +10%',f:()=>go({boldB:10})}]);
-  function go(fx){
+  let LC=null;
+  function go(fx){ LC=liveStart(`${c.Y} ${c.comp}決賽`,c.me,c.opp); fx={...fx,live:LC};
     bigMoment(`${c.Y} ${c.comp}決賽・上半場`,c.me,c.opp,c.par,ok1=>{
       bigMoment(`${c.Y} ${c.comp}決賽・下半場`,c.me,c.opp,c.par,ok2=>settle(ok1,ok2),{...fx,min:ri(80,89),a:ok1?1:0,b:ok1?0:1});
     },{...fx,min:ri(18,44),a:0,b:0});
@@ -3750,12 +3836,14 @@ function finalSeries(c,done){
     if(n===0&&!chance(clamp(Math.round(c.base*30),5,25)))return finish(false,ri(0,1),ri(2,3),false,false);
     if(n===0)return finish(true,2,1,false,false,'你下場後，替補上陣的隊友在延長賽打進致勝球。');
     const s=n===2?2:1;
+    liveEnd(LC,s,s,{et:true,pk:true});
     card('talk',`${c.Y} ${c.comp}決賽｜延長賽`,`九十分鐘戰成 ${s}–${s}。延長賽三十分鐘，雙方都跑到抽筋，誰也沒能再破門——<b class="hl">點球大戰</b>。`);
     pkShootout(c,(win,mine)=>finish(win,s,s,true,mine));
   }
   function finish(win,x,y,pk,star,note){
     if(win&&S.traits.bigfear){ removeTrait('bigfear'); card('good','心魔解除','捧起獎盃的那一刻，「大賽恐懼」的標籤被撕掉了。'); }
     const sc=`${c.me} ${x}–${y} ${c.opp}${pk?'（點球大戰）':''}`, mvp=win&&!!star&&chance(pk?50:35);
+    if(LC){ if(pk)liveStats(LC,{win,mvp,star}); else liveEnd(LC,x,y,{win,mvp,star,et:!!note}); }
     if(win){
       const cheer={世界盃:`你把${tr}高高舉過頭頂。${NATS[S.nat].n}的街頭，此刻一定已經瘋了。`,歐冠:`隊長把${tr}交到你手上，你轉身面向看台，彩帶從天而降。`,
         亞冠:`${tr}在燈光下閃閃發亮，你把它抱在胸前，久久不肯放下。`,亞洲盃:`${tr}的重量比想像中更重，那是整個國家的期待。`,奧運:'國歌響起，你低頭看著胸前的金牌，眼淚止不住。'}[c.comp]||`你捧起了${tr}。`;
