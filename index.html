@@ -868,7 +868,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.25.4';
+const APP_VER='v0.25.5';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1219,12 +1219,14 @@ function step(fn){
 function syncRev(){ const b=$('btn-rev'); if(b)b.textContent=$('log').classList.contains('review')?'回到目前':'回顧'; }
 function toggleReview(){ const L=$('log'); L.classList.toggle('review'); syncRev();
   if(L.classList.contains('review')&&SCR)SCR.scrollIntoView({block:'start'}); else scrollBottom(); }
+const NT_TITLE=/國家隊|世界盃|亞洲盃|美洲盃|歐洲國家盃|非洲國家盃|金盃賽|奧運|亞運|東亞錦標賽|東協錦標賽|世大運|資格賽|國家英雄/;
 function card(cls,title,html){ const d=document.createElement('div');
   /* 嚴重的壞事用紅牌;關鍵時刻與對話卡翻牌進場;大喜事放彩帶 */
   if(/\bbad\b/.test(cls)&&/重傷|降級|道歉無效|離婚|拒絕放人|落選/.test(title||''))cls+=' red';
   if(/moment|talk/.test(cls))cls+=' flip';
   d.className='card '+cls;
-  d.innerHTML=(title?`<h4>${title}</h4>`:'')+html; logTarget().appendChild(d);
+  const nf=title&&typeof S!=='undefined'&&S&&typeof flagSVG==='function'&&NT_TITLE.test(title)&&!/世俱盃/.test(title)?flagSVG(S.nat):''; /* v0.25.5 國家隊卡片加國旗 */
+  d.innerHTML=(title?`<h4>${nf}${title}</h4>`:'')+html; logTarget().appendChild(d);
   if(/gold/.test(cls)&&/冠軍|個人獎項|升級|金牌|世界盃資格賽|名人堂/.test(title||''))confetti();
   if(/\b(gold|red)\b/.test(cls)&&title)sideAdd(title,/red/.test(cls)?'red':'gold',d,d.textContent.slice(title.length));
   scrollBottom(); return d; }
@@ -4210,7 +4212,11 @@ function epilogue(ev,chs,hb){
   return s.join('<br>');
 }
 /* 結算圖:畫在 canvas 上,版面比照棒球版 */
-function shareImage(ev,out){
+function shareImage(ev,out){ /* v0.25.5 先把國旗 SVG 轉成圖片再畫 */
+  const img=new Image(); let done=false; const go=ok=>{ if(done)return; done=true; drawShare(ev,out,ok?img:null); }; setTimeout(()=>go(false),1500);
+  img.onload=()=>go(true); img.onerror=()=>go(false);
+  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 20" width="90" height="60">${FLAG[S.nat]||''}</svg>`); }
+function drawShare(ev,out,flag){
   const W=920, PAD=34, scale=2, gk=isGK(), tot=careerTotals();
   const cv=document.createElement('canvas'), c=cv.getContext('2d');
   /* 各聯賽累積 */
@@ -4231,7 +4237,8 @@ function shareImage(ev,out){
   c.fillStyle='#8b93b0'; c.font='13px sans-serif'; c.fillText('F o o t L i f e ・ 引 退 紀 念',PAD,30);
   c.fillStyle='#ffcf4a'; c.font='bold 36px sans-serif'; c.fillText(S.name,PAD,52);
   c.fillStyle='#eef1f8'; c.font='15px sans-serif';
-  c.fillText(`${NATS[S.nat].n}｜${DPN[S.dpos]}｜${S.peakType||playerType()}｜${pro.length?pro[0].y+'–'+(pro.at(-1).y+1):'未登上職業舞台'}｜引退時 ${S.age} 歲`,PAD,98);
+  let fx=PAD; if(flag){ c.drawImage(flag,PAD,98,27,18); c.strokeStyle='#00000066'; c.lineWidth=1; c.strokeRect(PAD+.5,98.5,26,17); fx=PAD+35; }
+  c.fillText(`${NATS[S.nat].n}｜${DPN[S.dpos]}｜${S.peakType||playerType()}｜${pro.length?pro[0].y+'–'+(pro.at(-1).y+1):'未登上職業舞台'}｜引退時 ${S.age} 歲`,fx,98);
   let y=130;
   const hr=()=>{ c.strokeStyle='#2a3354'; c.lineWidth=1; c.beginPath(); c.moveTo(PAD,y); c.lineTo(W-PAD,y); c.stroke(); y+=12; };
   const title=t=>{ c.fillStyle='#8b93b0'; c.font='bold 13px sans-serif'; c.fillText(t,PAD,y); y+=22; };
@@ -4256,7 +4263,7 @@ function shareImage(ev,out){
   lgs.forEach(k=>{ const b=S.stats[k], rs=S.log.filter(r=>r.lv===k&&r.st.App), avg=rs.length?(rs.reduce((s,r)=>s+r.st.Rt,0)/rs.length).toFixed(2):'-';
     row([LV[k].n,b.yr,b.App,b.Min,gk?b.CS:b.G,gk?b.GA:b.A,avg]); });
   row(['合計',pro.length,tot.App,'',gk?tot.CS:tot.G,gk?tot.GA:tot.A,'']); y+=6;
-  if(S.caps){ hr(); c.fillStyle='#eef1f8'; c.font='14px sans-serif'; c.fillText(`${NATS[S.nat].n}國家隊：出賽 ${S.caps} 場${gk?'':`、進 ${S.intlG} 球`}`,PAD,y); y+=32; }
+  if(S.caps){ hr(); c.fillStyle='#eef1f8'; c.font='14px sans-serif'; let nx=PAD; if(flag){ c.drawImage(flag,PAD,y-1,24,16); nx=PAD+32; } c.fillText(`${NATS[S.nat].n}國家隊：出賽 ${S.caps} 場${gk?'':`、進 ${S.intlG} 球`}`,nx,y); y+=32; }
   if(honors.length){ hr(); title(`生涯榮譽（${honors.length} 項）`);
     c.font='13px sans-serif'; c.fillStyle='#a9b8ff'; const y0=y; let cy=y0;
     blocks.forEach((b,i)=>{ if(i===half)cy=y0; const x=PAD+(i>=half?colW:0); b.forEach(l=>{ c.fillText(l,x,cy); cy+=23; }); });
