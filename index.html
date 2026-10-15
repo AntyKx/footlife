@@ -757,6 +757,11 @@ html.th .hero-pitch g.hp-b,html.th .hero-pitch g.hp-opp,html.th .hero-pitch g.hp
 @keyframes shine{0%,55%{left:-40%}100%{left:130%}}
 @media (max-width:600px){ .hero-pitch{display:block;max-width:100%} .htick{display:none} #start h1 .en{font-size:64px} .seg.pos button small{white-space:normal;font-size:9.5px;line-height:1.3} .field label .lg{display:none} }
 html.calm .htick span,html.calm .btn.shine::after{animation:none} html.calm .htick span{padding-left:0}
+.flag{display:inline-block;width:20px;height:13.33px;border-radius:2px;box-shadow:0 0 0 1px #0000004d;vertical-align:-2px;flex:none;margin-right:5px}
+.flag.big{width:36px;height:24px;margin:0 8px 0 0;border-radius:3px}
+.nn{display:inline-flex;align-items:center;gap:0}
+#nat-desc .nd-flag{display:flex;align-items:center;flex:0 0 auto}
+#bd-name small .flag{width:16px;height:10.67px;vertical-align:-1px;margin-right:4px}
 html.calm *,html.calm *::before,html.calm *::after{animation:none!important;transition:none!important}
 html.calm .var{display:none}
 </style>
@@ -863,7 +868,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.25.3';
+const APP_VER='v0.25.4';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1248,7 +1253,7 @@ function teamLabel(){
 function setNum(id,v){ const el=$(id), t=String(v); if(el.textContent===t)return; const first=el.textContent==='';
   el.textContent=t; if(!first){ el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); } }
 function board(phase){ if(phase!==undefined)S.ph=phase; /* 不帶參數時沿用目前階段 */
-  $('bd-name').innerHTML=`${S.name}<small>${NATS[S.nat].n}·${DPN[S.dpos]}·${playerType()}${S.traits.genius?' ★':''}</small>`;
+  $('bd-name').innerHTML=`${S.name}<small>${flagSVG(S.nat)}${NATS[S.nat].n}·${DPN[S.dpos]}·${playerType()}${S.traits.genius?' ★':''}</small>`;
   const nb=$('bd-num'); nb.textContent=jersey(); nb.style.background=clubColor(); $('board').style.setProperty('--club',clubColor()); document.documentElement.style.setProperty('--club',clubColor());
   $('bd-lg').textContent=S.stage==='PRO'?LV[S.lv].n:S.stage==='UNI'?'大學':'青訓';
   $('bd-team').textContent=teamLabel();
@@ -4284,6 +4289,39 @@ function shareImage(ev,out){
     dl(); };
 }
 
+/* ================= 國旗(v0.25.4):SVG 簡化版,30×20;Windows 不支援國旗表情符號所以自己畫 ================= */
+const _st=(cx,cy,r,f)=>{ let d=''; for(let i=0;i<10;i++){ const a=-Math.PI/2+i*Math.PI/5, rr=i%2?r*0.4:r; d+=(i?'L':'M')+(cx+Math.cos(a)*rr).toFixed(2)+' '+(cy+Math.sin(a)*rr).toFixed(2); } return `<path d="${d}Z" fill="${f}"/>`; };
+const _h=(cs)=>{ const h=20/cs.length; return cs.map((c,i)=>`<rect y="${(i*h).toFixed(2)}" width="30" height="${(h+0.05).toFixed(2)}" fill="${c}"/>`).join(''); };
+const _v=(cs)=>{ const w=30/cs.length; return cs.map((c,i)=>`<rect x="${(i*w).toFixed(2)}" width="${(w+0.05).toFixed(2)}" height="20" fill="${c}"/>`).join(''); };
+const FLAG={
+  TW:`<rect width="30" height="20" fill="#d7141a"/><rect width="15" height="10" fill="#1f3a93"/><circle cx="7.5" cy="5" r="2.8" fill="#fff"/><circle cx="7.5" cy="5" r="1.9" fill="#1f3a93"/><circle cx="7.5" cy="5" r="1.5" fill="#fff"/>`,
+  JP:`<rect width="30" height="20" fill="#fff"/><circle cx="15" cy="10" r="6" fill="#bc002d"/>`,
+  KR:`<rect width="30" height="20" fill="#fff"/><circle cx="15" cy="10" r="5" fill="#0047a0"/><path d="M10 10a5 5 0 0 1 10 0a2.5 2.5 0 0 1-5 0a2.5 2.5 0 0 0-5 0Z" fill="#cd2e3a"/><g stroke="#000" stroke-width=".9"><path d="M5 4.5l2.5 2.5M4 5.5l2.5 2.5M25 4.5l-2.5 2.5M26 5.5l-2.5 2.5M5 15.5l2.5-2.5M4 14.5l2.5-2.5M25 15.5l-2.5-2.5M26 14.5l-2.5-2.5"/></g>`,
+  AU:`<rect width="30" height="20" fill="#012169"/><path d="M0 0L15 10M15 0L0 10" stroke="#fff" stroke-width="2"/><path d="M7.5 0v10M0 5h15" stroke="#fff" stroke-width="3"/><path d="M7.5 0v10M0 5h15" stroke="#c8102e" stroke-width="1.6"/>${_st(7.5,15,2.2,'#fff')}${_st(23,4.5,1.2,'#fff')}${_st(26,9.5,1.2,'#fff')}${_st(22,15.5,1.2,'#fff')}${_st(19.5,8.5,1.2,'#fff')}`,
+  CN:`<rect width="30" height="20" fill="#de2910"/>${_st(5,5,3,'#ffde00')}${_st(10,2,1,'#ffde00')}${_st(12,4,1,'#ffde00')}${_st(12,7,1,'#ffde00')}${_st(10,9,1,'#ffde00')}`,
+  VN:`<rect width="30" height="20" fill="#da251d"/>${_st(15,10.5,6,'#ffff00')}`,
+  TH:_h(['#a51931','#f4f5f8','#2d2a4a','#2d2a4a','#f4f5f8','#a51931']),
+  EN:`<rect width="30" height="20" fill="#fff"/><path d="M15 0v20M0 10h30" stroke="#ce1124" stroke-width="4"/>`,
+  ES:`<rect width="30" height="20" fill="#aa151b"/><rect y="5" width="30" height="10" fill="#f1bf00"/>`,
+  FR:_v(['#002395','#fff','#ed2939']),
+  DE:_h(['#000','#dd0000','#ffce00']),
+  IT:_v(['#009246','#fff','#ce2b37']),
+  PT:`<rect width="30" height="20" fill="#ff0000"/><rect width="12" height="20" fill="#006600"/><circle cx="12" cy="10" r="4" fill="#ffcc00"/><circle cx="12" cy="10" r="2.6" fill="#ff0000"/><rect x="10.8" y="8.4" width="2.4" height="3.2" rx=".4" fill="#fff"/>`,
+  NL:_h(['#ae1c28','#fff','#21468b']),
+  HR:_h(['#ff0000','#fff','#171796'])+`<rect x="12" y="5.5" width="6" height="7" fill="#fff" stroke="#171796" stroke-width=".5"/><path d="M12 5.5h1.5v1.4H12zM15 5.5h1.5v1.4H15zM13.5 6.9H15v1.4h-1.5zM16.5 6.9H18v1.4h-1.5zM12 8.3h1.5v1.4H12zM15 8.3h1.5v1.4H15zM13.5 9.7H15v1.4h-1.5zM16.5 9.7H18v1.4h-1.5zM12 11.1h1.5v1.4H12zM15 11.1h1.5v1.4H15z" fill="#ff0000"/>`,
+  BR:`<rect width="30" height="20" fill="#009c3b"/><path d="M15 2.5L27 10L15 17.5L3 10Z" fill="#ffdf00"/><circle cx="15" cy="10" r="4.6" fill="#002776"/><path d="M10.6 9.2q4.4-1.4 8.8 1.6" stroke="#fff" stroke-width=".8" fill="none"/>`,
+  AR:_h(['#74acdf','#fff','#74acdf'])+`<circle cx="15" cy="10" r="2.2" fill="#f6b40e"/>`,
+  UY:`<rect width="30" height="20" fill="#fff"/>${[2.2,6.6,11,15.4].map(y=>`<rect y="${y}" width="30" height="2.2" fill="#0038a8"/>`).join('')}<rect width="11" height="11" fill="#fff"/><circle cx="5.5" cy="5.5" r="3" fill="#fcd116"/>`,
+  CO:`<rect width="30" height="20" fill="#ce1126"/><rect width="30" height="15" fill="#003893"/><rect width="30" height="10" fill="#fcd116"/>`,
+  US:`<rect width="30" height="20" fill="#fff"/>${[0,1,2,3,4,5,6].map(i=>`<rect y="${(i*20/6.5).toFixed(2)}" width="30" height="1.54" fill="#b22234"/>`).join('')}<rect width="13" height="10.8" fill="#3c3b6e"/><g fill="#fff">${[[2,2],[5,2],[8,2],[11,2],[3.5,4.5],[6.5,4.5],[9.5,4.5],[2,7],[5,7],[8,7],[11,7],[3.5,9.3],[6.5,9.3],[9.5,9.3]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r=".55"/>`).join('')}</g>`,
+  MX:_v(['#006847','#fff','#ce1126'])+`<circle cx="15" cy="10" r="2.6" fill="#8c5a2b"/><circle cx="15" cy="10" r="1.3" fill="#4a7a2a"/>`,
+  CA:`<rect width="30" height="20" fill="#fff"/><rect width="7.5" height="20" fill="#d52b1e"/><rect x="22.5" width="7.5" height="20" fill="#d52b1e"/><path d="M15 4.5l1 2 1.6-.6-.6 3 1.8-1.2.5 1.4 1.6-.3-1 2.2.8.4-3.4 2.6.3 1.6H15.4v2h-.8v-2h-2.2l.3-1.6-3.4-2.6.8-.4-1-2.2 1.6.3.5-1.4 1.8 1.2-.6-3 1.6.6Z" fill="#d52b1e"/>`,
+  MA:`<rect width="30" height="20" fill="#c1272d"/><path d="M15 5.2L17.9 14L10.4 8.6H19.6L12.1 14Z" fill="none" stroke="#006233" stroke-width="1"/>`,
+  SN:_v(['#00853f','#fdef42','#e31b23'])+_st(15,10.3,3,'#00853f'),
+  NG:_v(['#008751','#fff','#008751']),
+  EG:_h(['#ce1126','#fff','#000'])+`<path d="M15 7.6l1.6 1.2-.4 2.4h-2.4l-.4-2.4Z" fill="#c09300"/>`,
+  CV:`<rect width="30" height="20" fill="#003893"/><rect y="10" width="30" height="4" fill="#fff"/><rect y="11.3" width="30" height="1.4" fill="#cf2027"/><g fill="#f7d116">${[...Array(10)].map((_,i)=>{ const a=i*Math.PI/5; return `<circle cx="${(11+Math.cos(a)*4.6).toFixed(2)}" cy="${(12+Math.sin(a)*4.6).toFixed(2)}" r=".7"/>`; }).join('')}</g>`};
+const flagSVG=(k,cls)=>FLAG[k]?`<svg class="flag${cls?' '+cls:''}" viewBox="0 0 30 20" aria-hidden="true">${FLAG[k]}</svg>`:'';
 /* ================= 成就(v0.24):不影響數值,跨生涯收藏在瀏覽器 ================= */
 /* lv:分級門檻(值 ≥ 門檻即達該級);沒有 lv 的是單一成就(值 > 0 即達成) */
 const ACH_TIER=['銅','銀','金'], ACH_RAR={c:'常見',r:'稀有',e:'史詩',l:'傳說'};
@@ -4414,9 +4452,10 @@ $('bd-abt').onclick=function(){ const on=$('bd-ab').classList.toggle('open'); /*
 try{ if(localStorage.getItem('fl_abshut')){ $('bd-ab').classList.remove('open'); $('bd-abt').textContent='展開全部能力 ▾'; } }catch(e){}
 /* v0.25.3 首頁:國籍按鈕下方的國家隊實力燈號、國籍說明卡 */
 document.querySelectorAll('#seg-nat button').forEach(b=>{ const n=NATS[b.dataset.v]; if(!n)return; const lit=5-n.tier;
+  b.innerHTML=`<span class="nn">${flagSVG(b.dataset.v)}${b.textContent}</span>`;
   b.insertAdjacentHTML('beforeend',`<span class="tdots">${[0,1,2,3,4].map(i=>`<i class="${i<lit?'on':''}"></i>`).join('')}</span>`); });
 function natDesc(){ const n=NATS[selNat], lit=5-n.tier;
-  $('nat-desc').innerHTML=`<span><small>國家隊實力</small><b>${NAT_TIERN[n.tier]}</b><em class="tdots">${[0,1,2,3,4].map(i=>`<i class="${i<lit?'on':''}"></i>`).join('')}</em></span>`+
+  $('nat-desc').innerHTML=`<span class="nd-flag">${flagSVG(selNat,'big')}<b>${n.n}</b></span><span><small>國家隊實力</small><b>${NAT_TIERN[n.tier]}</b><em class="tdots">${[0,1,2,3,4].map(i=>`<i class="${i<lit?'on':''}"></i>`).join('')}</em></span>`+
     `<span><small>世界盃基準出線</small><b>${n.wc}%</b></span><span><small>本土聯賽</small><b>${n.home.map(k=>LV[k].n).join('、')}</b></span>${n.mil?'<span><small>兵役</small><b>有</b></span>':''}`; }
 { try{ const sv=JSON.parse(localStorage.getItem('fl-ach')||'{}'), k=Object.keys(sv).filter(x=>x[0]!=='_').length; const el=document.getElementById('start-ach'); if(el&&typeof ACH!=='undefined')el.textContent=`🏆 成就收藏 ${k}/${ACH.length}`; }catch(e){} }
 $('btn-rev').onclick=toggleReview; $('btn-side').onclick=()=>$('side').classList.add('open'); $('side-x').onclick=()=>$('side').classList.remove('open');
