@@ -974,7 +974,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.26.4';
+const APP_VER='v0.26.5';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1366,7 +1366,7 @@ function sideDash(){ const D=$('side-dash'); if(!D||typeof S==='undefined'||!S)r
     const LL=S.lastLg&&S.lastLg.y===last.y&&S.lastLg.club===baseTm(last.tm)?S.lastLg:null;
     h+=sec(`上季 ${seasonLabel(last.y)}・${baseTm(last.tm)}`,`<div class="dk">${kp.map(([n,v])=>`<span><b>${v}</b><small>${n}</small></span>`).join('')}</div>${LL?`<p>聯賽第 <b>${LL.rank}</b> 名${LL.q?`・取得${LL.q}資格`:''}</p>`:''}`); }
   if(S.stage==='PRO'&&S.ct&&S.lv){ const sal=salaryFor(S.lv,ovr()-LV[S.lv].par,S.ct.mult);
-    h+=sec('合約與國家隊',`<p>${S.club}${S.loan?'（租借）':''}・合約剩 <b>${S.ct.yrs}</b> 年</p><p>年薪約 <b>${fmtMoney(sal)}</b>・身價約 ${fmtMoney(marketValue())}</p>${S.coach?`<p>${coachLine()}</p>`:''}<p>${flagSVG(S.nat)}${S.ntOn?'<b class="up">國家隊入選中</b>':'國家隊未入選'}${S.caps?`・${S.caps} 場${gk?'':` ${S.intlG} 球`}`:''}</p>`); }
+    h+=sec('合約與國家隊',`<p>${S.club}${S.loan?'（租借）':''}・合約剩 <b>${S.ct.yrs}</b> 年</p><p>年薪約 <b>${fmtMoney(sal)}</b>・身價約 ${fmtMoney(marketValue())}</p>${S.coach?`<p>${coachLine()}</p>`:''}${S.agent?`<p>經紀人 ${S.agent.n}（${AGENT[S.agent.k].n}）</p>`:''}<p>${flagSVG(S.nat)}${S.ntOn?'<b class="up">國家隊入選中</b>':'國家隊未入選'}${S.caps?`・${S.caps} 場${gk?'':` ${S.intlG} 球`}`:''}</p>`); }
   else h+=sec(S.stage==='UNI'?'大學':'青訓',`<p>${S.stage==='UNI'?S.uni:S.team}${S.acad&&!S.acadOut?`・${S.acad.club}學院`:''}</p>`);
   if(pro.length){ const t=pro.reduce((a,r)=>{ a.G+=r.st.G||0; a.CS+=r.st.CS||0; a.App+=r.st.App||0; return a; },{G:0,CS:0,App:0});
     h+=sec('生涯',`<p>職業 <b>${pro.length}</b> 季・${new Set(pro.filter(r=>!r.loan).map(r=>r.tm)).size} 隊・出場 ${t.App}・${gk?`零封 ${t.CS}`:`進球 ${t.G}`}</p><p>榮譽 <b>${S.honors.length}</b> 項${S.honors.filter(x=>/冠軍（/.test(x)).length?`・冠軍 ${S.honors.filter(x=>/冠軍（/.test(x)).length} 座`:''}</p>`); }
@@ -1992,7 +1992,7 @@ function resolveMoment(sc,o,read,p,el,next){
   const svg=el.querySelector('svg'), ball=svg.querySelector('.ballp'), P=sc.pos;
   const def=['S','D'].includes(o.k)||sc.g.includes('GK');
   const end=ok?o.to:(o.k==='G'?[o.to[0]+(o.to[0]>=150?34:-34),-6]:def?[150+(o.to[0]>=150?-12:12),-3]:((P.opp||[])[0]||[150,120]));
-  setTimeout(()=>{ ball.style.transform=`translate(${end[0]-P.ball[0]}px,${end[1]-P.ball[1]}px)`; if(ok&&o.k==='G'||!ok&&def)svg.classList.add('hit'); },40);
+  setTimeout(()=>{ if(!ball)return; ball.style.transform=`translate(${end[0]-P.ball[0]}px,${end[1]-P.ball[1]}px)`; if(ok&&o.k==='G'||!ok&&def)svg.classList.add('hit'); },40);
   el.querySelector('.mres').innerHTML=`<b class="${ok?'up':'dn'}">${ok?'✔ ':'✘ '}${ok?o.ok:o.ng}</b>${ok&&MCTX.clutch&&o.k!=='K'?`<span class="readok">${MCTX.clutch}！</span>`:''}${read&&ok?'<span class="readok">讀對了對手的習慣！</span>':''}<br><span class="fx">${out.filter(Boolean).join('｜')}</span><div class="call">🎙 ${callLine(ok?(CALL[o.k]?o.k:'O'):'X')}</div>`;
   el.classList.add(ok?'won':'lost');
   sideAdd((MTAG||(STK?'關鍵時刻・'+STK:'關鍵時刻'))+'｜'+sc.t,ok?'won':'lost',el,(ok?'✔ ':'✘ ')+(ok?o.ok:o.ng));
@@ -2864,10 +2864,10 @@ function phasePre(){
   /* 身體警訊(v0.21.1):35 歲(門將 37)以上、能力已跟不上球隊水準,有機會在季前就決定引退 */
   if(S.stage==='PRO'&&!S.loan&&!S.skipMid&&S.age>=(isGK()?37:35)&&ovr()<curPar()-2&&chance(60)){
     card('bad','身體警訊',`季前體測，你的數據是全隊倒數。隊醫看著報告沉默了很久：「${S.name}，你的身體在跟你說話。」<br>綜合能力 ${ovr()}，球隊水準約 ${curPar()}。`);
-    choose('身體警訊 — 你的決定？',[{t:'再拚一季',main:true,s:'狀態小幅↓',f:()=>{ meter('form',-4); posReview(()=>squadReview(()=>coachCheck(training))); }},
+    choose('身體警訊 — 你的決定？',[{t:'再拚一季',main:true,s:'狀態小幅↓',f:()=>{ meter('form',-4); agentCheck(()=>posReview(()=>squadReview(()=>coachCheck(training)))); }},
       {t:'就在這裡畫下句點',warn:true,s:'季前宣布引退',f:()=>endGame(`季前體測後，在 ${S.year} 年夏天宣布引退。`)}]);
     return; }
-  posReview(()=>squadReview(()=>coachCheck(training)));
+  agentCheck(()=>posReview(()=>squadReview(()=>coachCheck(training))));
 }
 
 /* ================= 教練(v0.26.3):每支職業球隊有一位主帥,戰術風格決定你適不適合;換帥、冷板凳都要你做選擇 ================= */
@@ -2913,6 +2913,23 @@ function coachCheck(cont){
         card('good','加練',`全隊收操後，你一個人留在場上。${out.filter(Boolean).join('、')}`); cont(); }},
       {t:'接受媒體訪問抱怨',warn:true,s:'球迷↑｜信任大幅↓｜想離隊',f:()=>{ S.wantOut=true; card('bad','公開抱怨',`隔天的頭條：「${S.name}：我不知道教練要什麼。」${[meter('fans',6),meter('trust',-15)].join('、')}`); cont(); }}]);
     return; }
+  cont(); }
+
+/* ================= 經紀人(v0.26.5):第一個職業季開始前選一位,影響報價、合約與名氣;每五年可以換人 ================= */
+const AGENT={money:{n:'貪財型',d:'報價多一份、年薪 +12%，但合約短一年，新東家的教練信任 −3',t:'只要價錢對，什麼都好談。'},
+  care:{n:'照顧型',d:'只推薦你能上場的球隊（報價少一份），加盟時教練信任 +6',t:'我只問一件事：你在那裡踢不踢得上。'},
+  star:{n:'造星型',d:'豪門門檻降低、加盟時人氣 +3、每季人氣小漲，但媒體壓力讓狀態起伏變大',t:'你的名字，要讓全世界都知道。'}};
+const agentIs=k=>!!(S&&S.agent&&S.agent.k===k), agentPay=()=>agentIs('money')?1.12:1;
+function agentPick(cont,again){ const L=nameSet(S.nat), ns=Object.keys(AGENT).map(()=>pick(L[0])+pick(L[1]));
+  card('talk',again?'經紀人合約到期':'經紀人找上門',again?`你和 <b class="hl">${S.agent.n}</b> 合作滿五年了。要續約，還是換人？`:`簽下職業合約後，三位經紀人先後約你吃飯。每個人都說自己最懂你。`);
+  const opts=Object.keys(AGENT).map((k,i)=>({t:`${ns[i]}（${AGENT[k].n}）`,main:k==='care',s:AGENT[k].d,f:()=>{ S.agent={k,n:ns[i],y:S.year}; card('info','經紀人',`和 <b class="hl">${ns[i]}</b> 簽約。${AGENT[k].n}：「${AGENT[k].t}」`); cont(); }}));
+  if(again)opts.unshift({t:`續約 ${S.agent.n}（${AGENT[S.agent.k].n}）`,main:true,f:()=>{ S.agent.y=S.year; cont(); }});
+  choose(again?'經紀人 — 續約或換人？':'經紀人 — 你選誰？',opts); }
+function agentCheck(cont){
+  if(S.stage!=='PRO'||S.done){ cont(); return; }
+  if(!S.agent){ agentPick(cont); return; }
+  if(agentIs('star')&&!S.skipMid){ meter('fans',2); const d=ri(-5,5); if(d)meter('form',d); }
+  if(S.year-S.agent.y>=5){ agentPick(cont,true); return; }
   cont(); }
 /* 位置審查(v0.26.4 擴充):
    1) 教練提議:同大類或相鄰位置 OVR 高 4 以上(30 歲後含轉型位置)
@@ -3529,7 +3546,7 @@ const ctYears=()=>S.age>=34?1:S.age>=32?ri(1,2):S.age>=28?ri(2,3):ri(3,5); /* �
 /* 從聯賽挑 n 支球隊報價;豪門只找綜合 ≥ par+2 的人 */
 function makeOffers(lv,n,ex){
   const o=ovr(), par=LV[lv].par;
-  const cands=TEAMS[lv].filter(t=>t!==ex&&!(tierOf(lv,t)===1&&o<par+2));
+  const cands=TEAMS[lv].filter(t=>t!==ex&&!(tierOf(lv,t)===1&&o<par+(agentIs('star')?0:2)));
   return shuffle(cands).slice(0,n).map(club=>({lv,club,tier:tierOf(lv,club),yrs:ctYears()}));
 }
 /* 對你有興趣的聯賽(par 高到低):過簽約門檻;往上跳需達該聯賽 par−1;工作證;首次登陸歐洲需 par+球探打折 且未滿 30 歲 */
@@ -3557,18 +3574,21 @@ function genOffers(n,allowDown){
   for(let i=0;i<n*4&&out.length<n;i++){
     const of=makeOffers(home.length&&R()<0.45?pick(home):pick(R()<0.7?top:ls),1)[0];
     if(of&&!used.has(of.club)){ used.add(of.club); out.push(of); } }
+  if(agentIs('care')){ const ok=out.filter(x=>offerRole(x)<=2); return (ok.length?ok:out).sort((a,b)=>offerRole(a)-offerRole(b)); }
   return out;
 }
+/* 報價的預估角色(給經紀人評估用):以該隊同位置競爭者約在 par+2 估算 */
+const offerRole=of=>roleOf(ovr()-(LV[of.lv].par+TIER_PAR[of.tier]+2));
 /* 報價數:上季評分越高越多;自由球員 +1、申請轉會 +1 */
 function offerCount(fa){
   const last=S.log[S.log.length-1], rt=last?last.st.Rt:0;
-  return Math.max(0,(rt>=7.3?ri(2,3):rt>=6.9?ri(1,2):ri(0,1))+(fa?1:0)+(S.wantOut?1:0)+(S.fans>=75?1:0)-(S.age>=36?2:S.age>=34?1:0)); /* 高人氣多一份;34 歲起報價變少 */
+  return Math.max(0,(rt>=7.3?ri(2,3):rt>=6.9?ri(1,2):ri(0,1))+(fa?1:0)+(S.wantOut?1:0)+(S.fans>=75?1:0)-(S.age>=36?2:S.age>=34?1:0)+(agentIs('money')?1:agentIs('care')?-1:0)); /* 高人氣多一份;34 歲起報價變少 */
 }
 const ofName=of=>`${of.club}（${LV[of.lv].n}・${TIERN[of.tier]}）`;
 function offerOpt(of,main,title){
-  const est=salaryFor(of.lv,ovr()-LV[of.lv].par,TIER_PAY[of.tier]);
+  const est=salaryFor(of.lv,ovr()-LV[of.lv].par,TIER_PAY[of.tier]*agentPay());
   return {t:title||ofName(of),main,offer:1,
-    s:`${of.yrs} 年｜年薪約 ${fmtMoney(est)}｜${TIER_DESC[of.tier]}`,f:()=>negotiate(of,()=>signTo(of))};
+    s:`${agentIs('money')?Math.max(1,of.yrs-1):of.yrs} 年｜年薪約 ${fmtMoney(est)}｜${TIER_DESC[of.tier]}${S.agent?`｜經紀人評估：${ROLES[offerRole(of)][0]}`:''}`,f:()=>negotiate(of,()=>signTo(of))};
 }
 function signTo(of){
   const prev=S.club; /* v0.25 修正:原本先改 S.club 才比較,換隊判斷永遠不成立 */
@@ -3578,9 +3598,11 @@ function signTo(of){
   if(S.acad&&!S.acadOut&&of.club===S.acad.club&&!S.acadGrad)S.acadGrad=true; /* 學院出身升上一隊 */
   if(S.buyback&&of.club===S.buyback.club){ S.buyback=null; S.boughtBack=true;
     card('gold','回家了',`${of.club}行使當年的買回條款。走進熟悉的訓練基地，青訓教練站在門口等你：「我就知道你會回來。」`); }
-  S.ct={yrs:of.yrs,mult:TIER_PAY[of.tier],lv:of.lv}; S.wantOut=false; S.relegated=false;
+  const nw=of.club!==prev; S.ct={yrs:agentIs('money')?Math.max(1,of.yrs-1):of.yrs,mult:TIER_PAY[of.tier]*agentPay(),lv:of.lv}; S.wantOut=false; S.relegated=false;
   if(!S.coach){ S.coach=newCoach(); S.trust=clamp(50+coachFit()*5,0,100); }
-  card('gold','簽約',`與 <b class="hl">${of.club}</b>（${LV[of.lv].n}・${TIERN[of.tier]}）簽下 <b class="hl">${of.yrs} 年</b>合約。<br>${coachLine()}`);
+  const ag=nw&&S.agent?{money:'經紀人抽走一筆可觀的佣金，但合約數字很漂亮。',care:'經紀人事先跟教練確認過你的角色。',star:'經紀人安排了盛大的簽約儀式，社群上全是你的照片。'}[S.agent.k]:'';
+  if(nw&&agentIs('money'))S.trust=clamp(S.trust-3,0,100); if(nw&&agentIs('care'))S.trust=clamp(S.trust+6,0,100); if(nw&&agentIs('star'))S.fans=clamp(S.fans+3,0,100);
+  card('gold','簽約',`與 <b class="hl">${of.club}</b>（${LV[of.lv].n}・${TIERN[of.tier]}）簽下 <b class="hl">${S.ct.yrs} 年</b>合約。<br>${coachLine()}${ag?`<br>${ag}`:''}`);
   board(2);
 }
 /* 大學季末:世大運(奇數年)→ 大二、大三可提前轉職業 → 大四畢業 */
