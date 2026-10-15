@@ -325,6 +325,29 @@ svg.scene{display:block;width:100%;height:auto;margin-top:8px;border-radius:8px;
 @keyframes bob{50%{transform:translateY(-7px) rotate(25deg)}}
 .hlrow{font-size:13.5px;padding:5px 0;border-bottom:1px dashed var(--edge)} .hlrow:last-child{border-bottom:none}
 .hlrow b{font-family:var(--mono);color:var(--amber);font-weight:700}
+/* 生涯結算(v0.22):章節、數據磚、歷史榜 */
+.card.chap .ch-meta{font-family:var(--mono);font-size:12px;color:var(--dim);margin-bottom:6px}
+.card.chap .ch-story{font-size:14px;line-height:1.7}
+.card.chap .ch-stat{font-family:var(--mono);font-size:12.5px;color:var(--blue);margin-top:6px}
+.card.chap .ch-hon{font-size:13px;color:var(--amber);margin-top:6px;line-height:1.6}
+.card .fx{font-size:12.5px;color:var(--dim)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{background:var(--panel2);border:1px solid var(--edge);border-radius:10px;padding:8px 10px;min-width:0}
+.tile small{display:block;font-size:11.5px;color:var(--dim);letter-spacing:.05em}
+.tile b{font-family:var(--mono);font-size:20px;color:var(--amber);word-break:break-all}
+.tile em{font-style:normal;font-size:11.5px;color:var(--dim);margin-left:3px}
+.tiles-sub{margin-top:8px} .tiles-sub .tile b{font-size:14px;color:var(--chalk)}
+@media(max-width:520px){ .tiles{grid-template-columns:repeat(2,1fr)} }
+.hbs{display:grid;grid-template-columns:1fr 1fr;gap:10px} @media(max-width:620px){ .hbs{grid-template-columns:1fr} }
+.hb-t{display:flex;justify-content:space-between;gap:8px;font-size:13px;font-weight:700;margin:4px 0}
+.hb-t span{font-weight:400;color:var(--dim)}
+table.hbt tr.me td{color:var(--amber);font-weight:700;background:color-mix(in srgb,var(--amber) 12%,transparent)}
+table.hbt tr.gap td{text-align:center;color:var(--dim);padding:0}
+.hcab{margin-bottom:8px}
+.pctbar{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--edge);margin:8px 0;overflow:hidden}
+.pctbar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--amber))}
+.card details summary{cursor:pointer;color:var(--blue);font-size:13px}
+table.fin tr.inj td{color:var(--bad)}
 @media (prefers-reduced-motion:reduce){.var{display:none}}
 /* ================= v0.11 視覺 ================= */
 :root{--line:#ffffff14;--disp:'Oswald','Noto Sans TC',sans-serif}
@@ -623,7 +646,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.21.1';
+const APP_VER='v0.22.0';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -2422,7 +2445,18 @@ function checkTraitsMid(){
 }
 
 /* ---------- 戀愛事件(20 歲起、職業球員) ---------- */
-let CHEER=['林曉晴','陳若彤','張沛慈','王詠恩','許昀熙','蘇采蓁','周依潔','郭芷萱']; /* 全虛構人名 */
+/* 伴侶與緋聞對象(v0.22):依國籍產生女性名字,全虛構;一半機率是自己國家的人、一半是效力聯賽所在國 */
+const FEM={TW:['曉晴','若彤','沛慈','詠恩','昀熙','采蓁','依潔','芷萱'],CN:['欣怡','雨萱','思琪','佳怡','夢瑤','婉婷','靜怡','詩涵'],JP:['美咲','結衣','陽菜','葵','莉子','彩花','真由','七海'],
+  KR:['敏智','秀妍','智恩','惠珍','瑞妍','多賢','允兒','藝琳'],VN:['氏蘭','玉安','秋香','海燕','明珠','芳草'],TH:['娜塔','帕妮','希琳','瑪麗卡','蘭娜','普拉','安娜'],AU:['艾拉','奧莉薇亞','夏洛特','米亞','露比','格蕾絲'],
+  EN:['艾蜜莉','蘇菲','克洛伊','奧莉薇亞','潔西卡','露西','艾米','漢娜'],ES:['露西亞','瑪蒂娜','卡門','保拉','茱莉亞','伊莎貝爾','艾琳娜','安娜'],FR:['卡蜜兒','露易絲','克蘿伊','瑪儂','茱莉','艾莉絲','蕾雅','莎拉'],
+  DE:['蘇菲','漢娜','艾瑪','莉娜','蕾娜','安娜','克拉拉','茱莉亞'],IT:['茱莉亞','蘇菲亞','奧蘿拉','嘉雅','琪亞拉','法蘭切斯卡','瑪蒂娜','艾莉莎'],PT:['瑪麗亞','碧翠絲','伊內絲','卡塔琳娜','瑪蒂爾德','蕾奧諾爾'],
+  NL:['艾瑪','茱莉亞','莎拉','黛絲','安娜','費姆克','麗莎','伊娃'],HR:['安娜','露西亞','米婭','佩特拉','伊娃','瑪雅','卡塔琳娜','莎拉'],BR:['茱莉亞','布魯娜','卡蜜拉','拉莉莎','碧安卡','瑪麗安娜','安娜','雷蒂西亞'],
+  AR:['瓦倫蒂娜','卡蜜拉','索菲亞','露西亞','瑪蒂娜','安東妮雅','茱莉安娜','羅西奧'],UY:['瓦倫蒂娜','卡蜜拉','露西亞','阿古斯蒂娜','佛蘿倫西亞','瑪蒂娜'],CO:['瓦倫蒂娜','瑪麗亞荷西','丹妮拉','卡蜜拉','莎拉','娜塔莉亞'],
+  US:['艾瑪','艾娃','索菲亞','麥迪森','艾比蓋兒','泰勒','莉莉','克蘿伊'],MX:['西梅娜','瓦倫蒂娜','瑪麗亞荷西','蕾吉娜','卡蜜拉','露西亞','費南達'],CA:['奧莉薇亞','艾瑪','夏洛特','克蘿伊','蘇菲','愛麗絲','茱莉亞'],
+  MA:['伊曼','雅斯敏','薩爾瑪','莉娜','娜迪雅','阿雅','法蒂瑪'],SN:['艾莎','法圖','阿瓦','瑪麗亞瑪','畢圖','庫姆巴'],NG:['奇瑪','阿達','恩戈齊','芬米','托拉尼','阿瑪拉','伊菲歐瑪'],
+  EG:['法麗達','瑪麗亞姆','雅斯敏','努爾','莎爾瑪','哈比芭','蕾拉'],CV:['瑪麗莎','茱莉亞','卡蜜拉','伊內絲','安娜','索妮亞'],EU:['安娜','蘇菲','瑪麗亞','艾瑪','莉娜','克拉拉']};
+const femName=k=>{ const N=nameSet(k), f=FEM[k]||FEM.EU; return N[1][0][0]==='・'?pick(f)+pick(N[1]):pick(N[0])+pick(f); };
+const cheerName=home=>{ const k=home||S.stage!=='PRO'||!S.lv||chance(50)?S.nat:LV[S.lv].cty, L=S.love; let n; for(let i=0;i<6;i++){ n=femName(k); if(n!==L.partner&&!L.exes.some(x=>x.name===n))break; } return n; };
 const CHEER_JOB=['人氣主播','女演員','網紅','女足國腳'];
 function loveGainTxt(k,amt){ /* 加點機制同事件卡;超過潛力的部分轉為本季成績加成 */
   const before=S.pendStat, g=addAbStat(k,amt), over=S.pendStat-before;
@@ -2456,8 +2490,9 @@ function loveEvent(next){
       card('bad','分手',`${cheatPen?'那晚的事她其實都知道。':''}交往 ${y} 年，婚期一延再延。<b class="hl">${ex}</b> 最後留下一句：「我等不到了。」整個夏天你魂不守舍——<b class="dn">${ABL[k1]} ${g1}、${ABL[k2]} ${g2}</b>。`);
       next(); return; }
     const ask=()=>proposalAsk(next);
+    if(loveDating(ask))return;
     if(chance(30)){ const r=R()*100;
-      if(r<40){ const t=pick(CHEER.filter(n=>n!==L.partner));
+      if(r<40){ const t=cheerName();
         choose(`慶功宴散場，${t} 說順路想搭你的車`,[
           {t:'讓她上車（賭一把）',warn:true,s:'沒被抓到＝體能提升｜被抓到＝能力下跌、當年分手率 +30%',f:()=>{
             L.affairs++;
@@ -2471,11 +2506,12 @@ function loveEvent(next){
       ask(); return; }
     ask(); return;
   }
-  const fire=(L.st==='married'&&L.kids===0)?40:(L.st==='single'||L.st==='divorced')?40:30;
+  const fire=(L.st==='married'&&L.kids===0)?45:(L.st==='single'||L.st==='divorced')?55:45; /* v0.22:戀愛事件變多 */
   if(!chance(fire)){ next(); return; }
   /* 單身/離婚:緋聞 → 承認與否 → 交往 */
   if(L.st==='single'||L.st==='divorced'){
-    const p=pick(CHEER), job=pick(CHEER_JOB);
+    if(loveMeet(next))return;
+    const p=cheerName(), job=pick(CHEER_JOB);
     card('info','場外話題',`你和${job} <b class="hl">${p}</b> 被拍到球場外同框，緋聞登上娛樂版頭條。${L.exes.length?'（評論區：「離過婚還這麼搶手」）':''}`);
     choose('記者把麥克風遞到你面前：「兩位是在交往嗎？」',[
       {t:'大方承認：「請大家祝福我們」',s:'還要看她那邊願不願意公開',f:()=>{
@@ -2494,8 +2530,9 @@ function loveEvent(next){
     L.kids++; const gt=loveGainTxt(pick(GRP_AB[S.grp]),2); board();
     card('gold','新生命',`${L.partner} 平安生下你們的第 <b class="hl">${L.kids}</b> 個孩子。當了爸爸的男人，眼神都不一樣了——${gt}。`);
     next(); return; }
+  if(loveFamily(next))return;
   const r=R()*100;
-  if(r<40){ const t=pick(CHEER.filter(n=>n!==L.partner));
+  if(r<40){ const t=cheerName();
     choose(`客場飯店酒吧，${t} 傳來訊息：「睡了嗎？」`,[
       {t:'赴約（賭一把）',warn:true,s:'沒被抓到＝體能提升｜被抓到＝能力下跌、婚姻危機',f:()=>{
         L.affairs++;
@@ -2507,6 +2544,65 @@ function loveEvent(next){
   if(r<70&&L.kids>0)card('good','球場邊的父親',`你被拍到賽前在場邊教孩子顛球，影片配文「最強足球教室」瘋傳——${gt}。`);
   else card('good','結婚紀念日',`結婚紀念日，你推掉了加練，陪 <b class="hl">${L.partner}</b> 回到當年辦婚禮的場地。她說：「明年也要來喔。」——${gt}。`);
   next();
+}
+/* v0.22 新增戀愛事件:回傳 true 表示已處理(會自己呼叫 cont) */
+const startDating=p=>{ const L=S.love; L.st='dating'; L.partner=p; L.dyrs=0; L.datedTimes++;
+  if(L.datedTimes>=3&&L.kids===0&&!S.traits.confidante)traitCard('confidante','第三段戀情，還是走到了同樣的結局——有些人註定是別人生命裡的過客。'); };
+function loveMeet(next){
+  const abroad=S.lv&&LV[S.lv].cty!==S.nat, r=R()*100;
+  if(r<25){ const p=cheerName(), mate=locName();
+    choose(`隊友 ${mate} 神秘兮兮地說：「我老婆的朋友，人超好，週末一起吃個飯？」`,[
+      {t:'去吃飯',main:true,s:'也許會有下文',f:()=>{ if(chance(60)){ startDating(p); const gt=loveGainTxt('sta',1); board();
+          card('gold','意外的緣分',`<b class="hl">${p}</b> 不懂越位是什麼，但她記得你點的每一道菜。第三次約會後，你們在一起了——${gt}。`); }
+        else card('info','只是朋友',`${p} 很好聊，但你們都知道沒有火花。至少 ${mate} 欠你一頓飯。`); next(); }},
+      {t:'婉拒：「我現在只想專心踢球」',s:'狀態小幅↑',f:()=>{ card('info','專心比賽',`${mate} 翻了個白眼：「你會孤老一生。」${meter('form',3)}`); next(); }}]); return true; }
+  if(r<45&&S.age<=30){ const p=cheerName(true);
+    choose(`放假回家鄉，你在超市遇到國中同班的 ${p}——她說她一直有在看你的比賽`,[
+      {t:'約她吃飯敘舊',main:true,s:'青梅竹馬，最懂你的人',f:()=>{ if(chance(70)){ startDating(p); const gt=loveGainTxt('sta',1); board();
+          card('gold','青梅竹馬',`你們聊到餐廳打烊。<b class="hl">${p}</b> 還記得你國中把球踢進教室窗戶的事。這一次，你沒有讓她走掉——${gt}。`); }
+        else card('info','錯過的時間',`${p} 下個月就要結婚了。她笑著說：「我老公也是你的球迷喔。」`); next(); }},
+      {t:'寒暄幾句就道別',f:()=>{ card('info','擦肩而過','你們加了聯絡方式，之後只在對方的動態按讚。'); next(); }}]); return true; }
+  if(r<65&&abroad){ const p=cheerName(), job=pick(['球隊翻譯','語言老師','物理治療師','咖啡店老闆']);
+    choose(`在異鄉的第 ${Math.max(1,S.log.filter(x=>x.lv===S.lv).length)} 年，${job} ${p} 是你最常說話的人`,[
+      {t:'鼓起勇氣告白',main:true,s:'成功＝融入當地、球迷↑',f:()=>{ if(chance(55)){ startDating(p); const gt=loveGainTxt('sta',1); board();
+          card('gold','異鄉的家',`<b class="hl">${p}</b> 用你的母語回答：「我等你這句話很久了。」從此這座城市不再陌生——${gt}、${meter('fans',3)}。`); }
+        else card('bad','說錯了話',`你用剛學的當地話告白，結果用錯了一個字。${p} 笑到蹲在地上，然後溫柔地拒絕了你。`); next(); }},
+      {t:'保持距離，專心適應',s:'狀態小幅↑',f:()=>{ card('info','保持距離',`你把心思都放在訓練上。${meter('form',2)}`); next(); }}]); return true; }
+  return false;
+}
+function loveDating(cont){
+  const L=S.love, moved=S.log.length&&baseTm(S.log[S.log.length-1].tm)!==S.club&&S.stage==='PRO';
+  if(moved&&L.ldYr!==S.year&&chance(70)){ L.ldYr=S.year;
+    choose(`轉隊到 ${S.club}，${L.partner} 還留在原本的城市`,[
+      {t:'請她搬來一起生活',main:true,s:'她可能答應，也可能放不下工作',f:()=>{ if(chance(60)){ const gt=loveGainTxt('sta',1); board();
+          card('good','一起出發',`<b class="hl">${L.partner}</b> 辭掉工作，拖著兩個行李箱出現在新城市的機場——${gt}。`); }
+        else { L.dyrs++; card('bad','放不下',`${L.partner} 沉默了很久：「我的人生也在這裡啊。」你們決定先遠距離。（交往壓力增加）`); } cont(); }},
+      {t:'談遠距離戀愛',s:'狀態小幅↓；有分手風險',f:()=>{ if(chance(25)){ const ex=L.partner; breakUp(); card('bad','時差',`八個小時的時差，訊息越來越短。三個月後，<b class="hl">${ex}</b> 說：「我們都累了。」`); }
+        else card('info','視訊的晚上',`每晚十一點，你們準時視訊。有時候她講到一半就睡著了。${meter('form',-3)}`); cont(); }}]); return true; }
+  if(L.dyrs>=1&&!L.metPar&&chance(40)){ L.metPar=true;
+    choose(`${L.partner} 說：「這個週末，我爸媽想見見你。」`,[
+      {t:'穿上西裝，提早半小時到',main:true,s:'穩紮穩打',f:()=>{ const gt=loveGainTxt('sta',1); board(); card('good','見家長',`她爸爸全程話不多，臨走前拍了拍你的肩：「好好照顧她。」——${gt}。`); cont(); }},
+      {t:'帶一件簽名球衣當伴手禮',warn:true,s:'看她爸支持哪一隊',f:()=>{ if(chance(55)){ const gt=loveGainTxt('sta',2); board(); card('good','岳父是球迷',`她爸爸當場換上球衣，拿出你新秀年的剪報——他追蹤你很多年了。${gt}、${meter('fans',2)}。`); }
+        else card('bad','死敵球迷',`她爸爸看了球衣一眼：「我是你們死敵的季票會員。」整頓飯你都在冒冷汗。${meter('form',-3)}`); cont(); }}]); return true; }
+  if(L.dyrs>=1&&chance(25)){
+    choose(`${L.partner} 的生日剛好撞上客場比賽`,[
+      {t:'跟教練請假陪她',s:'感情↑；教練信任↓',f:()=>{ const gt=loveGainTxt('sta',1); board(); card('info','缺席',`她看到你出現在餐廳門口時哭了。教練就沒那麼開心了。${gt}、${meter('trust',-5)}`); cont(); }},
+      {t:'比賽優先，賽後視訊',main:true,s:'狀態↑；交往壓力增加',f:()=>{ L.dyrs++; card('info','螢幕那頭',`你在客場更衣室唱完生日快樂歌。她說沒關係，但聲音聽起來不太像沒關係。${meter('form',3)}`); cont(); }}]); return true; }
+  return false;
+}
+function loveFamily(cont){
+  const L=S.love, r=R()*100;
+  if(r<25&&L.kids>0&&S.stage==='PRO'){
+    choose(`孩子第一次到現場看你比賽，坐在 ${L.partner} 腿上揮著小旗子`,[
+      {t:'賽前走到看台跟孩子擊掌',main:true,s:'狀態↑',f:()=>{ const gt=loveGainTxt('sta',1); board(); card('good','小小球迷',`孩子在看台上喊得比誰都大聲。你覺得腳步特別輕——${gt}、${meter('form',4)}。`); cont(); }},
+      {t:'答應孩子：「進球就跑去抱你」',warn:true,s:'成功＝球迷大增',f:()=>{ if(chance(45)){ card('gold','說到做到',`第 71 分鐘，你進球後直奔看台把孩子抱起來。這張照片成了年度最佳體育攝影。${meter('fans',8)}`); }
+        else card('info','下次一定',`你這場沒進球。回家路上，孩子在後座睡著了，手裡還握著小旗子。${meter('form',-2)}`); cont(); }}]); return true; }
+  if(r<45){
+    choose(`${L.partner} 拿到一份夢寐以求的工作，但要經常出差`,[
+      {t:'全力支持她',main:true,s:'球迷↑；家務變多、狀態小幅↓',f:()=>{ card('good','神隊友',`你在社群貼出她的新名片：「我家最強的人。」${meter('fans',3)}、${meter('form',-2)}`); cont(); }},
+      {t:'希望她留在家裡',warn:true,s:'狀態↑；她可能不高興',f:()=>{ if(chance(60))card('info','妥協',`她想了一週，最後婉拒了那份工作。家裡安靜了好一陣子。${meter('form',3)}`);
+        else card('bad','爭吵',`「你的夢想是夢想，我的就不是嗎？」那晚你睡在客廳。${meter('form',-4)}`); cont(); }}]); return true; }
+  return false;
 }
 function proposalAsk(next){
   const L=S.love; if(L.st!=='dating'){ next(); return; }
@@ -3584,10 +3680,156 @@ function evaluate(){
   if(tr.length||S.removed.length)lines.push(`隱藏特質：${tr.join('、')||'—'}${S.removed.length?`（已解除：${S.removed.join('、')}）`:''}`);
   return {sc,tier,lines};
 }
-function careerTotals(){ return S.log.reduce((t,r)=>{ ['App','G','A','CS','GA'].forEach(k=>t[k]+=r.st[k]); return t; },{App:0,G:0,A:0,CS:0,GA:0}); }
-/* 引退後的路:依生涯經歷給選項,寫進場外人生 */
+function careerTotals(){ return S.log.reduce((t,r)=>{ ['App','G','A','CS','GA','Min','Y','R'].forEach(k=>t[k]+=r.st[k]||0); return t; },{App:0,G:0,A:0,CS:0,GA:0,Min:0,Y:0,R:0}); }
+/* ================= 生涯結算(v0.22):引退記者會 → 生涯章節 → 位置數據 → 歷史地位 → 評價與後記 ================= */
+/* 結算的文字變化與虛構人名只用雜湊與 Math.random,不動種子亂數 */
+function hRng(str){ let h=hashStr(str)||1; return ()=>{ h^=h<<13; h^=h>>>17; h^=h<<5; return ((h>>>0)%100000)/100000; }; }
+const rpick=a=>a[Math.floor(Math.random()*a.length)];
+const baseTm=t=>(t||'').replace('（租）','');
+const yrOf=h=>+(h.match(/^(\d{4})/)||[0,0])[1];
+/* 依效力球隊分章:連續同一隊算一章;租借、大學、青訓各自成章 */
+function careerChapters(){
+  const ch=[];
+  S.log.forEach(r=>{ const kind=r.lv?(r.loan?'loan':'pro'):(S.uni&&r.tm===S.uni?'uni':'youth'), last=ch[ch.length-1];
+    if(kind==='loan'&&last&&last.kind==='pro'){ last.loans.push(r); return; } /* 租借併進母隊那一章 */
+    if(last&&last.tm===r.tm&&last.kind===kind)last.rs.push(r); else ch.push({tm:r.tm,club:baseTm(r.tm),kind,rs:[r],loans:[]}); });
+  ch.forEach((c,i)=>{ const rs=c.rs, t={App:0,G:0,A:0,CS:0,GA:0,Min:0}, ys=[...rs,...c.loans].map(r=>r.y);
+    rs.forEach(r=>Object.keys(t).forEach(k=>t[k]+=r.st[k]||0)); c.t=t; c.y0=Math.min(...ys); c.y1=Math.max(...ys); c.a0=rs[0].age; c.a1=rs[rs.length-1].age;
+    if(c.loans.length){ c.a0=Math.min(c.a0,c.loans[0].age); c.a1=Math.max(c.a1,c.loans[c.loans.length-1].age); }
+    c.lvs=[...new Set(rs.filter(r=>r.lv).map(r=>r.lv))]; c.par=c.lvs.length?Math.max(...c.lvs.map(k=>LV[k].par)):0;
+    const pl=rs.filter(r=>r.st.App>0); c.best=pl.length?pl.reduce((a,b)=>b.st.Rt>a.st.Rt?b:a):null;
+    c.honors=c.kind==='youth'||c.kind==='uni'?[]:S.honors.filter(h=>{ const y=yrOf(h); if(y<c.y0||y>c.y1+1)return false;
+      if(h.includes(c.club)||c.loans.some(r=>h.includes(baseTm(r.tm))))return true; const k=honorLv(h); return !!k&&c.lvs.includes(k)&&y<=c.y1&&!/（/.test(h); });
+    c.hl=(S.hl||[]).filter(h=>h.y>=c.y0&&h.y<=c.y1);
+    c.cap=!!(S.mem&&S.mem.captain&&S.mem.captain.club===c.club);
+    c.no=c.kind==='pro'?jerseyFor(c.club):null; c.i=i; });
+  return ch;
+}
+function jerseyFor(club){ const p={GK:[1,12,23,31],DF:[2,3,4,5,15,22],MF:[6,8,10,14,16,18],FW:[7,9,11,19,20,29]}[S.grp]; return p[hashStr((club||'')+S.name)%p.length]; }
+const ROLE_RANK={主力:0,輪替:1,替補:2,板凳:3};
+function chStat(t,gk){ return gk?`出場 ${t.App}・零封 ${t.CS}`:`出場 ${t.App}・${t.G} 球 ${t.A} 助攻${['CB','FB','DM'].includes(S.dpos)&&t.CS?`・零封 ${t.CS}`:''}`; }
+function chStory(c,all){
+  const gk=isGK(), lgn=c.rs[0].lv?LV[c.rs[0].lv].n:'', n=c.rs.length, prevPro=all.slice(0,c.i).reverse().find(x=>x.kind==='pro'), nextC=all[c.i+1];
+  const home=c.lvs.some(k=>NATS[S.nat].home.includes(k)), s=[];
+  if(c.kind==='youth')s.push(`${c.a0} 歲，你走進 ${c.club} 的青訓，${n>=3?'三年的球場青春，從這裡開始。':'在這裡學會了職業足球的第一課。'}`);
+  else if(c.kind==='uni')s.push(`你選擇先念大學，替 ${c.club} 踢了 ${n} 年${S.uniGrad?'，最後拿到畢業證書':''}。`);
+  else if(c.kind==='loan')s.push(`${c.a0} 歲，被租借到 ${lgn}的 ${c.club}。${c.t.App>=15?'這一季的上場時間，讓你重新找回了節奏。':'可惜上場機會仍然不多。'}`);
+  else if(all.slice(0,c.i).some(x=>x.kind==='pro'&&x.club===c.club))s.push(`${c.a0} 歲，你重返老東家 ${c.club}${prevPro&&prevPro.club!==c.club?'，熟悉的更衣室還留著你的位置':''}。`);
+  else if(!prevPro)s.push(`${c.a0} 歲，${c.club} 給了你第一份職業合約，${lgn}的大門為你打開。`);
+  else if(home&&!c.lvs.some(k=>prevPro.lvs.includes(k))&&!prevPro.lvs.some(k=>NATS[S.nat].home.includes(k)))s.push(`${c.a0} 歲，你結束海外的日子，回到家鄉加盟 ${c.club}。`);
+  else if(c.par>prevPro.par+1)s.push(rpick([`${c.a0} 歲，你帶著野心轉戰${lgn}，加盟 ${c.club}。`,`${c.a0} 歲那年夏天，${c.club} 開出報價，你踏上更大的${lgn}舞台。`]));
+  else if(c.par<prevPro.par-1)s.push(rpick([`${c.a0} 歲，你來到${lgn}的 ${c.club}，想要更多上場時間。`,`${c.a0} 歲，你轉往${lgn}，在 ${c.club} 重新出發。`]));
+  else s.push(`${c.a0} 歲，你轉投同樣在${lgn}的 ${c.club}。`);
+  if(c.loans.length)s.push(`期間曾租借到 ${[...new Set(c.loans.map(r=>baseTm(r.tm)))].join('、')} 累積經驗。`);
+  if(c.kind!=='youth'&&c.kind!=='uni'){
+    const r0=ROLE_RANK[c.rs[0].st.role], r1=Math.min(...c.rs.map(r=>ROLE_RANK[r.st.role]??3));
+    if(c.best&&c.best.st.Rt>=7.0)s.push(`${seasonLabel(c.best.y)} 賽季是這段時期的巔峰：${gk||(S.grp==='DF'&&c.best.st.G+c.best.st.A<3)?`${c.best.st.CS} 場零封`:`${c.best.st.G} 球 ${c.best.st.A} 助攻`}，評分 ${c.best.st.Rt}。`);
+    else if(n>=2&&r0>=2&&r1===0)s.push(`從${c.rs[0].st.role}一路踢成主力。`);
+    else if(!c.t.App)s.push('只是一整季都沒等到上場的機會。');
+    if(c.cap)s.push(`你在這裡戴上了隊長袖標${c.no?`，${c.no} 號成了球隊的象徵`:''}。`);
+    else if(c.honors.some(h=>/冠軍（/.test(h))){ const k=c.honors.filter(h=>/冠軍（/.test(h)).length; s.push(k>=3?`${k} 座冠軍獎盃，讓這段時光成為隊史的黃金年代。`:`你和隊友一起捧起了 ${k} 座冠軍獎盃。`); }
+    else if(!nextC&&c.kind==='pro')s.push(`這裡也是你職業生涯的最後一站。`);
+    else if(n>=8)s.push(`${n} 個賽季過去，你早已是這支球隊的一部分。`);
+  }
+  return s.slice(0,4).join('');
+}
+/* ---------- 歷史榜:真實紀錄的數字、虛構的人名 ---------- */
+/* 國家隊男足歷史出場與進球紀錄(2026 年,依真實紀錄四捨五入) */
+const NAT_REC={TW:[70,25],JP:[152,75],KR:[153,59],AU:[110,50],CN:[112,39],VN:[90,51],TH:[134,71],EN:[125,91],ES:[180,59],FR:[145,67],DE:[150,71],IT:[176,35],
+  PT:[234,146],NL:[134,55],HR:[206,45],BR:[142,80],AR:[208,126],UY:[161,69],CO:[128,36],US:[164,57],MX:[182,52],CA:[104,43],MA:[115,36],SN:[120,56],NG:[110,37],EG:[184,69],CV:[75,22]};
+/* 聯賽歷史紀錄:有真實紀錄的聯賽用真實數字,其餘依每季場數估算 */
+const LG_REC={ENG:{G:260,App:653,CS:202,A:162},ESP:{G:474,App:622},GER:{G:365,App:602},ITA:{G:274,App:657},FRA:{G:299,App:618},J1:{G:191,App:672},K1:{G:228,App:706},MLS:{G:171,App:514}};
+const lgRec=(k,s)=>{ const g=LV[k].g, r=LG_REC[k]||{}; return r[s]||Math.round(g*{G:6.5,App:17,CS:5.3,A:4.2}[s]); };
+const clubRec=(club,k,s)=>{ const g=LV[k].g, v=0.9+hRng(club+s)()*0.2; return Math.round(g*{G:4.8,App:15,CS:4.5,A:3.3}[s]*v); };
+const BOARD_F=[1,.86,.77,.7,.64,.59,.55,.51,.48,.45];
+const boardVal=(rec,k)=>k<=10?Math.round(rec*BOARD_F[k-1]):Math.round(rec*0.45*Math.pow(10/k,0.7));
+function boardRank(rec,v){ if(v>rec)return 1; for(let k=1;k<=999;k++)if(v>=boardVal(rec,k))return k; return 1000; }
+/* 榜單:前 3 名＋你的前後一名;人名用國籍名單雜湊產生 */
+function boardHtml(title,unit,rec,v,cty,seed){
+  const rk=boardRank(rec,v), nm=nameSet(cty), rnd=hRng(seed), name=()=>nm[0][Math.floor(rnd()*nm[0].length)]+nm[1][Math.floor(rnd()*nm[1].length)];
+  const others={}; const nameAt=k=>others[k]||(others[k]=name());
+  const show=[...new Set((rk>=1000?[1,2,3,rk]:[1,2,3,rk-1,rk,rk+1]).filter(k=>k>=1&&k<=Math.max(rk+1,3)))].sort((a,b)=>a-b);
+  let rows='', last=0;
+  show.forEach(k=>{ if(k>last+1)rows+=`<tr class="gap"><td colspan="3">⋯</td></tr>`;
+    if(k===rk)rows+=`<tr class="me"><td>${rk>=1000?'—':k}</td><td>${S.name}</td><td>${v}</td></tr>`;
+    else { const kk=k>rk?k-1:k; rows+=`<tr><td>${k}</td><td>${nameAt(kk)}</td><td>${boardVal(rec,kk)}</td></tr>`; }
+    last=k; });
+  const tag=rk===1?'<b class="hl">歷史第一</b>':rk<=3?`<b class="hl">歷史第 ${rk} 名</b>`:rk<=10?`<b class="up">歷史第 ${rk} 名</b>`:rk>=1000?'排名 1000 名外':`歷史第 ${rk} 名`;
+  return {rk,txt:`${title}：${tag}`,html:`<div class="hb"><div class="hb-t">${title}<span>${tag}</span></div><table class="fin hbt"><tr><th>#</th><th>球員</th><th>${unit}</th></tr>${rows}</table></div>`};
+}
+/* 生涯分 → 模擬生涯百分位(依校準時的五帶門檻內插) */
+function scorePct(sc){ const P=[[0,0],[TIER_TH[3],25],[TIER_TH[2],65],[TIER_TH[1],90],[TIER_TH[0],98],[TIER_TH[0]*2.2,99.9]];
+  for(let i=1;i<P.length;i++)if(sc<=P[i][0])return P[i-1][1]+(sc-P[i-1][0])/(P[i][0]-P[i-1][0])*(P[i][1]-P[i-1][1]); return 99.9; }
+function historyBoards(chs){
+  const gk=isGK(), fw=S.grp==='FW', mf=S.grp==='MF', out=[];
+  const sk=gk?'CS':fw?'G':mf?'A':'CS', sn={G:'進球',A:'助攻',CS:'零封',App:'出場'};
+  /* 效力最久的俱樂部 */
+  const byClub={}; chs.filter(c=>c.kind==='pro').forEach(c=>{ const b=byClub[c.club]||(byClub[c.club]={club:c.club,n:0,t:{App:0,G:0,A:0,CS:0},lv:c.lvs[0]});
+    b.n+=c.rs.length; Object.keys(b.t).forEach(k=>b.t[k]+=c.t[k]); });
+  const mc=Object.values(byClub).sort((a,b)=>b.n-a.n||b.t.App-a.t.App)[0];
+  if(mc&&mc.t.App){ const cty=LV[mc.lv].cty;
+    out.push({sec:`${mc.club} 隊史（效力 ${mc.n} 季）`,b:[boardHtml('隊史出場榜','場',clubRec(mc.club,mc.lv,'App'),mc.t.App,cty,mc.club+'App'),
+      boardHtml(`隊史${sn[sk]}榜`,gk||sk==='CS'?'場':sk==='G'?'球':'次',clubRec(mc.club,mc.lv,sk),mc.t[sk],cty,mc.club+sk)]}); }
+  /* 代表聯賽 */
+  const lg=mainLeague();
+  if(lg&&S.stats[lg]&&S.stats[lg].App){ const b=S.stats[lg], cty=LV[lg].cty, k2=fw||mf?(fw?'G':'A'):'CS';
+    out.push({sec:`${LV[lg].n}歷史（${b.yr} 季）`,b:[boardHtml(`${LV[lg].n}歷史${sn[k2]}榜`,k2==='G'?'球':k2==='A'?'次':'場',lgRec(lg,k2),b[k2],cty,lg+k2),
+      boardHtml(`${LV[lg].n}歷史出場榜`,'場',lgRec(lg,'App'),b.App,cty,lg+'App')]}); }
+  /* 國家隊 */
+  if(S.caps){ const R=NAT_REC[S.nat]||[100,40], N=NATS[S.nat].n, bs=[boardHtml(`${N}國家隊出場榜`,'場',R[0],S.caps,S.nat,S.nat+'caps')];
+    if(!gk&&(fw||mf||S.intlG>=5))bs.push(boardHtml(`${N}國家隊射手榜`,'球',R[1],S.intlG,S.nat,S.nat+'goals'));
+    out.push({sec:`${N}國家隊`,b:bs}); }
+  return out;
+}
+/* ---------- 位置數據總表 ---------- */
+function posStats(){
+  const gk=isGK(), pro=S.log.filter(r=>r.lv), pl=pro.filter(r=>r.st.App>0), t=pro.reduce((a,r)=>{ ['App','G','A','CS','GA','Min','Y','R'].forEach(k=>a[k]+=r.st[k]||0); return a; },{App:0,G:0,A:0,CS:0,GA:0,Min:0,Y:0,R:0});
+  const cnt=re=>S.honors.filter(h=>re.test(h)).length, avg=t.Min?(pl.reduce((s,r)=>s+r.st.Rt*r.st.Min,0)/t.Min).toFixed(2):'—';
+  const peak=pl.length?pl.reduce((a,b)=>b.st.Rt>a.st.Rt?b:a):null, most=k=>pl.length?pl.reduce((a,b)=>(b.st[k]||0)>(a.st[k]||0)?b:a):null;
+  const T=(n,v,sub)=>({n,v,sub}), tiles=[], m=k=>{ const r=most(k); return r&&r.st[k]?`${r.st[k]}（${seasonLabel(r.y)}）`:'—'; };
+  if(gk){ tiles.push(T('零封',t.CS,'場'),T('零封率',t.App?Math.round(t.CS/t.App*100)+'%':'—',''),T('場均失球',t.Min?(t.GA/(t.Min/90)).toFixed(2):'—',''),T('失球',t.GA,'球'),
+      T('金手套',cnt(/金手套/),'次'),T('單季最多零封',m('CS'),'')); }
+  else if(S.grp==='FW'){ tiles.push(T('進球',t.G,'球'),T('助攻',t.A,'次'),T('每場進球',t.App?(t.G/t.App).toFixed(2):'—',''),T('每 90 分鐘進球',t.Min?(t.G/(t.Min/90)).toFixed(2):'—',''),
+      T('金靴',cnt(/金靴/),'次'),T('單季最多進球',m('G'),'')); }
+  else if(S.grp==='MF'){ tiles.push(T('助攻',t.A,'次'),T('進球',t.G,'球'),T('進球＋助攻',t.G+t.A,''),T('每場助攻',t.App?(t.A/t.App).toFixed(2):'—',''),
+      T('年度最佳陣容',cnt(/年度最佳陣容/),'次'),T('單季最多助攻',m('A'),'')); }
+  else { tiles.push(T('出場',t.App,'場'),T('零封',t.CS,'場'),T('進球',t.G,'球'),T('助攻',t.A,'次'),T('年度最佳陣容',cnt(/年度最佳陣容/),'次'),T('單季最多零封',m('CS'),'')); }
+  const common=[T('職業賽季',pro.length,'季'),T('出場',t.App,'場'),T('出場分鐘',t.Min.toLocaleString(),''),T('平均評分',avg,''),T('巔峰評分',peak?`${peak.st.Rt}（${seasonLabel(peak.y)}）`:'—',''),
+    T('黃牌／紅牌',`${t.Y}／${t.R}`,''),T('聯賽最佳球員',cnt(/[^盃]最佳球員$/),'次'),T('國家隊',S.caps?`${S.caps} 場${gk?'':`・${S.intlG} 球`}`:'—','')];
+  return {main:tiles,common:common.filter(x=>!tiles.some(y=>y.n===x.n)),t};
+}
+const tileHtml=a=>`<div class="tiles">${a.map(x=>`<div class="tile"><small>${x.n}</small><b>${x.v}</b>${x.sub&&x.v!=='—'?`<em>${x.sub}</em>`:''}</div>`).join('')}</div>`;
+/* 榮譽櫃:同名合併、分類 */
+function honorCabinet(){
+  const m={}; S.honors.forEach(h=>{ const i=h.indexOf(' '), yr=h.slice(0,i), n=h.slice(i+1); (m[n]=m[n]||[]).push(yr); });
+  const cat={俱樂部賽事:[],個人獎項:[],國家隊:[],其他:[]};
+  Object.keys(m).forEach(n=>{ const s=m[n].length>1?`${n} <b class="hl">×${m[n].length}</b>`:`${n}（${m[n][0]}）`;
+    const c=/世界盃|國家盃|美洲盃|金盃賽|非洲國家盃|亞洲盃|奧運|亞運|世大運|錦標賽/.test(n)?'國家隊':/冠軍（|世俱盃|（[^）]*・/.test(n)?'俱樂部賽事':/金球|足球先生|最佳|金靴|金手套|射手王|陣容/.test(n)?'個人獎項':'其他';
+    cat[c].push(s); });
+  return Object.keys(cat).filter(k=>cat[k].length).map(k=>`<div class="hcab"><div class="hb-t">${k}<span>${cat[k].length} 項</span></div>${cat[k].map(x=>`<div class="hlrow">${x}</div>`).join('')}</div>`).join('');
+}
+/* ---------- 引退記者會與告別 ---------- */
+function farewellOpts(){
+  const A=S.arcs||{}, L=S.love, chs=careerChapters().filter(c=>c.kind==='pro'), last=chs[chs.length-1], o=[];
+  const loyal=Object.entries(chs.reduce((m,c)=>(m[c.club]=(m[c.club]||0)+c.rs.length,m),{})).sort((a,b)=>b[1]-a[1])[0];
+  o.push({t:'謝謝球迷',q:'「每一個週末，看台上的你們都是我繼續跑下去的理由。謝謝你們。」'});
+  if(loyal&&loyal[1]>=5)o.push({t:`謝謝 ${loyal[0]}`,q:`「${loyal[0]}的 ${loyal[1]} 年，是我人生最好的時光。這件球衣，我會一輩子收好。」`});
+  if(L.st==='married')o.push({t:`謝謝 ${L.partner}${L.kids?'和孩子們':''}`,q:`「${L.partner}，這些年你一個人撐起了這個家。從今天起，換我陪你們。」`});
+  if(A.mentor&&A.mentor.n)o.push({t:`謝謝恩師 ${A.mentor.n}`,q:`「${A.mentor.n} 教練，當年那個不懂事的孩子，總算沒讓你失望。」`});
+  if(A.rival&&A.rival.n&&A.rival.w+A.rival.l>=2)o.push({t:`向宿敵 ${A.rival.n} 致意`,q:`「${A.rival.n}，沒有你，我不會變成今天的我。我們 ${A.rival.w} 勝 ${A.rival.l} 敗——下輩子再分勝負。」`});
+  if((last&&last.t.App===0)||S.fans<30)o.push({t:'低調說聲再見',q:'「沒什麼好說的。我很幸運，能把喜歡的事做成工作。」'});
+  return o.slice(0,4);
+}
 function endGame(reason){
   S.done=true; stepQ=[]; board(2);
+  const pro=S.log.filter(r=>r.lv), tot=pro.reduce((a,r)=>{ ['App','G','A','CS'].forEach(k=>a[k]+=r.st[k]||0); return a; },{App:0,G:0,A:0,CS:0}), gk=isGK(), last=pro[pro.length-1];
+  const where=last?baseTm(last.tm):S.team, crowd=S.fans>=80?'記者會擠滿了媒體，場外還有上百名球迷舉著你的球衣。':S.fans>=50?'各家媒體都到了，閃光燈沒停過。':'只來了幾家媒體，但你不在意。';
+  card('talk','引退記者會',`${S.year} 年夏天，${S.age} 歲的 <b class="hl">${S.name}</b> 在 ${where} 召開記者會。${reason}<br>${crowd}<br>`+
+    (pro.length?`<span class="fx">${pro.length} 個職業賽季・出場 ${tot.App}・${gk?`零封 ${tot.CS}`:`進球 ${tot.G}・助攻 ${tot.A}`}${S.caps?`・國家隊 ${S.caps} 場`:''}</span><br>`:'')+'麥克風遞到你面前。最後一句話，你想對誰說？');
+  choose('引退記者會 — 你的告別',farewellOpts().map((x,i)=>({t:x.t,main:i===0,f:()=>{ S.farewell=x.q; card('talk','',`${x.q}<br><span class="fx">全場起立鼓掌了很久。</span>`); afterLife(reason); }})));
+}
+/* 引退後的路:依生涯經歷給選項,寫進場外人生 */
+function afterLife(reason){
   const F=S.flags||{}, A=S.arcs||{}, o=[];
   if(F.youth)o.push({t:`回青訓當教練（答應過 ${A.mentor.n}）`,a:`回到青訓，接下 ${A.mentor.n} 留給你的位置，帶著一群跟當年的你一樣的孩子。`});
   if(F.lic)o.push({t:'走上職業教練之路',a:'拿著教練證從助理教練做起，十年後帶隊站上了職業聯賽的場邊。'});
@@ -3596,25 +3838,59 @@ function endGame(reason){
   if(S.salary>=800)o.push({t:'創業開公司',a:'開了運動品牌，第一款球鞋用你的背號命名。'});
   o.push({t:F.field?'回家鄉，在那座以你命名的球場開足球學校':'回家鄉開足球學校',a:F.field?'每個週末，你都站在那座以你命名的球場上，教孩子們第一次踢球。':'在家鄉開了足球學校，學費很便宜，報名的孩子很多。'});
   o.push({t:'離開足球，過平凡的生活',a:'你搬到海邊，偶爾在電視上看到老隊友，會笑著轉台。'});
-  card('talk','引退之後',`${reason}<br>鞋櫃裡的球鞋都收好了。接下來的人生，你想怎麼過？`);
+  card('talk','引退之後','鞋櫃裡的球鞋都收好了。接下來的人生，你想怎麼過？');
   choose('引退之後 — 你的選擇？',o.map(x=>({t:x.t,main:x===o[0],f:()=>{ S.after=x.a; endGameFinal(reason); }})));
 }
+const nextPage=(t,f)=>choose('',[{t:`▸ ${t}`,main:true,f}]);
 function endGameFinal(reason){
-  const ev=evaluate(), tot=careerTotals();
-  const rows=S.log.map(r=>{ const s=r.st;
-    return `<tr><td>${seasonLabel(r.y)}</td><td>${r.age}</td><td>${r.tm}</td><td>${s.App}</td><td>${isGK()?s.CS:s.G}</td><td>${isGK()?s.GA:s.A}</td><td>${s.Rt||'—'}</td></tr>`; }).join('');
-  card('gold','生涯落幕',`${reason}<br>職業生涯 ${S.log.filter(r=>r.lv).length} 季，總出場 <b class="hl">${tot.App}</b>，${isGK()?`零封 <b class="hl">${tot.CS}</b>`:`進球 <b class="hl">${tot.G}</b>、助攻 <b class="hl">${tot.A}</b>`}。生涯總薪資 <b class="hl">${fmtMoney(Math.round(S.salary))}</b>。
-    ${S.caps?`<br>${NATS[S.nat].n}國家隊出賽 <b class="hl">${S.caps}</b> 場${isGK()?'':`、進 <b class="hl">${S.intlG}</b> 球`}。`:''}
-    ${S.honors.length?`<div class="statline">${S.honors.join('<br>')}</div>`:''}
-    <table class="fin"><tr><th>賽季</th><th>齡</th><th>球隊</th><th>出場</th><th>${isGK()?'零封':'進球'}</th><th>${isGK()?'失球':'助攻'}</th><th>評分</th></tr>${rows}</table>`);
-  const L=S.love, fam=L.st==='married'?`已婚（${L.partner}）${L.kids?`、${L.kids} 個孩子`:''}`:L.st==='dating'?`與 ${L.partner} 交往中`:L.exes.length?`離過 ${L.exes.length} 次婚`:'單身';
-  const edu=S.uniGrad?`${S.uni}畢業`:S.uni?`${S.uni}肄業`:'青訓出身';
-  card('info','場外人生',`家庭：${fam}。<br>學歷：${edu}。<br>引退時球迷人氣 ${S.fans}。${S.after?`<br>引退後：${S.after}`:''}`);
-  if(S.hl.length){ const top=[...S.hl.filter(h=>h.big),...S.hl.filter(h=>!h.big).reverse()].slice(0,5).sort((a,b)=>a.y-b.y);
-    card('gold','生涯精華',top.map(h=>`<div class="hlrow"><b>${seasonLabel(h.y)}</b>・${h.age} 歲｜${h.t}</div>`).join('')); }
-  card('gold','生涯評價',ev.lines.map((l,i)=>i?`★ ${l}`:`<b class="hl">${l}</b>`).join('<br>')+'<div id="share-out" style="margin-top:8px"></div>');
-  choose('',[{t:'▸ 產生結算圖',main:true,f:()=>{ shareImage(ev,$('share-out')); choose('',[{t:'↺ 重新開始',main:true,f:()=>{ location.href=location.pathname; }}]); }},
-    {t:'↺ 重新開始',f:()=>{ location.href=location.pathname; }}]);
+  const chs=careerChapters(), gk=isGK(), tot=careerTotals(), pro=S.log.filter(r=>r.lv);
+  /* 第一頁:生涯章節 */
+  card('gold','生涯落幕',`<b class="hl">${S.name}</b>｜${NATS[S.nat].n}・${DPN[S.dpos]}・${S.peakType||playerType()}<br>${pro.length?`${pro[0].y}–${pro[pro.length-1].y+1}，職業生涯 ${pro.length} 季，效力 ${new Set(chs.filter(c=>c.kind==='pro').map(c=>c.club)).size} 支球隊。`:'沒能踏上職業舞台。'}生涯總薪資 <b class="hl">${fmtMoney(Math.round(S.salary))}</b>。`);
+  const CN='一二三四五六七八九十', cn=n=>n<=10?CN[n-1]:n<20?'十'+CN[n-11]:CN[Math.floor(n/10)-1]+'十'+(n%10?CN[n%10-1]:'');
+  chs.forEach((c,i)=>{ const yrs=c.y0===c.y1?`${c.y0}`:`${c.y0}–${c.y1+1}`, kn={youth:'青訓',uni:'大學',loan:'租借',pro:''}[c.kind];
+    const hm={}; c.honors.forEach(h=>{ const n=h.replace(/^\S+ /,''); hm[n]=(hm[n]||0)+1; });
+    const hon=c.honors.length?`<div class="ch-hon">🏆 ${Object.keys(hm).map(n=>hm[n]>1?`${n} ×${hm[n]}`:n).join('、')}</div>`:'';
+    const loan=c.loans.length?`<div class="ch-stat">租借：${c.loans.map(r=>`${baseTm(r.tm)}（${seasonLabel(r.y)}・出場 ${r.st.App}）`).join('、')}</div>`:'';
+    const hl=[...c.hl.filter(h=>h.big),...c.hl.filter(h=>!h.big)].slice(0,2).map(h=>`<div class="hlrow"><b>${seasonLabel(h.y)}</b>｜${h.t}</div>`).join('');
+    card(c.honors.some(h=>/冠軍（/.test(h))?'gold chap':'info chap',`第${cn(i+1)}章　${c.club}${kn?`（${kn}）`:''}`,
+      `<div class="ch-meta">${yrs}・${c.a0}${c.a1!==c.a0?`–${c.a1}`:''} 歲${c.lvs.length?`・${c.lvs.map(k=>LV[k].n).join('、')}`:''}${c.no?`・${c.no} 號`:''}</div>`+
+      `<div class="ch-story">${chStory(c,chs)}</div><div class="ch-stat">${chStat(c.t,gk)}${c.best&&c.best.st.Rt?`・最佳評分 ${c.best.st.Rt}`:''}</div>${loan}${hon}${hl}`); });
+  nextPage('生涯數據',()=>{
+    /* 第二頁:位置數據、榮譽櫃、完整年表 */
+    const P=posStats();
+    card('gold',`${DPN[S.dpos]}生涯數據`,tileHtml(P.main)+`<div class="tiles-sub">${tileHtml(P.common)}</div>`);
+    const cab=honorCabinet(); if(cab)card('gold',`榮譽櫃（${S.honors.length} 項）`,cab);
+    const rows=S.log.map(r=>{ const s=r.st; return `<tr class="${r.inj?'inj':''}"><td>${seasonLabel(r.y)}</td><td>${r.age}</td><td>${r.tm}</td><td>${s.App}</td><td>${gk?s.CS:s.G}</td><td>${gk?s.GA:s.A}</td><td>${s.Rt||'—'}</td></tr>`; }).join('');
+    card('info','完整年表',`<details><summary>展開逐年數據（${S.log.length} 年）</summary><div class="tblwrap"><table class="fin"><tr><th>賽季</th><th>齡</th><th>球隊</th><th>出場</th><th>${gk?'零封':'進球'}</th><th>${gk?'失球':'助攻'}</th><th>評分</th></tr>${rows}</table></div></details>`);
+    nextPage('歷史地位',()=>{
+      /* 第三頁:歷史地位 */
+      const ev=evaluate(), pct=scorePct(ev.sc), hb=historyBoards(chs);
+      card('gold','歷史地位',`生涯分 <b class="hl">${ev.sc}</b>，勝過約 <b class="hl">${pct>=99.5?pct.toFixed(1):Math.round(pct)}%</b> 的模擬足球人生。<div class="pctbar"><i style="width:${pct}%"></i></div>`+
+        `<span class="fx">歷史榜的數字依各國家隊與聯賽的真實紀錄（2026 年），榜上其他人名為虛構。</span>`);
+      hb.forEach(x=>card('info hist',x.sec,`<div class="hbs">${x.b.map(b=>b.html).join('')}</div>`));
+      S.histTxt=hb.flatMap(x=>x.b.filter(b=>b.rk<=50).map(b=>b.txt.replace(/<[^>]+>/g,'')));
+      nextPage('生涯評價',()=>{
+        /* 第四頁:評價、場外人生、後記 */
+        card('gold','生涯評價',ev.lines.map((l,i)=>i?`★ ${l}`:`<b class="hl">${l}</b>`).join('<br>'));
+        card('info','十年後',epilogue(ev,chs,hb)+'<div id="share-out" style="margin-top:8px"></div>');
+        choose('',[{t:'▸ 產生結算圖',main:true,f:()=>{ shareImage(ev,$('share-out')); choose('',[{t:'↺ 重新開始',main:true,f:()=>{ location.href=location.pathname; }}]); }},
+          {t:'↺ 重新開始',f:()=>{ location.href=location.pathname; }}]); }); }); });
+}
+/* 人生後記:把家庭、引退後的路、球隊與球迷的反應寫成一段結尾 */
+function epilogue(ev,chs,hb){
+  const L=S.love, A=S.arcs||{}, s=[], top=hb.flatMap(x=>x.b).filter(b=>b.rk===1);
+  const byClub=chs.filter(c=>c.kind==='pro').reduce((m,c)=>(m[c.club]=(m[c.club]||0)+c.rs.length,m),{}), loyal=Object.keys(byClub).sort((a,b)=>byClub[b]-byClub[a])[0];
+  if(S.after)s.push(S.after);
+  if(ev.tier==='傳奇'&&loyal)s.push(`${loyal} 在主場外替你立了一座銅像，${jerseyFor(loyal)} 號球衣從此退役。`);
+  else if(loyal&&byClub[loyal]>=8)s.push(`${loyal} 把 ${jerseyFor(loyal)} 號球衣保留了一整季，向你致敬。`);
+  if(top.length)s.push(`${top.map(b=>b.txt.replace(/<[^>]+>/g,'').replace(/：.*/,'')).join('、')}的榜首，至今仍寫著你的名字。`);
+  if(L.st==='married')s.push(L.kids?`你和 ${L.partner} 的${L.kids>1?`${L.kids} 個孩子`:'孩子'}${Math.random()<0.5?'也開始在青訓踢球了，你從不缺席任何一場比賽。':'對足球沒什麼興趣，你反而鬆了一口氣。'}`:`你和 ${L.partner} 終於有時間一起去旅行。`);
+  else if(L.st==='dating')s.push(`你和 ${L.partner} 決定結婚，婚禮上來了半支當年的球隊。`);
+  if(A.rival&&A.rival.n&&A.rival.w+A.rival.l>=3)s.push(`每年夏天，你和 ${A.rival.n} 都會約一場業餘賽，誰也不肯讓誰。`);
+  if(S.fans>=80)s.push('只要你出現在球場，看台上還是會響起你的名字。');
+  else if(S.fans<25)s.push('多數球迷已經不記得你了，但你自己記得每一場比賽。');
+  if(S.farewell)s.push(`<span class="fx">引退那天你說：${S.farewell}</span>`);
+  return s.join('<br>');
 }
 /* 結算圖:畫在 canvas 上,版面比照棒球版 */
 function shareImage(ev,out){
@@ -3629,8 +3905,8 @@ function shareImage(ev,out){
   const colW=(W-PAD*2)/2, maxW=colW-20;
   const blocks=honors.map(h=>{ const L=[]; let cur=''; for(const ch of '· '+h){ if(c.measureText(cur+ch).width>maxW&&cur){ L.push(cur); cur='  '+ch; } else cur+=ch; } if(cur)L.push(cur); return L; });
   const half=Math.ceil(blocks.length/2), hH=Math.max(...[blocks.slice(0,half),blocks.slice(half)].map(b=>b.reduce((s,x)=>s+x.length*23,0)),0);
-  const pro=S.log.filter(r=>r.lv);
-  let H=140+30+ev.lines.length*24+14+34+(lgs.length+1)*26+16+(S.caps?56:0)+(honors.length?30+hH+16:0)+34+pro.length*20+24+70;
+  const pro=S.log.filter(r=>r.lv), chs=careerChapters().filter(x=>x.kind!=='youth'), hist=S.histTxt||[], pct=scorePct(ev.sc);
+  let H=140+30+ev.lines.length*24+14+(34+chs.length*22+10)+(34+(hist.length+1)*22+10)+34+(lgs.length+1)*26+16+(S.caps?56:0)+(honors.length?30+hH+16:0)+34+pro.length*20+24+70;
   cv.width=W*scale; cv.height=H*scale; c.scale(scale,scale);
   c.fillStyle='#0c0f1d'; c.fillRect(0,0,W,H);
   c.strokeStyle='#2a3354'; c.lineWidth=3; c.strokeRect(10,10,W-20,H-20);
@@ -3644,6 +3920,13 @@ function shareImage(ev,out){
   const title=t=>{ c.fillStyle='#8b93b0'; c.font='bold 13px sans-serif'; c.fillText(t,PAD,y); y+=22; };
   hr(); title('生涯評價');
   ev.lines.forEach((l,i)=>{ c.font=(i?'':'bold ')+'16px sans-serif'; c.fillStyle=i?'#a9b8ff':'#ffcf4a'; c.fillText((i?'★ ':'')+l,PAD,y); y+=24; }); y+=6;
+  hr(); title('生涯章節');
+  chs.forEach((x,i)=>{ c.font='13px sans-serif'; c.fillStyle=x.honors.some(h=>/冠軍（/.test(h))?'#ffcf4a':'#d6dcf0';
+    const t=`${i+1}. ${x.club}${x.kind==='loan'?'（租借）':x.kind==='uni'?'（大學）':''}　${x.y0}–${x.y1+1}　${chStat(x.t,gk)}${x.honors.filter(h=>/冠軍（/.test(h)).length?`　🏆×${x.honors.filter(h=>/冠軍（/.test(h)).length}`:''}`;
+    c.fillText(t,PAD,y); y+=22; }); y+=10;
+  hr(); title('歷史地位');
+  c.font='bold 14px sans-serif'; c.fillStyle='#ffcf4a'; c.fillText(`勝過約 ${pct>=99.5?pct.toFixed(1):Math.round(pct)}% 的模擬足球人生`,PAD,y); y+=22;
+  c.font='13px sans-serif'; c.fillStyle='#a9b8ff'; hist.forEach(t=>{ c.fillText('· '+t,PAD,y); y+=22; }); y+=10;
   hr(); title('生涯累積數據');
   const cols=[['聯賽',150],['季',50],['出場',70],['分鐘',90],[gk?'零封':'進球',70],[gk?'失球':'助攻',70],['平均評分',90]];
   const row=(cells,head)=>{ let x=PAD; c.font=(head?'bold ':'')+'13px monospace'; c.fillStyle=head?'#8b93b0':'#eef1f8';
