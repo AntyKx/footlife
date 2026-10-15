@@ -831,6 +831,12 @@ html.calm .hball,html.calm .lower3 .trk i,html.calm .hero-pitch .hp-flash circle
 #hp-gl .gs{font:700 7.5px var(--num);letter-spacing:.14em;fill:var(--amber)}
 .hero-pitch .yt path{fill:var(--amber)} .hero-pitch .yt text{font:800 7px var(--num);letter-spacing:.1em;fill:var(--amber);paint-order:stroke;stroke:#0b1020;stroke-width:2}
 .hero-pitch.scored .hp-flash circle{animation-duration:.7s}
+/* ---------- v0.26.1 存檔 ---------- */
+.rsm{border:1px solid color-mix(in srgb,var(--amber) 50%,var(--edge));background:linear-gradient(135deg,color-mix(in srgb,var(--amber) 10%,var(--panel)),var(--panel));border-radius:12px;padding:12px 14px;margin-bottom:16px}
+.rsm-t{display:flex;justify-content:space-between;align-items:center;font:700 11.5px var(--num);letter-spacing:.2em;color:var(--amber)} .rsm-t small{color:var(--dim);letter-spacing:.05em}
+.rsm-t .flag{width:16px;height:10.67px;vertical-align:-1px;margin-right:6px}
+.rsm>b{display:block;font-size:18px;margin-top:4px} .rsm p{font-size:13px;color:var(--dim);margin:2px 0 10px}
+.rsm-b{display:flex;gap:8px} .rsm-b .btn{flex:1;margin:0} .rsm-h{display:block;font-size:11.5px;color:var(--dim);margin-top:6px}
 html.calm *,html.calm *::before,html.calm *::after{animation:none!important;transition:none!important}
 html.calm .var{display:none}
 </style>
@@ -874,6 +880,7 @@ html.calm .var{display:none}
       <div class="htick"><span>學院出身的 17 歲新星提前升上一隊<em>｜</em>小國逆襲：踢上世界盃的那個夏天<em>｜</em>德比之夜，第 89 分鐘的單刀<em>｜</em>買回條款生效，他回家了<em>｜</em>金球獎頒獎典禮，最後一個名字是……</span></div>
     </section>
     <section class="panel">
+      <div id="resume"></div>
       <div class="ptitle">建立你的球員</div>
       <div class="field"><label><i>01</i>球員姓名</label><input id="in-name" maxlength="10" placeholder="例如：陳柏良" value=""></div>
       <div class="field"><label><i>02</i>位置</label>
@@ -945,7 +952,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.26.0';
+const APP_VER='v0.26.1';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -2748,7 +2755,7 @@ function stageLabel(){
 }
 function startYear(){ const go=()=>{ HDR=null; stepQ=[phasePre,phaseMid,phaseEnd]; divider(`${seasonLabel(S.year)} 賽季 · ${S.age} 歲 · ${stageLabel()}`); nextStep(); };
   /* 季末結算自成一個畫面,按了才進下一季 */
-  if(S.log.length){ HDR=HDR_PREV; HDR_PREV=null; } if(S.log.length)choose('',[{t:`▸ 進入 ${seasonLabel(S.year)} 賽季（${S.age} 歲）`,main:true,f:go}]); else go(); }
+  if(S.log.length){ saveGame(); HDR=HDR_PREV; HDR_PREV=null; } if(S.log.length)choose('',[{t:`▸ 進入 ${seasonLabel(S.year)} 賽季（${S.age} 歲）`,main:true,f:go}]); else go(); }
 function advance(){ HDR_PREV=`${seasonLabel(S.year)} 賽季・${S.age} 歲・${stageLabel()}`; S.age++; S.year++; if(S.stage==='YOUTH'||S.stage==='UNI')S.stageYr++; startYear(); }
 
 /* ---------- 季前 ---------- */
@@ -4241,7 +4248,7 @@ function farewellOpts(){
   return o.slice(0,4);
 }
 function endGame(reason){
-  S.done=true; stepQ=[]; board(2);
+  S.done=true; stepQ=[]; board(2); clearSave();
   const pro=S.log.filter(r=>r.lv), tot=pro.reduce((a,r)=>{ ['App','G','A','CS'].forEach(k=>a[k]+=r.st[k]||0); return a; },{App:0,G:0,A:0,CS:0}), gk=isGK(), last=pro[pro.length-1];
   const where=last?baseTm(last.tm):S.team, crowd=S.fans>=80?'記者會擠滿了媒體，場外還有上百名球迷舉著你的球衣。':S.fans>=50?'各家媒體都到了，閃光燈沒停過。':'只來了幾家媒體，但你不在意。';
   card('talk','引退記者會',`${S.year} 年夏天，${S.age} 歲的 <b class="hl">${S.name}</b> 在 ${where} 召開記者會。${reason}<br>${crowd}<br>`+
@@ -4596,6 +4603,26 @@ $('btn-start').onclick=()=>{
   prologue();
 };
 $('ver-badge').textContent=APP_VER;
+/* ================= 存檔(v0.26.1):每季開始自動存;S 與亂數狀態一起存,讀檔後從該季開頭接著玩,結果與沒中斷一樣 ================= */
+const SAVE_KEY='fl-save';
+function saveGame(){ try{ localStorage.setItem(SAVE_KEY,JSON.stringify({v:1,ver:APP_VER,seed:SEED,rs:_s,hp:HDR_PREV,side:$('side-list').innerHTML,sn:SIDE_N,S})); }catch(e){} }
+function clearSave(){ try{ localStorage.removeItem(SAVE_KEY); }catch(e){} }
+function loadSave(){ try{ const x=JSON.parse(localStorage.getItem(SAVE_KEY)||'null'); return x&&x.v===1&&x.S&&!x.S.done?x:null; }catch(e){ return null; } }
+function resumeGame(x){
+  SEED=x.seed; history.replaceState(null,'','?seed='+encodeURIComponent(SEED)); _s=x.rs; S=x.S; HDR_PREV=x.hp;
+  $('start').style.display='none'; $('board').style.display=''; $('act').style.display='';
+  if(x.side){ $('side-list').innerHTML=x.side; SIDE_N=x.sn||0; $('side-n').textContent=SIDE_N;
+    $('side-list').querySelectorAll('.sg-h').forEach(h=>h.onclick=()=>h.parentNode.classList.toggle('shut'));
+    $('side-list').querySelectorAll('.sd').forEach(b=>{ b.style.opacity='.6'; b.title='讀檔前的紀錄，無法跳回當時畫面'; }); }
+  card('info','繼續生涯',`歡迎回來，<b class="hl">${S.name}</b>。從 ${seasonLabel(S.year)} 賽季開頭接著踢。${x.ver!==APP_VER?`<br><span class="fx">存檔來自 ${x.ver}，遊戲已更新到 ${APP_VER}，之後的發展可能和原本略有不同。</span>`:''}`);
+  board(0); startYear(); }
+function resumeBox(){ const x=loadSave(), el=$('resume'); if(!el)return; if(!x){ el.innerHTML=''; return; }
+  const P=x.S, where=P.stage==='PRO'?P.club:P.stage==='UNI'?P.uni:P.team;
+  el.innerHTML=`<div class="rsm"><div class="rsm-t"><span>${flagSVG(P.nat)}存檔</span><small>${x.ver}</small></div><b>${P.name}</b><p>${P.age} 歲・${GRPN[P.grp]}・${where}・${seasonLabel(P.year)} 賽季開頭</p><div class="rsm-b"><button class="btn main" id="rsm-go">▶ 繼續生涯</button><button class="btn" id="rsm-del">刪除存檔</button></div><small class="rsm-h">開始新生涯會覆蓋這份存檔</small></div>`;
+  $('rsm-go').onclick=()=>resumeGame(x);
+  $('rsm-del').onclick=()=>{ if($('rsm-del').dataset.k){ clearSave(); resumeBox(); } else { $('rsm-del').dataset.k=1; $('rsm-del').textContent='再按一次確認刪除'; } }; }
+resumeBox();
+
 /* ---------- 配色與動畫設定(存在本機瀏覽器) ---------- */
 const THEMES=[['soft','夜賽轉播','預設・深藍夜空配照明燈金','#0d1322','#e8ecf4','#f2c14e'],['ucl','歐冠星夜','深藍黑配銀藍，冠軍之夜','#070b1d','#eef2ff','#3d6bff'],
   ['claret','酒紅主場','深酒紅配奶油金','#170d13','#f1e8ec','#e8c27a'],['blackgold','黑金','近黑配香檳金，最沉穩','#0c0c0d','#eeeae2','#d4af37'],
