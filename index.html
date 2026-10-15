@@ -806,7 +806,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.24.0';
+const APP_VER='v0.25.0';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -856,6 +856,26 @@ const YOUTH={ /* 依國籍,隊名全虛構 */
   CV:{'普拉亞足球學院':1,'明德盧青年學院':1,'薩爾島青訓中心':2,'聖安唐足球學校':2,'海灘業餘隊':3,'火山島足球隊':3},
 };
 const YOUTH_PAR={1:30,2:27,3:24};
+/* 豪門學院(v0.25):第一級青訓換成真實俱樂部的學院(台灣沒有對應的職業學院,維持虛構);[學院名, 母隊] */
+const ACAD={JP:[['FC東京U-18','FC東京'],['大阪櫻花U-18','大阪櫻花']],KR:[['蔚山HD U18','蔚山HD'],['浦項鐵人U18','浦項鐵人']],
+  CN:[['魯能足球學校','山東泰山'],['上海海港青訓','上海海港']],AU:[['雪梨FC學院','雪梨FC'],['墨爾本城學院','墨爾本城']],
+  VN:[['河內FC青訓','河內FC'],['軍隊體工青訓','軍隊體工']],TH:[['武里南聯學院','武里南聯'],['曼谷聯青訓','曼谷聯']],
+  EN:[['曼聯青訓學院','曼聯'],['切爾西科巴姆學院','切爾西']],ES:[['巴薩拉瑪西亞','巴塞隆納'],['皇馬青訓','皇家馬德里']],
+  FR:[['里昂青訓中心','里昂'],['巴黎聖日耳曼學院','巴黎聖日耳曼']],DE:[['拜仁青訓學院','拜仁慕尼黑'],['多特蒙德青訓','多特蒙德']],
+  IT:[['亞特蘭大青訓','亞特蘭大'],['國際米蘭青訓','國際米蘭']],PT:[['本菲卡塞沙爾學院','本菲卡'],['葡萄牙體育學院','葡萄牙體育']],
+  NL:[['阿賈克斯未來學院','阿賈克斯'],['PSV青訓','PSV燕豪芬']],HR:[['札格雷布迪納摩學院','札格雷布迪納摩'],['哈伊杜克青訓','哈伊杜克斯普利特']],
+  BR:[['桑托斯青訓','桑托斯'],['弗拉門哥青訓','弗拉門哥']],AR:[['河床青訓','河床'],['博卡青年青訓','博卡青年']],
+  UY:[['國民青訓','國民'],['佩納羅爾青訓','佩納羅爾']],CO:[['國民競技青訓','國民競技'],['百萬富翁青訓','百萬富翁']],
+  US:[['費城聯合學院','費城聯合'],['紐約紅牛學院','紐約紅牛']],MX:[['帕丘卡青訓','帕丘卡'],['瓜達拉哈拉青訓','瓜達拉哈拉']],
+  CA:[['多倫多FC學院','多倫多FC'],['溫哥華白浪學院','溫哥華白浪']],MA:[['維達德青訓','卡薩布蘭卡維達德'],['拉賈青訓','卡薩布蘭卡拉賈']],
+  SN:[['世代足球學院U19','世代足球學院'],['達卡聖心學院','達卡聖心']],NG:[['雷莫之星青訓','雷莫之星'],['恩伊姆巴青訓','恩伊姆巴']],
+  EG:[['阿赫利青訓','阿赫利'],['扎馬雷克青訓','扎馬雷克']],CV:[['明德盧體育會青訓','明德盧體育會'],['帕爾梅拉青訓','帕爾梅拉']]};
+/* 全家移居才能進的歐洲學院(國際足總禁止 18 歲以下跨國轉會,家庭移居例外) */
+const ACAD_FOREIGN=[['巴薩拉瑪西亞','巴塞隆納','西班牙'],['阿賈克斯未來學院','阿賈克斯','荷蘭'],['本菲卡塞沙爾學院','本菲卡','葡萄牙'],['里昂青訓中心','里昂','法國']];
+const ACAD_ALL={};
+Object.keys(ACAD).forEach(k=>{ const y=YOUTH[k]; Object.keys(y).filter(n=>y[n]===1).forEach(n=>delete y[n]); ACAD[k].forEach(([n,c])=>{ y[n]=1; ACAD_ALL[n]=c; }); });
+ACAD_FOREIGN.forEach(([n,c])=>{ ACAD_ALL[n]=c; });
+const teamLv=club=>Object.keys(TEAMS).find(k=>TEAMS[k].includes(club));
 /* 大學:校名全虛構;分級依入學時綜合決定(強校競爭較激烈) */
 const UNIS={TW:['北嶺體育大學','鳳林大學','海昇大學','雲嵐大學'],JP:['東都体育大学','青嶺大学','浪華経済大学','北辰学院大学'],
   KR:['漢江體育大學','清嵐大學','釜海大學','月城大學'],AU:['海港大學','藍嶺理工大學','南灣大學','紅土大學'],
@@ -1056,7 +1076,7 @@ function newState(name,grp,nat){
   else sh.forEach((k,i)=>{ pot[k]= i===0?ri(72,80) : i===1?ri(60,70) : i===2?ri(52,62) : ri(40,56); });
   const yt=YOUTH[nat]||YOUTH.TW, team=pick(Object.keys(yt));
   return {name,grp,dpos:DP_DEFAULT[grp],nat,natFrom:null,age:15,year:2026,stage:'YOUTH',stageYr:1,
-    ab,pot,carry:{},team,youthTier:yt[team],
+    ab,pot,carry:{},team,youthTier:yt[team],acad:ACAD_ALL[team]?{club:ACAD_ALL[team]}:null,
     lv:null,club:null,clubTier:2,ct:null,rivals:[],loan:null,wantOut:false,relegated:false,honors:[],
     traits:Object.fromEntries(Object.keys(TRAITN).map(k=>[k,false])),removed:[],six:0,pendStat:0,tmpInj:0,rehab:0,seasonFactor:1,skipMid:false,
     roleAdj:0,salary:0,stats:{},log:[],done:false,
@@ -3167,7 +3187,7 @@ function marketValue(){
   return Math.round(LV[S.lv].sal*3*clamp(1+(ovr()-LV[S.lv].par)*0.08,0.3,3)*ageF*ctF*DP_MULT[S.dpos]*(0.8+S.fans/250)); /* 人氣 50 為 ×1 */
 }
 function movement(){
-  if(S.stage==='YOUTH'){ if(S.stageYr<3)advance(); else youthExit(); return; }
+  if(S.stage==='YOUTH'){ if(S.stageYr<3){ if(S.acad&&!S.acadOut)acadReview(); else advance(); } else youthExit(); return; }
   if(S.stage==='UNI'){ uniYearEnd(); return; }
   if(S.mil==='serving'){ if(endService())summerWindow(); else contractEnd(); return; }
   if(S.loan)endLoan();
@@ -3224,9 +3244,13 @@ function offerOpt(of,main,title){
     s:`${of.yrs} 年｜年薪約 ${fmtMoney(est)}｜${TIER_DESC[of.tier]}`,f:()=>negotiate(of,()=>signTo(of))};
 }
 function signTo(of){
-  if(of.club!==S.club)S.rivals=[]; /* 換隊就換一批競爭者 */
+  const prev=S.club; /* v0.25 修正:原本先改 S.club 才比較,換隊判斷永遠不成立 */
+  if(of.club!==prev)S.rivals=[]; /* 換隊就換一批競爭者 */
   S.stage='PRO'; S.lv=of.lv; S.club=of.club; S.clubTier=of.tier; S.loan=null;
-  if(of.club!==S.club){ S.newSign=true; S.trust=50; } /* 新加盟第一個夏窗不會被賣、也沒人來談;教練信任重新開始 */
+  if(of.club!==prev){ S.newSign=true; S.trust=50; } /* 新加盟第一個夏窗不會被賣、也沒人來談;教練信任重新開始 */
+  if(S.acad&&!S.acadOut&&of.club===S.acad.club&&!S.acadGrad)S.acadGrad=true; /* 學院出身升上一隊 */
+  if(S.buyback&&of.club===S.buyback.club){ S.buyback=null; S.boughtBack=true;
+    card('gold','回家了',`${of.club}行使當年的買回條款。走進熟悉的訓練基地，青訓教練站在門口等你：「我就知道你會回來。」`); }
   S.ct={yrs:of.yrs,mult:TIER_PAY[of.tier],lv:of.lv}; S.wantOut=false; S.relegated=false;
   card('gold','簽約',`與 <b class="hl">${of.club}</b>（${LV[of.lv].n}・${TIERN[of.tier]}）簽下 <b class="hl">${of.yrs} 年</b>合約。`);
   board(2);
@@ -3274,8 +3298,16 @@ function youthExit(){
   const N=NATS[S.nat], alt=N.alt||(N.cf==='AFC'?['J2','K2']:null);
   if(alt&&LV[homeLow()].par<40&&o>=38)offers.push(...makeOffers(pick(alt),o>=42?2:1));
   const opts=offers.map((of,i)=>offerOpt(of,i===0));
+  /* 學院出身:母隊一隊升格,能力不夠就簽約後外租 */
+  if(S.acad&&!S.acadOut){ const lv=teamLv(S.acad.club), c=S.acad.club;
+    if(lv){ opts.forEach(x=>x.main=false);
+      if(o>=LV[lv].min-3)opts.unshift({t:`一隊升格：${c}（${LV[lv].n}）`,main:true,s:'學院最好的結局：簽下 4 年職業約，先從板凳開始爭取',f:()=>{
+        card('gold','一隊升格',`${S.team}的畢業生名單上，只有你被叫進一隊更衣室。櫃子上已經掛好你的名字。`); signTo({lv,club:c,tier:tierOf(lv,c),yrs:4}); advance(); }});
+      else { const lo=acadLoan(lv,o); if(lo)opts.unshift({t:`簽約並外租：${c}`,main:true,s:`母隊簽下你，先外租到${LV[lo.lv].n}累積上場時間（類似 B 隊）`,f:()=>{
+        card('info','簽約外租',`${c}不想放走自己培養的球員，但一隊沒有你的位置。`); signTo({lv,club:c,tier:tierOf(lv,c),yrs:4}); startLoan(lo); advance(); }});
+        else card('bad','學院畢業',`${c}沒有給你職業合約。學院的路走到這裡，接下來要靠自己。`); } } }
   /* 歐洲青訓試訓:潛力夠高才有機會;失敗只能晚一步回國簽短約 */
-  if(potAvg>=60&&N.cf!=='UEFA'){ const p=clamp(Math.round(25+(potAvg-60)*4+(S.traits.genius?20:0)),10,70);
+  if(potAvg>=60&&N.cf!=='UEFA'&&!(S.acad&&S.acad.foreign&&!S.acadOut)){ const p=clamp(Math.round(25+(potAvg-60)*4+(S.traits.genius?20:0)),10,70);
     opts.push({t:'赴歐青訓試訓',warn:true,s:`成功率 ${p}%｜成功直接簽歐洲球隊；失敗只能回國簽 1 年短約`,f:()=>{
       if(chance(p)){ const lv=pick(N.trial||['NED','POR','BEL']), club=pick(TEAMS[lv].filter(t=>tierOf(lv,t)>=2));
         card('gold','試訓成功',`${club}的青訓總監看中你的潛力，開出一份長約。`);
@@ -3301,12 +3333,14 @@ function summerWindow(){
       {t:'拒絕，留在隊上',warn:true,s:'球團不太高興，教練信任 −15',f:()=>{ card('bad','拒絕轉會',`你拒絕離開，但球團的態度明顯冷淡了。${meter('trust',-15)}`); advance(); }}]);
       return; } }
   const offers=interest?genOffers(Math.max(1,offerCount(false)),lastRole>=2):[];
+  { const BB=S.buyback, bl=BB&&teamLv(BB.club); /* 學院買回條款:能力達母隊聯賽水準、25 歲前 */
+    if(BB&&bl&&!fresh&&S.club!==BB.club&&S.age<=25&&ovr()>=LV[bl].par&&chance(45)&&!offers.some(x=>x.club===BB.club))offers.unshift({lv:bl,club:BB.club,tier:tierOf(bl,BB.club),yrs:4,bb:1}); }
   /* 降級條款:上級聯賽球隊來挖角 */
   if(S.relegated){ const up=Object.keys(LV).find(k=>LV[k].rel===S.lv), of=up&&ovr()>=LV[up].min&&makeOffers(up,1,S.club)[0];
     if(of&&!offers.some(x=>x.club===of.club))offers.unshift(of); }
   const opts=[{t:'▸ 留隊，進入下一季',main:true,stay:1,f:advance}];
   offers.forEach(of=>{ const fee=Math.round(mv*(0.9+R()*0.3));
-    opts.push({t:`轉會：${ofName(of)}`,offer:1,s:`${of.yrs} 年｜轉會費約 ${fmtMoney(fee)}｜${TIER_DESC[of.tier]}`,f:()=>{
+    opts.push({t:`${of.bb?'母隊行使買回條款':'轉會'}：${ofName(of)}`,offer:1,s:`${of.yrs} 年｜轉會費約 ${fmtMoney(fee)}｜${TIER_DESC[of.tier]}`,f:()=>{
       /* 合約剩 2 年以上的主力,球隊可能拒絕放人;申請轉會後比較願意放 */
       if(lastRole===0&&S.ct.yrs>=2&&chance(S.wantOut?20:50)){
         card('bad','球隊拒絕放人',`${S.club}認為你是核心戰力，拒絕了 ${of.club} 的報價。`); advance(); return; }
@@ -4221,6 +4255,9 @@ const ACH=[
   {id:'wall',cat:'軌跡',n:'零封之牆',d:'門將職業生涯零封 100／200／300 場',lv:[100,200,300],r:'r',v:A=>A.gk?A.tot.CS:0},
   {id:'natlegend',cat:'軌跡',n:'國家隊傳奇',d:'國家隊出場榜或射手榜歷史第一',r:'r',v:A=>(A.hb||[]).some(x=>/國家隊/.test(x.sec)&&x.b.some(b=>b.rk===1))},
   {id:'nemesis',cat:'軌跡',n:'宿敵終結者',d:'與宿敵交手 5 勝以上、一場沒輸',r:'r',v:A=>{ const R=S.arcs&&S.arcs.rival; return !!R&&R.w>=5&&R.l===0; }},
+  {id:'acadstar',cat:'軌跡',n:'學院之光',d:'學院出身升上母隊一隊，並為母隊踢滿 5 季',r:'r',v:A=>!!S.acadGrad&&!!S.acad&&A.pro.filter(r=>!r.loan&&r.tm===S.acad.club).length>=5},
+  {id:'comeback',cat:'軌跡',n:'被放走的那個人',d:'被學院釋出，後來拿到頂級聯賽冠軍或踢上五大聯賽',r:'e',v:A=>S.acadOut==='released'&&(A.pro.some(r=>LV[r.lv].top5)||S.honors.some(h=>{ const k=honorLv(h); return /冠軍（[^・）]*）$/.test(h)&&k&&!LV[k].up; }))},
+  {id:'boomerang',cat:'軌跡',n:'回家的路',d:'被學院賣掉後，母隊行使買回條款把你買回來',r:'e',v:A=>!!S.boughtBack},
   {id:'redking',cat:'趣味',n:'紅牌之王',d:'職業生涯 10 張紅牌',r:'r',v:A=>A.tot.R>=10},
   {id:'bench',cat:'趣味',n:'板凳哲學家',d:'職業生涯有 5 季坐板凳',r:'c',v:A=>A.pro.filter(r=>r.st.role==='板凳').length>=5},
   {id:'traveler',cat:'趣味',n:'環球旅行家',d:'效力 8 支以上球隊',r:'r',v:A=>new Set(A.pro.map(r=>baseTm(r.tm))).size>=8},
@@ -4265,6 +4302,51 @@ function openAch(){
   $('achp').classList.add('open');
 }
 
+/* ================= 學院與前情(v0.25) ================= */
+const ORIGIN={1:['十二歲那年，你在全國少年賽踢進決賽的致勝球。看台上坐著 %A 的球探。','你的少年隊教練把比賽影片寄給了 %A。三週後，對方打電話到你家。','你在暑期營隊連過三個人射門，%A 的青訓總監當場要了你父母的電話。'],
+  2:['你是 %A 的特招生，一邊念書一邊踢球，校隊的學長都叫你「小怪物」。','國中畢業那年，%A 的教練到你家拜訪了三次，你父母才點頭。'],
+  3:['沒有球探來看過你。你每天放學在 %A 踢到天黑，鞋子補了又補。','你是在街頭比賽裡長大的。%A 的教練說：「你很野，但你很會踢。」']};
+const yName=(nat,t)=>Object.keys(YOUTH[nat]||YOUTH.TW).filter(n=>(YOUTH[nat]||YOUTH.TW)[n]===t);
+function prologue(){
+  const N=NATS[S.nat], tips=`<br><span style="color:var(--dim);font-size:12px">提示：21 歲前完成 8 堂滿強度（6 星）訓練可覺醒隱藏特質。關鍵時刻記得看球探情報。</span>`;
+  const start=()=>{ card('info','球員誕生',`${S.year} 年夏天，${N.n}${GRPN[S.grp]} <b class="hl">${S.name}</b> 加入 <b class="hl">${S.team}</b>。三年後的路，要自己選。${S.acad?`<br>學院的規矩很簡單：每年考核，留下或離開。`:''}${tips}`); startYear(); };
+  const story=rpick(ORIGIN[S.youthTier]).replace('%A',S.team);
+  /* 全家移居:非歐洲國籍、6% 機率可以進歐洲學院 */
+  if(N.cf!=='UEFA'&&chance(6)){ const [an,ac,cty]=pick(ACAD_FOREIGN);
+    card('talk','被發掘',`${story}<br>就在這時，你父親接到公司調派 <b class="hl">${cty}</b> 的通知。${an} 的球探說，只要全家搬過去，學院願意讓你試訓——國際足總只允許全家移居的未成年球員加入外國學院。`);
+    choose('前情 — 你的選擇？',[{t:`全家搬到${cty}，加入 ${an}`,main:true,s:'海外學院：競爭激烈、遠離家鄉，但可能直接升上歐洲一隊',f:()=>{ S.team=an; S.youthTier=1; S.acad={club:ac,foreign:true}; meter('form',-3); start(); }},
+      {t:`留在家鄉的 ${S.team}`,s:'熟悉的環境',f:start}]); return; }
+  if(S.acad){ const alt=pick(yName(S.nat,2));
+    card('talk','被發掘',`${story}<br>${S.team}是 ${S.acad.club} 的青訓體系，最好的學員會直接升上一隊——但每年考核，不合格就會被賣掉或釋出。`);
+    choose('前情 — 你的選擇？',[{t:`加入 ${S.team}`,main:true,s:'學院路線：一隊升格、被賣或被釋出',f:start},
+      {t:`去 ${alt}`,s:'穩定的地方名校：上場機會多、壓力小，但沒有直通一隊的路',f:()=>{ S.team=alt; S.youthTier=2; S.acad=null; meter('trust',8); start(); }}]); return; }
+  card('talk','被發掘',story); choose('',[{t:'▸ 開始青訓第一年',main:true,f:start}]);
+}
+/* 學院畢業生外租:母隊所在國、水準較低的聯賽(學院在地居住,不受本土限制) */
+function acadLoan(plv,o){ const cty=LV[plv].cty, ls=Object.keys(LV).filter(k=>LV[k].cty===cty&&LV[k].par<LV[plv].par&&o>=LV[k].min).sort((a,b)=>LV[b].par-LV[a].par);
+  if(!ls.length){ const low=Object.keys(LV).filter(k=>LV[k].cty===cty&&LV[k].par<LV[plv].par).sort((a,b)=>LV[a].par-LV[b].par)[0]; if(!low||o<LV[low].min-6)return null; ls.push(low); } /* 能力不夠也先放到最低級別(像 B 隊) */
+  const lv=ls[0], cs=TEAMS[lv].filter(t=>tierOf(lv,t)>=2); return {lv,club:pick(cs.length?cs:TEAMS[lv]),tier:2,yrs:1}; }
+/* 學院年度考核(青訓第一、二年季末):跳級、提前升一隊、續留、被賣、被釋出 */
+function acadReview(){
+  const A=S.acad, o=ovr(), par=YOUTH_PAR[1], last=S.log[S.log.length-1], rt=last?last.st.Rt:0, lv=teamLv(A.club);
+  const key=Object.keys(DP_W[S.dpos]).sort((a,b)=>DP_W[S.dpos][b]-DP_W[S.dpos][a])[0];
+  if(o>=par+5&&rt>=7.1){ const gt=loveGainTxt(key,2), tx=meter('trust',6); board();
+    card('gold','學院考核：跳級',`教練組把你提前升到 U19，跟大你兩歲的學長一起訓練——${gt}${tx?'、'+tx:''}。`);
+    if(S.stageYr===2&&lv&&o>=LV[lv].min-4){ choose('17 歲 · 一隊想提前簽下你',[
+      {t:`提前簽約：${A.club}`,warn:true,s:'17 歲就當職業球員：上場機會少，但成長環境最好',f:()=>{
+        card('gold','提前升格',`17 歲，你在 ${A.club} 簽下第一份職業合約，成為學院近年最年輕的一隊球員。`); signTo({lv,club:A.club,tier:tierOf(lv,A.club),yrs:5}); advance(); }},
+      {t:'留在 U19 再練一年',main:true,s:'穩紮穩打，18 歲再升格',f:advance}]); return; }
+    advance(); return; }
+  if(o<par-1&&chance(o<par-4?55:25)){
+    if(chance(50)){ const nt=pick(yName(S.nat,2)); S.acadOut='sold'; S.buyback={club:A.club,y:S.year};
+      card('bad','學院考核：被賣',`${S.team}把你賣給了 <b class="hl">${nt}</b>，附帶一條買回條款。總監說：「如果你證明我們錯了，我們會回來找你。」`);
+      S.team=nt; S.youthTier=2; }
+    else { const nt=pick(yName(S.nat,3)); S.acadOut='released';
+      card('bad','學院考核：被釋出',`名單公布那天，你的名字不在上面。你收拾好置物櫃，回到家鄉的 <b class="hl">${nt}</b>。${meter('form',-5)}`);
+      S.team=nt; S.youthTier=3; }
+    S.rivals=[]; board(); advance(); return; }
+  card('info','學院考核',`通過年度考核，${S.team}續留你一年。`); advance();
+}
 /* ================= 開場設定 ================= */
 (function(){ const t=$('act-toggle');
   if(t)t.onclick=()=>{ $('act').classList.toggle('collapsed');
@@ -4296,8 +4378,7 @@ $('btn-start').onclick=()=>{
   S=newState(nm,selGrp,selNat);
   $('start').style.display='none';
   $('board').style.display=''; $('act').style.display='';
-  card('info','球員誕生',`${S.year} 年夏天，${NATS[S.nat].n}${GRPN[S.grp]} <b class="hl">${S.name}</b> 加入 <b class="hl">${S.team}</b>。三年後的路，要自己選。<br><span style="color:var(--dim);font-size:12px">提示：21 歲前完成 8 堂滿強度（6 星）訓練可覺醒隱藏特質。關鍵時刻記得看球探情報。</span>`);
-  startYear();
+  prologue();
 };
 $('ver-badge').textContent=APP_VER;
 /* ---------- 配色與動畫設定(存在本機瀏覽器) ---------- */
