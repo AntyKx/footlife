@@ -9,7 +9,7 @@ const R=a=>a[Math.floor(Math.random()*a.length)];
   const dom=new JSDOM(html,{runScripts:'dangerously',url:'https://x.test/?seed='+SEEDP+k,pretendToBeVisual:true});
   const w=dom.window,d=w.document; w.scrollTo=()=>{}; w.Element.prototype.scrollIntoView=function(){}; let err=null;
   w.addEventListener('error',e=>{ err=String(e.error&&e.error.message||e.message); });
-  const nat=nats[(k*7+3)%27], ps=pos[k%4];
+  const nat=nats[(k*7+3)%nats.length], ps=pos[k%4];
   d.querySelector(`[data-v="${ps}"]`).click(); d.querySelector(`[data-v="${nat}"]`).click(); d.getElementById('btn-start').click();
   let steps=0, idle=0;
   while(steps++<8000){

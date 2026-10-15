@@ -974,7 +974,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.26.6';
+const APP_VER='v0.26.7';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -4281,7 +4281,7 @@ function careerScore(){
   return Math.round(S.log.reduce((s,r)=>s+seasonPts(r)*lgW(r.lv||'TW1'),0)+S.honors.reduce((s,h)=>s+honorPts(h),0));
 }
 /* 五帶門檻(批次模擬校準):傳奇 2%、巨星 8%、主力 25%、浮沉 40%、過客 25% */
-const TIER_TH=[1379,734,436,225]; /* 600 段生涯模擬(v0.25.1:學院、新特質、引退與冠軍率調整後)的 p98/p90/p65/p25 */
+const TIER_TH=[1925,1105,537,247]; /* 600 段生涯模擬(v0.26.6:教練、經紀人、轉位、新聯賽與新國籍加入後)的 p98/p90/p65/p25 */
 const TIERS=['傳奇','巨星','主力','浮沉','過客'];
 const HOF_TH=210; /* 單一聯賽(未加權)生涯分門檻 */
 function mainLeague(){ const m={}; S.log.forEach(r=>{ if(r.lv)m[r.lv]=(m[r.lv]||0)+r.st.Min*lgW(r.lv); }); /* 以加權上場時間選代表聯賽 */
