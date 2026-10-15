@@ -475,7 +475,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.12.0';
+const APP_VER='v0.12.1';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -546,8 +546,8 @@ const NATS={
   KR:{n:'韓國',tier:1,wc:85,cap:10,nt:49,home:['K1','K2'],scout:0,wp:0,mil:'KR'},
   AU:{n:'澳洲',tier:2,wc:70,cap:25,nt:46,home:['AUS'],scout:0,wp:0},
   CN:{n:'中國',tier:3,wc:30,cap:30,nt:42,home:['CSL','CHN2'],scout:1,wp:1},
-  VN:{n:'越南',tier:4,wc:6,cap:25,nt:38,home:['VIE'],scout:2,wp:1},
-  TH:{n:'泰國',tier:4,wc:6,cap:25,nt:38,home:['THA'],scout:2,wp:1},
+  VN:{n:'越南',tier:4,wc:4,cap:12,nt:38,home:['VIE'],scout:2,wp:1},
+  TH:{n:'泰國',tier:4,wc:4,cap:12,nt:38,home:['THA'],scout:2,wp:1},
 };
 const NAT_TIERN={1:'強',2:'中強',3:'中',4:'中弱',5:'弱'};
 const homeLow=()=>NATS[S.nat].home.at(-1), homeTop=()=>NATS[S.nat].home[0];
