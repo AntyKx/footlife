@@ -974,7 +974,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.26.8';
+const APP_VER='v0.26.9';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -3299,18 +3299,19 @@ function seasonRole(){
     card('good','季中逆襲',`狀態火燙，教練把你拉上更重要的角色：<b class="up">${ROLES[r][0]}</b>。`); }
   return r;
 }
+const GK_APP=[[.80,1.0],[.30,.55],[.06,.20],[0,.06]]; /* v0.26.9 門將出賽比例:很少輪換,替補一季只有幾場 */
 const YEL_RATE={GK:.008,CB:.19,FB:.16,DM:.24,CM:.17,AM:.10,W:.10,ST:.12,SS:.10}; /* 每場黃牌率 */
 const DEF_BASE={GK:.30,CB:.31,FB:.28,DM:.30,CM:.24}; /* 防守位置的評分基礎貢獻(對應進攻球員的進球助攻) */
 function simSeason(par,games,r){
   const d=ovr()-par, f=S.seasonFactor;
-  const [rn,a,b,m1,m2]=ROLES[r];
+  const [rn,a0,b0,m1,m2]=ROLES[r], [a,b]=isGK()?GK_APP[r]:[a0,b0];
   let app=Math.round(games*(a+R()*(b-a))*f);
   /* 黃紅牌:每場黃牌率依位置;累積 5 張停賽 1 場,紅牌停賽 2 場 */
   const MC=S.mCards||{y:0,r:0}, yr=YEL_RATE[S.dpos]*(S.traits.redcard?1.4:S.traits.gent?0.3:1);
   const yel=Math.round(app*yr*(0.6+R()*0.8))+MC.y, red=MC.r+(chance(app*yr*0.02*(S.traits.redcard?2:1)*100)?1:0), ban=Math.floor(yel/5)+red*2;
   app=Math.max(0,app-ban);
   let mpg=ri(m1,m2);
-  if(isGK())mpg=r<=1?90:mpg; else if(S.ab.sta<45)mpg=Math.round(mpg*0.85);
+  if(isGK())mpg=r<=2?90:75; /* 門將替補多半是盃賽或傷停時先發踢滿;板凳偶爾中途上場 */ else if(S.ab.sta<45)mpg=Math.round(mpg*0.85);
   const min=app*mpg, n90=min/90;
   const st={App:app,Min:min,G:0,A:0,Rt:0,CS:0,GA:0,role:rn,d,Y:yel,R:red,Ban:ban};
   const pend=S.pendStat, fb=(S.form-50)/50; S.pendStat=0; const boost=(1+pend*0.03)*(1+fb*0.12); /* 狀態 0–100 影響進球效率 */
