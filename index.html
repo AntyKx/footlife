@@ -861,6 +861,7 @@ html.calm .lv-l p{opacity:1;animation:none}
 .ft-me em{font-style:normal;font-size:11.5px;background:var(--amber);color:var(--on-amber);border-radius:4px;padding:1px 7px;font-weight:700}
 .dtr{display:flex;flex-wrap:wrap;gap:5px;padding:0 4px} .dtr span{font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--amber) 55%,transparent);color:var(--amber);background:color-mix(in srgb,var(--amber) 10%,transparent);cursor:help}
 .dtr span.neg{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 55%,transparent);background:color-mix(in srgb,var(--bad) 10%,transparent)} .dtr span.off{color:var(--dim);border-color:var(--edge);background:none;text-decoration:line-through;cursor:default}
+.hlrow small.hlq{display:block;margin-top:2px;font-size:12px;font-weight:400;color:var(--dim)}
 html.calm *,html.calm *::before,html.calm *::after{animation:none!important;transition:none!important}
 html.calm .var{display:none}
 </style>
@@ -976,7 +977,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.26.11';
+const APP_VER='v0.26.12';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1863,7 +1864,7 @@ function momentCtx(min,a,b){ const mn=typeof min==='number'?min:parseInt(String(
   if(d<=-2)return {txt:'已經落後兩球，球隊急需一個進球——',clutch:null};
   return {txt:'',clutch:null}; }
 function momentCard(tag,sc,tell,see,min,me,a,b,opp){
-  MCTX=momentCtx(min,a,b);
+  MCTX=momentCtx(min,a,b); Object.assign(MCTX,{mn:typeof min==='number'?min:parseInt(String(min).replace(/\D/g,''))||0,a,b,opp});
   return card('moment',tag+'｜'+sc.t,`<div class="mhead"><span class="mmin">${min}'</span><span class="msc"><span class="tm">${me}</span><b class="sc" data-a="${a}" data-b="${b}">${a} – ${b}</b><span class="tm">${opp}</span></span></div>
     <p style="margin-top:6px">${MCTX.txt?`<b class="hl">${MCTX.txt}</b>`:''}${sc.d}</p>${pitchSVG(sc)}
     <div class="mtell">${see?'🔍 球探情報：'+tell.h:'🔍 看不出對手的意圖'}</div><div class="mres"></div>`); }
@@ -1954,6 +1955,7 @@ function liveStats(c,o){ const win=o.win, pos=clamp(50+(win?rnd(2,12):rnd(-12,2)
 /* 單次大舞台關鍵時刻(國際賽淘汰賽、盃賽決賽):done(ok) */
 function bigMoment(tag,me,opp,par,done,fx){ fx=fx||{}; /* fx:min/a/b 指定時間與比分、see 必看出對手、bonus 成功率加成、boldB 冒險加成、half 點數減半 */
   const sc=pickScene(), tell=pick(sc.tells), see=chance(scoutSee())||!!fx.see;
+  if(!fx.live)HL_PEND=[];
   const min=fx.min??ri(55,118), a=fx.a??ri(0,1), b=fx.b??a, LC=fx.live||liveStart(tag,me,opp); livePre(LC,min,a,b);
   const el=momentCard(tag,sc,tell,see,min>90?`延長 ${min}`:min,me,a,b,opp);
   MTAG=tag; MHALF=!!fx.half;
@@ -1966,13 +1968,13 @@ function leagueMoment(last,i,tot,done){
   const min=ri(8,90), a=ri(0,2), b=ri(0,2), opp=oppName(), me=S.stage==='PRO'?S.club:S.stage==='UNI'?S.uni:S.team;
   const dby=derbyOf(); let vs=opp;
   STK=S.stage!=='PRO'?null:dby&&chance(25)?(vs=dby[0],dby[1]):last&&S.clubTier===1&&chance(35)?'爭冠關鍵戰':last&&S.clubTier===3&&chance(35)?'保級生死戰':null;
-  const LC=STK?liveStart(STK,me,vs):null; if(LC)livePre(LC,min,a,b);
+  HL_PEND=[]; const LC=STK?liveStart(STK,me,vs):null; if(LC)livePre(LC,min,a,b);
   const el=momentCard(STK?'關鍵時刻・'+STK:'關鍵時刻',sc,tell,see,min,me,a,b,vs);
   choose(`關鍵時刻 — 你的選擇？（季中第 ${i}/${tot} 場｜${STK==='爭冠關鍵戰'?'結果直接影響奪冠機率':STK==='保級生死戰'?'結果直接影響降級機率':'成功讓球隊排名往上'}）`,sc.opts.map((o,j)=>{ const p=clamp(momentOdds(o)+sceneBonus(sc),5,95);
     return {t:o.t,main:o.m==='norm',warn:o.m==='bold',s:momentSub(o,p),
       f:()=>resolveMoment(sc,o,j===tell.o,p,el,ok=>{ const M=S.lgMo||(S.lgMo={ok:0,ng:0,stk:null}); ok?M.ok++:M.ng++; if(STK==='爭冠關鍵戰'||STK==='保級生死戰')M.stk={t:STK,ok};
-        if(LC){ liveMark(LC,min,ok); const up=Math.random()<.5?1:0, x=ok?Math.max(a+1,b+up):a, y=ok?b:Math.max(b+up,a===b?b+1:b); liveEnd(LC,Math.max(x,a),Math.max(y,b),{win:x>y}); }
-        STK=null; board(); done(); })}; }));
+        if(LC){ liveMark(LC,min,ok); const up=Math.random()<.5?1:0, x=ok?Math.max(a+1,b+up):a, y=ok?b:Math.max(b+up,a===b?b+1:b); liveEnd(LC,Math.max(x,a),Math.max(y,b),{win:x>y}); hlFin({w:x>y,x:Math.max(x,a),y:Math.max(y,b)}); }
+        HL_PEND=[]; STK=null; board(); done(); })}; }));
 }
 /* v0.24 情境特質加成:點球專家、德比之王、歐戰之夜、大賽恐懼 */
 const BIG_RE=/歐冠|歐霸|歐協聯|亞冠|自由盃|南美盃|中北美冠軍盃|非洲冠軍聯賽|非洲聯合會盃|世界盃|國家盃|美洲盃|亞洲盃|金盃賽|世俱盃|奧運/;
@@ -1992,6 +1994,34 @@ function trackMomentTraits(sc,ok,sub){ const T=S.traits, inc=k=>(S[k]=(S[k]||0)+
     if(T.yips){ removeTrait('yips'); card('good','心魔解除','點球恐懼症痊癒了。'); } }
   if(ok&&sub&&S.age>=20&&inc('cSub')>=14&&!T.supersub)traitCard('supersub','第十四次替補登場改變比賽。教練說：「你是我最好的武器。」——<b class="hl">替補身分時賽季評分 +0.2</b>。');
 }
+/* v0.26.12 生涯精華:記下賽事、對手、分鐘、比分與動作,組成結果句;原本的現場描述留作灰字 */
+const HL_K=/^[GASDF]$/; let HL_PEND=[];
+function hlVerb(sc,o){ const t=o.t, all=sc.t+'|'+t, back=/回追/.test(sc.t)?'回追':'';
+  if(o.k==='G'){ if(/點球/.test(all))return '罰進點球'; if(/自由球|任意球/.test(all))return '自由球直接破門';
+    if(/頭|甩頭/.test(t)||o.ab[0]==='hea')return '頭槌破門'; if(/凌空/.test(t))return '凌空抽射破門'; if(/吊/.test(t))return '吊射破門';
+    if(/掠射|蹭/.test(t))return '掠射破門'; if(/遠射|弧頂|禁區外|世界波/.test(all))return '遠射破門'; if(/晃|過人|盤帶|變向|突破/.test(t))return '晃開防守球員破門'; return '射門破門'; }
+  if(o.k==='A'){ const v=/傳中/.test(t)?'傳中':/倒三角|回傳/.test(t)?'倒三角回傳':/直塞|直傳|穿透/.test(t)?'送出直塞':/長傳|大腳/.test(t)?'送出長傳':/擺渡|頭球/.test(t)?'頭球擺渡':/角球|自由球/.test(all)?'開出定位球':'';
+    return (v?v+'，':'')+'助攻隊友破門'; }
+  if(o.k==='S'){ if(/點球/.test(all))return '撲出點球'; if(/自由球/.test(all))return '撲出自由球'; if(/單刀|一對一|二打一|突破|反擊/.test(sc.t))return '封住對方單刀';
+    if(/角球|傳中|高球/.test(all))return '沒收對方傳中'; return '做出關鍵撲救'; }
+  if(o.k==='D'){ if(/鏟|剷/.test(t))return back+'鏟斷對手'; if(/頭球|爭頂|搶頂|高球/.test(t))return '頭球解圍'; if(/封堵|擋|封/.test(t))return back+'封堵化解危機';
+    if(/斷|搶/.test(t))return back+'搶斷對手'; if(/越位/.test(t))return '帶頭前壓，造成對方越位'; if(/犯規/.test(t))return '用戰術犯規阻止反擊'; return back+'防守化解危機'; }
+  return /點球/.test(o.ok)?'製造點球':'造成對方犯規'; }
+function hlMake(sc,o,cl){ const C=MCTX, comp=(MTAG?MTAG.replace(/^\S+ /,'').replace(/・/g,' '):STK||({PRO:'聯賽',UNI:'大學聯賽'}[S.stage]||'青訓比賽')).replace(/([^\s\d])(\d+ 強)/,'$1 $2'), et=C.mn>90;
+  const goal=/[GA]/.test(o.k), a2=goal?C.a+1:C.a;
+  let t=`${comp}${C.opp&&C.opp!=='對手'?'對'+C.opp:''}，${et?'延長賽':''}第 ${C.mn} 分鐘${C.a||C.b?` ${C.a}–${C.b}`:''}，你${hlVerb(sc,o)}`;
+  if(goal)t+=`，${a2}–${C.b}${cl?`，${{絕殺時刻:'絕殺',扳平時刻:'扳平',延長賽英雄:'延長賽建功'}[cl]||cl}`:''}`;
+  else if(/[SD]/.test(o.k)&&C.a>=C.b&&C.mn>=70)t+=`，保住 ${C.a}–${C.b}`;
+  return {y:S.year,age:S.age,v:2,t,q:o.ok,ko:!!MTAG&&/強|決賽|關鍵戰|附加賽/.test(MTAG)&&!/小組賽/.test(MTAG),fnl:!!MTAG&&/決賽/.test(MTAG),big:o.m==='bold'||!!MTAG||!!STK||!!cl}; }
+/* 比賽打完後補上整場結果:r={w:贏或晉級,x,y 比分(可省略),pk 點球大戰,q 資格賽 1=出線 0=出局} */
+function hlFin(r){ HL_PEND.forEach(h=>h.fin=r); HL_PEND=[]; }
+function hlFinTxt(h){ const r=h.fin; if(!r)return ''; const sc=r.x!=null?`${r.x}–${r.y}${r.pk?'（點球大戰）':''}`:'';
+  if(r.q!=null)return r.q?'，最終拿到世界盃門票':'，但球隊最終無緣世界盃';
+  if(h.fnl)return r.w?`，最終${sc?` ${sc} `:''}奪冠`:`，但球隊${sc?` ${sc} `:''}落敗，屈居亞軍`;
+  if(h.ko)return r.w?`，最終${sc?` ${sc} `:''}晉級`:`，但球隊${sc?` ${sc} `:''}出局`;
+  if(!sc)return '';
+  return r.x>r.y?`，最終 ${sc} 獲勝`:r.x===r.y?`，最終 ${sc} 戰平`:`，但球隊最終 ${sc} 落敗`; }
+function hlHtml(h){ return h.v===2?`${h.t}${hlFinTxt(h)}。<small class="hlq">${h.q}</small>`:h.t; }
 const FOUL_RE=/鏟|犯規|上搶|斷球|出腳|撲搶|硬吃|貼上去|撲向腳下|撲向持球者|衝出去封堵/;
 let LAST_MO=null;
 function resolveMoment(sc,o,read,p,el,next){
@@ -2008,7 +2038,7 @@ function resolveMoment(sc,o,read,p,el,next){
     const cl=MCTX.clutch&&o.k!=='K'?MCTX.clutch:null;
     if(cl){ out.push(meter('fans',4)); out.push(meter('trust',2)); }
     if(o.k==='G'&&!isGK())S.mG++; else if(o.k==='A')S.mA++;
-    if(m!=='safe'||MTAG||cl)S.hl.push({y:S.year,age:S.age,t:`${MTAG?MTAG.replace(/^\S+ /,'')+'・':STK?STK+'・':''}${cl?cl+'・':''}${sc.t}：${o.ok}`,big:m==='bold'||!!MTAG||!!STK||!!cl}); }
+    if((m!=='safe'||MTAG||cl)&&HL_K.test(o.k)){ const h=hlMake(sc,o,cl); S.hl.push(h); HL_PEND.push(h); } }
   else { out.push(meter('form',m==='bold'?-6:-3)); if(m==='bold')out.push(meter('trust',-4));
     if(m!=='safe'&&abLose(o.ab[0],1))out.push(`<span class="dn">${ABL[o.ab[0]]} −1</span>`); }
   /* 發牌:鏟球、犯規、上搶類的選項。成功的戰術犯規多半吃黃牌;失敗的冒險動作可能直接紅牌(停賽 2 場) */
@@ -3268,7 +3298,7 @@ function schedMoment(m,i,tot,next){
   MTAG=tag; MHALF=true;
   choose(`${lbl} — 你的選擇？（季中第 ${i}/${tot} 場｜成功：季末晉級率↑）`,sc.opts.map((o,j)=>{ const p=momentOdds(o,par);
     return {t:o.t,main:o.m==='norm',warn:o.m==='bold',s:momentSub(o,p),
-      f:()=>resolveMoment(sc,o,j===tell.o,p,el,ok=>{ MTAG=null; MHALF=false; S.cupB[cup?'cup':'cont']=ok?0.06:-0.03;
+      f:()=>resolveMoment(sc,o,j===tell.o,p,el,ok=>{ MTAG=null; MHALF=false; HL_PEND=[]; S.cupB[cup?'cup':'cont']=ok?0.06:-0.03;
         el.querySelector('.mres').insertAdjacentHTML('beforeend',`<div class="fx">${cup?CUP_N[S.lv]:m.n}季末晉級率 <b class="${ok?'up':'dn'}">${ok?'↑':'↓'}</b></div>`);
         board(); next(); })}; }));
 }
@@ -3844,7 +3874,8 @@ function intlYear(Y,cont){
 }
 function wcRoll(Y,next,p){
   const N=NATS[S.nat];
-  if(!chance(p)){ card('bad',`${Y} 世界盃資格賽`,`${N.n}在資格賽出局（出線率 ${p}%）。`); next(); return; }
+  const qok=chance(p); hlFin({q:qok?1:0});
+  if(!qok){ card('bad',`${Y} 世界盃資格賽`,`${N.n}在資格賽出局（出線率 ${p}%）。`); next(); return; }
   if(!S.ntOn){ card('info',`${Y} 世界盃`,`${N.n}打進世界盃（出線率 ${p}%），但你不在名單上。`); next(); return; }
   card('gold',`${Y} 世界盃資格賽`,`${N.n}拿到世界盃門票！（出線率 ${p}%）${N.tier>=4?'<br>這是國家足球史上最重要的一刻。':''}`);
   const play=after=>playTourney(T_WC,Y,true,false,()=>{ S.pool+=1; if(after)after(); next(); });
@@ -3937,7 +3968,7 @@ function koCard(title,stage,me,opp,adv,lg2){
   const pk=chance(18); let x,y;
   if(pk){ x=y=ri(1,2); } else { [x,y]=scoreFor(adv?'W':'L'); if(lg2){ x+=ri(0,2); y+=ri(0,1); if(adv&&x<=y)x=y+1; if(!adv&&y<=x)y=x+1; } }
   const pks=pk?(adv?`（PK ${ri(4,5)}–${ri(2,3)}）`:`（PK ${ri(2,3)}–${ri(4,5)}）`):'';
-  const sc=`${me} ${x}–${y} ${opp}${pks}`;
+  const sc=`${me} ${x}–${y} ${opp}${pks}`; hlFin({w:adv,x,y,pk});
   card(adv?'good':'bad',`${title}｜${stage}`,`${lg2?'兩回合總比分 ':''}${sc}——${adv?'<b class="up">晉級</b>':'<b class="dn">淘汰</b>'}。`);
   return `${stage}：${sc}　${adv?'晉級':'淘汰'}`;
 }
@@ -3967,7 +3998,7 @@ function finalSeries(c,done){
   }
   function finish(win,x,y,pk,star,note){
     if(win&&S.traits.bigfear){ removeTrait('bigfear'); card('good','心魔解除','捧起獎盃的那一刻，「大賽恐懼」的標籤被撕掉了。'); }
-    const sc=`${c.me} ${x}–${y} ${c.opp}${pk?'（點球大戰）':''}`, mvp=win&&!!star&&chance(pk?50:35);
+    hlFin({w:win,x,y,pk}); const sc=`${c.me} ${x}–${y} ${c.opp}${pk?'（點球大戰）':''}`, mvp=win&&!!star&&chance(pk?50:35);
     if(LC){ if(pk)liveStats(LC,{win,mvp,star}); else liveEnd(LC,x,y,{win,mvp,star,et:!!note}); }
     if(win){
       const cheer={世界盃:`你把${tr}高高舉過頭頂。${NATS[S.nat].n}的街頭，此刻一定已經瘋了。`,歐冠:`隊長把${tr}交到你手上，你轉身面向看台，彩帶從天而降。`,
@@ -4212,7 +4243,7 @@ function clubCups(cont){
         card(i>=1?'gold':'info',`${Y} 世俱盃`,`以${S.cwcRg||(eu?'歐洲':'亞洲')}冠軍身分出戰世俱盃：<b class="hl">${label}</b>。${i===2?'<br>賽事成果 <b class="up">+2</b> 點（季末自由分配）':''}`); board(); next(); };
       if(!chance(p[0]*100+b*100)){ end(); return; } i=1;
       if(!usedMoment){ usedMoment=true;
-        bigMoment(`${Y} 世俱盃決賽`,S.club,eu?pick(CWC_OPP):pick(TEAMS[pick(['ENG','ESP','GER','ITA'])].slice(0,3)),L.par+(eu?6:12),ok=>{ if(ok||chance(eu?35:15))i=2; end(); }); return; }
+        bigMoment(`${Y} 世俱盃決賽`,S.club,eu?pick(CWC_OPP):pick(TEAMS[pick(['ENG','ESP','GER','ITA'])].slice(0,3)),L.par+(eu?6:12),ok=>{ if(ok||chance(eu?35:15))i=2; hlFin({w:i===2}); end(); }); return; }
       if(chance(p[1]*100+b*100))i=2; end(); }); }
   /* 洲際 */
   const clName=S.contPlan&&S.contPlan.y===S.year&&S.contPlan.club===S.club?S.contPlan.n:contComp();
@@ -4248,7 +4279,7 @@ function clubCups(cont){
         card(i>=3?'gold':'info',`${Y} ${clName}`,`${S.club}在${clName}的旅程：<b class="hl">${label}</b>。${cp?`<br>賽事成果 <b class="up">+${cp}</b> 點（季末自由分配）`:''}`); board(); next(); };
       const go=()=>{ while(i<5){
           if(i>=3&&!usedMoment){ usedMoment=true;
-            bigMoment(`${Y} ${clName}${CL_ST[i]}`,S.club,opp(),L.par+C.par,ok=>{ if(ok||chance(30))i++; else { end(); return; } if(ok)b+=0.05; go(); }); return; }
+            bigMoment(`${Y} ${clName}${CL_ST[i]}`,S.club,opp(),L.par+C.par,ok=>{ const w=ok||chance(30); hlFin({w}); if(w)i++; else { end(); return; } if(ok)b+=0.05; go(); }); return; }
           if(chance((i===0?P[0]:P[1])*100+b*100))i++; else break; }
         end(); };
       go(); }); }
@@ -4259,7 +4290,7 @@ function clubCups(cont){
     while(i<4&&chance(p0*100))i++;
     if(i<4){ if(i>=2)end(false); else next(); return; } /* 早早出局就不另外報告 */
     if(!usedMoment){ usedMoment=true;
-      bigMoment(`${Y} ${CUP_N[S.lv]}決賽`,S.club,pick(TEAMS[S.lv].filter(t=>t!==S.club)),L.par+TIER_PAR[1],ok=>end(ok||chance(30))); return; }
+      bigMoment(`${Y} ${CUP_N[S.lv]}決賽`,S.club,pick(TEAMS[S.lv].filter(t=>t!==S.club)),L.par+TIER_PAR[1],ok=>{ const w=ok||chance(30); hlFin({w}); end(w); }); return; }
     end(chance(p0*100)); });
   function next(){ const f=q.shift(); if(f)f(); else cont(); }
   next();
@@ -4324,7 +4355,7 @@ const yrOf=h=>+(h.match(/^(\d{4})/)||[0,0])[1];
 function hlScore(h){ const t=h.t;
   return /決賽最佳球員|點球大戰/.test(t)?100:/(金球獎|金靴|金手套|最佳球員|最佳年輕球員)$/.test(t)?85:/決賽/.test(t)?80:
     /世界盃|歐冠|亞冠|自由盃|中北美冠軍盃|非洲冠軍聯賽|歐洲國家盃|美洲盃|亞洲盃|非洲國家盃|金盃賽|奧運/.test(t)?70:/宿命對決/.test(t)?65:
-    /絕殺時刻|延長賽英雄|扳平時刻/.test(t)?60:/傷癒復出/.test(t)?55:/爭冠|保級|德比|對決|Fla-Flu|Gre-Nal|克拉西科/.test(t)?50:h.big?30:10; }
+    /絕殺|延長賽英雄|延長賽建功|扳平/.test(t)?60:/傷癒復出/.test(t)?55:/爭冠|保級|德比|對決|Fla-Flu|Gre-Nal|克拉西科/.test(t)?50:h.big?30:10; }
 function hlPick(list,n){ const out=[], yrs=new Set();
   [...list].map((h,i)=>({h,i,sc:hlScore(h)})).sort((a,b)=>b.sc-a.sc||b.i-a.i).forEach(x=>{ if(out.length<n&&!yrs.has(x.h.y)){ yrs.add(x.h.y); out.push(x); } });
   return out.sort((a,b)=>a.i-b.i).map(x=>x.h); }
@@ -4492,7 +4523,7 @@ function endGameFinal(reason){
     const hm={}; c.honors.forEach(h=>{ const n=h.replace(/^\S+ /,''); hm[n]=(hm[n]||0)+1; });
     const hon=c.honors.length?`<div class="ch-hon">🏆 ${Object.keys(hm).map(n=>hm[n]>1?`${n} ×${hm[n]}`:n).join('、')}</div>`:'';
     const loan=c.loans.length?`<div class="ch-stat">租借：${c.loans.map(r=>`${baseTm(r.tm)}（${seasonLabel(r.y)}・出場 ${r.st.App}）`).join('、')}</div>`:'';
-    const hl=hlPick(c.hl,c.kind==='youth'||c.kind==='uni'?1:clamp(Math.ceil(c.rs.length/3),1,4)).map(h=>`<div class="hlrow"><b>${seasonLabel(h.y)}</b>｜${h.t}</div>`).join('');
+    const hl=hlPick(c.hl,c.kind==='youth'||c.kind==='uni'?1:clamp(Math.ceil(c.rs.length/3),1,4)).map(h=>`<div class="hlrow"><b>${seasonLabel(h.y)}</b>｜${hlHtml(h)}</div>`).join('');
     const cc=c.kind==='pro'||c.kind==='loan'?`hsl(${hashStr(c.club)%360} 62% 55%)`:'var(--dim)';
     card(c.honors.some(h=>/冠軍（/.test(h))?'gold chap':'info chap',`第${cn(i+1)}章　${c.club}${kn?`（${kn}）`:''}`,
       `<div class="ch-meta">${yrs}・${c.a0}${c.a1!==c.a0?`–${c.a1}`:''} 歲${c.lvs.length?`・${c.lvs.map(k=>LV[k].n).join('、')}`:''}${c.no?`・${c.no} 號`:''}</div>`+

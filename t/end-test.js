@@ -36,7 +36,7 @@ const pos=['GK','DF','MF','FW'], R=a=>a[Math.floor(Math.random()*a.length)];
     }
     const S=w.eval('S'), txt=[...d.querySelectorAll('#log .scr')].slice(-6).map(s=>s.innerText||s.textContent).join('\n');
     const chap=d.querySelectorAll('.card.chap').length, hb=d.querySelectorAll('.hb').length, tiles=d.querySelectorAll('.tile').length;
-    console.log(`#${k} ${S.grp} ${S.nat} 引退 ${S.age} 歲 done=${S.done} 結算圖=${sharing} 章節=${chap} 歷史榜=${hb} 數據磚=${tiles} 錯誤=${err.length}`);
+    console.log(`#${k} ${S.grp} ${S.nat} 引退 ${S.age} 歲 done=${S.done} 結算圖=${sharing} 章節=${chap} 歷史榜=${hb} 數據磚=${tiles} 精華=${d.querySelectorAll(".hlrow").length}（灰字 ${d.querySelectorAll(".hlrow .hlq").length}） 錯誤=${err.length}`);
     if(err.length){ errs+=err.length; console.log(err.slice(0,3).join('\n')); }
     if(TEXT)console.log([...d.querySelectorAll('.card')].slice(-30).map(c=>c.textContent.replace(/\s+/g,' ').trim()).filter(t=>t).slice(-24).join('\n')+'\n');
     w.close(); }
