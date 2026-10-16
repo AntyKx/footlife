@@ -1044,7 +1044,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.27.2';
+const APP_VER='v0.28.0';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -2776,6 +2776,7 @@ function applyFx(fx){ const out=[];
   if(fx.ab){ const k=dKey(fx.ab[0]), v=fx.ab[1];
     out.push(v>0?loveGainTxt(k,v):`${ABL[k]} <span class="dn">${addAb(k,v)}</span>`); }
   if(fx.inj){ S.tmpInj+=fx.inj; out.push(`本季受傷機率 <span class="${fx.inj>0?'dn':'up'}">${fx.inj>0?'+':''}${fx.inj}%</span>`); }
+  if(fx.injP){ S.injMod=clamp((S.injMod||0)+fx.injP,-6,8); out.push(`之後每季受傷機率 <span class="${fx.injP>0?'dn':'up'}">${fx.injP>0?'+':''}${fx.injP}%</span>`); }
   if(fx.pay){ const p=Math.round((S.lv?LV[S.lv].sal:30)*0.1*fx.pay*(fx.pay>0?0.7+S.fans/170:1)); S.salary+=p;
     out.push(p>=0?`收入 <span class="up">+${fmtMoney(p)}</span>`:`支出 <span class="dn">${fmtMoney(-p)}</span>`); }
   if(fx.nt){ const o=S.ntRep; S.ntRep=clamp(S.ntRep+fx.nt,-3,3); const d=S.ntRep-o; if(d)out.push(`國家隊教練印象 <span class="${d>0?'up':'dn'}">${d>0?'+':''}${d}</span>`); }
@@ -2857,6 +2858,9 @@ function runDialog(dg,tag,cls,after,done){
 }
 function echoEvent(done){ const fu=followDue(); if(!fu){ done(); return; } fu.m.done=1; S.cEcho=(S.cEcho||0)+1; (S.echoT=S.echoT||{})[fu.f.fu]=(S.echoT[fu.f.fu]||0)+1; const dg=fu.f.mk(fu.m);
   runDialog(dg,'回聲｜','talk story',(oi,ok,dice,el,txt)=>sideAdd('回聲｜'+dg.n,'story',el,txt),done); }
+function runArc(arc,done){ const dg=arc.mk(); S.cArc=(S.cArc||0)+1;
+  runDialog(dg,'劇情｜','talk story',(oi,ok,dice,el,txt)=>{ arc.after(oi,ok,dice); sideAdd('劇情｜'+dg.n,'story',el,txt); },done); }
+function arcEvent(done){ const arc=arcDue(true); if(arc)runArc(arc,done); else done(); }
 function dialogEvent(done){
   const st=S.stage==='PRO'?'PRO':'YU';
   S.seenDlg=S.seenDlg||[];
@@ -2865,8 +2869,7 @@ function dialogEvent(done){
   if(fu&&chance(80)){ fu.m.done=1; S.cEcho=(S.cEcho||0)+1; (S.echoT=S.echoT||{})[fu.f.fu]=(S.echoT[fu.f.fu]||0)+1; const dg=fu.f.mk(fu.m);
     runDialog(dg,'回聲｜','talk story',(oi,ok,dice,el,txt)=>sideAdd('回聲｜'+dg.n,'story',el,txt),done); return; }
   const arc=arcDue();
-  if(arc){ const dg=arc.mk();
-    runDialog(dg,'劇情｜','talk story',(oi,ok,dice,el,txt)=>{ arc.after(oi,ok,dice); sideAdd('劇情｜'+dg.n,'story',el,txt); },done); return; }
+  if(arc){ runArc(arc,done); return; }
   const nt=S.stage==='PRO'&&S.ntOn&&chance(30);
   let pool=DIALOGS.filter(x=>(nt?x.st==='NT':(x.st==='ANY'||x.st===st))&&(!x.c||x.c()));
   const fresh=pool.filter(x=>!S.seenDlg.includes(x.n)); if(fresh.length)pool=fresh;
@@ -3046,7 +3049,10 @@ function arcSeason(){ /* 季前:建立劇情線、宿敵成長 */
   else if(!A.rival.out){ const r=A.rival; r.ov=clamp(r.ov+(S.age<=21?ri(2,4):S.age<=26?ri(0,3):S.age<=30?ri(-1,1):-ri(1,3)),20,80); }
   if(!A.mentor)A.mentor={n:nm(),done:{}};
   if(S.skipMid&&!A.cb)A.cb={done:{}}; /* 上一季整季報銷 → 復出線 */
-  if(S.stage==='PRO'&&(S.wantOut||S.rumor)&&!A.sg)A.sg={done:{},club:S.club,big:pick(TEAMS[pick(['ENG','ESP','GER','ITA'])].slice(0,3))};
+  if(S.stage==='PRO'&&(S.wantOut||S.rumor)&&(!A.sg||(A.sg.out&&S.year-(A.sg.last||0)>=5)))A.sg={done:{},club:S.club,big:pick(TEAMS[pick(['ENG','ESP','GER','ITA'])].slice(0,4).filter(t=>t!==S.club))};
+  /* v0.28:更衣室領袖(轉職業起)、引退後規劃(30 歲起) */
+  if(S.stage==='PRO'&&!A.lead)A.lead={y:S.year,rep:0,done:{}};
+  if(S.stage==='PRO'&&S.age>=28&&!A.post)A.post={done:{}};
   if(S.stage==='PRO'&&S.age>=19&&!A.fam)A.fam={done:{}};
   /* v0.13:主帥(換隊或被開除後換人)、隊長之路(接下袖標後)、旅外(第一次出國) */
   if(S.stage==='PRO'&&S.club&&!(S.ct&&S.ct.mil)&&!S.loan&&(!A.coach||A.coach.club!==S.club||A.coach.out))A.coach={n:locName(),club:S.club,y:S.year,rel:0,done:{}};
@@ -3110,15 +3116,40 @@ const ARCS={
    after:(c,i,ok)=>{ if(i===0&&ok)S.hl.push({y:S.year,age:S.age,t:'傷癒復出即進球',big:true}); }},
  ],
  sg:[
-  {id:'g0',when:g=>S.stage==='PRO'&&S.club===g.club,mk:g=>({n:'轉會風波',d:`經紀人來電：「${g.big} 有興趣，但 ${S.club} 開價太高，他們在等你表態。」`,o:[
+  {id:'gA',when:g=>S.stage==='PRO'&&S.club===g.club&&!g.done.g0,mk:g=>({n:'豪門的秘密接觸',d:`經紀人壓低聲音：「<b class="hl">${g.big}</b> 的體育總監這週在城裡，想跟你吃頓飯——不能讓任何人知道。」`,o:[
+    {t:'赴約密會',m:'bold',p:55,s:'成功＝對方更積極；失敗＝被拍到',ok:{rumor:1,form:3},ng:{fans:-6,trust:-6},okt:'牛排還沒上桌，他已經把你的球衣號碼都準備好了',ngt:'隔天早上，你們在餐廳門口的照片登上了頭版'},
+    {t:'讓經紀人代為聽聽',m:'norm',s:'下個夏窗更容易有人來談',ok:{rumor:1},okt:'經紀人回來只說了一句：「他們是認真的。」'},
+    {t:'直接回絕',m:'safe',s:'球迷↑、教練信任↑',ok:{loyal:1,fans:4,trust:3},okt:'經紀人嘆了口氣：「好吧，我幫你回絕。」'}]}),
+   after:(g,i,ok)=>{ if(i===0&&!ok)g.leak=1; if(i===2)g.stay=g.refused=1; }},
+  {id:'g0',when:g=>S.stage==='PRO'&&S.club===g.club&&!g.refused&&g.done.gA,mk:g=>({n:'轉會風波',d:`經紀人來電：「${g.big} 有興趣，但 ${S.club} 開價太高，他們在等你表態。」`,o:[
     {t:'罷訓逼宮',m:'bold',s:'等同申請轉會；教練信任、球迷大幅↓',ok:{want:1,rumor:1,trust:-15,fans:-10},okt:'你沒有出現在訓練場，新聞台跑馬燈整天都是你的名字'},
     {t:'讓經紀人去談',m:'norm',s:'下個夏窗更容易有人來談',ok:{rumor:1,trust:-3},okt:'經紀人說：「交給我。」'},
     {t:'公開表態留隊',m:'safe',s:'球迷大幅↑、教練信任↑',ok:{loyal:1,fans:10,trust:6},okt:'「這裡就是我的家。」看台上掛出了感謝你的布條'}]}),
-   after:(g,i)=>{ g.stay=i===2; }},
+   after:(g,i)=>{ g.stay=i===2; if(i===0)g.strike=1; }},
+  {id:'gB',when:g=>S.stage==='PRO'&&S.club===g.club&&g.done.g0&&!g.stay,mk:g=>({n:'轉會截止日',d:`轉會截止前三小時，${g.big} 送出最後報價，${S.club} 拒絕了。經紀人在電話裡喊：「現在只差你一句話！」${g.strike?'<br>罷訓的事，更衣室還沒有忘。':''}`,o:[
+    {t:'衝進主席辦公室：「我要走。」',m:'bold',p:g.strike?35:45,s:'成功＝夏天放人；失敗＝全城翻臉',ok:{want:1,rumor:1,trust:-8},ng:{trust:-12,fans:-8},okt:'主席沉默很久，最後鬆口：「夏天，我放你走。」',ngt:'主席拒絕了，消息一小時內就傳遍全城'},
+    {t:'坐下來談一份新合約',m:'norm',s:'加薪、續約 2 年',ok:{pay:1.5,ext:2,loyal:1,trust:3},okt:'凌晨一點，你在新合約上簽了名'},
+    {t:'關掉手機去訓練',m:'safe',s:'狀態↑',ok:{form:4},okt:'截止時間過了，你還在這裡'}]}),
+   after:(g,i,ok)=>{ if(i===0&&!ok)g.burn=1; if(i===1)g.stay=g.signed=1; }},
   {id:'g1',when:g=>S.stage==='PRO'&&S.club===g.club&&g.done.g0&&!g.stay,mk:g=>({n:'看台上的布條',d:`沒走成。主場看台拉出巨型布條：「${S.name}，你的心在哪裡？」`,o:[
     {t:'進球後親吻隊徽',m:'bold',p:45,s:'成功＝球迷大幅↑',ok:{fans:14,form:4},ng:{fans:-8},okt:'你進球後跑到看台前親吻隊徽，布條在第二天被拆了',ngt:'你沒進球，噓聲持續了整場'},
     {t:'賽後走到看台前道歉',m:'norm',p:60,s:'球迷↑',ok:{fans:10},ng:{fans:-4},okt:'球迷頭子跟你握了手：「用場上表現證明。」',ngt:'有人朝你丟了水瓶'},
     {t:'視而不見',m:'safe',s:'狀態小幅↑、球迷↓',ok:{form:2,fans:-3},okt:'你戴上耳機走進球員通道'}]})},
+  {id:'gC',when:g=>S.stage==='PRO'&&S.club===g.club&&g.burn,mk:g=>({n:'燒球衣',d:`主場外，一群球迷把印著「${S.name}」的球衣堆起來點火。電視台直播了整整十分鐘。`,o:[
+    {t:'用進球回應，然後指著隊徽',m:'bold',p:45,s:'成功＝從叛徒變英雄',ok:{fans:14,form:4},ng:{fans:-6,form:-4},okt:'你進球後指著胸前的隊徽，噓聲在一分鐘內變成了歌聲',ngt:'你沒有進球，終場前就被換下場'},
+    {t:'寫一封公開信',m:'norm',p:60,s:'球迷↑',ok:{fans:8},ng:{fans:-3},okt:'信的最後一句是：「我從來沒有不愛這裡。」',ngt:'球迷說：「太遲了。」'},
+    {t:'申請轉會',m:'safe',s:'下個轉會窗更容易離開',ok:{want:1,fans:-4},okt:'你不想再待在一個不要你的地方'}]}),
+   after:(g,i,ok,dice)=>{ if(i===0&&ok){ g.hero=1; S.hl.push({y:S.year,age:S.age,t:'燒球衣風波後進球，噓聲變成歌聲',big:true}); } g.out=true; }},
+  {id:'gD',when:g=>S.stage==='PRO'&&S.club!==g.club&&!g.stay&&(g.done.g0||g.done.gA)&&(TEAMS[S.lv]||[]).includes(g.club),mk:g=>({n:'回到老東家',d:`第一次以客隊身分回到 ${g.club} 的主場。${g.burn?'看台上有人舉著一件燒焦的球衣。':'熟悉的歌聲裡，混著刺耳的噓聲。'}`,o:[
+    {t:'進球後不慶祝，雙手合十',m:'norm',p:55,s:'成功＝兩邊球迷都記住你',ok:{fans:6,trust:3},ng:{form:-3},okt:'主場球迷沉默了幾秒，然後有人開始鼓掌',ngt:'你整場被包夾，一腳射門都沒有'},
+    {t:'進球後衝到客隊看台狂歡',m:'bold',p:50,s:'成功＝新球迷大幅↑',ok:{fans:10,form:4},ng:{fans:-4,form:-4},okt:'客隊看台陷入瘋狂，你的新隊友把你壓在最底下',ngt:'你沒進球，老東家球迷唱了整晚嘲諷你的歌'},
+    {t:'賽前走到看台前鞠躬',m:'safe',s:'球迷↑、狀態↑',ok:{fans:3,form:2},okt:'一半的人鼓掌，一半的人轉過身'}]}),
+   after:g=>{ g.out=true; }},
+  {id:'gH',when:g=>S.stage==='PRO'&&S.club===g.club&&g.stay&&S.year>g.last,mk:g=>({n:'忠誠的英雄',d:`開賽前，主場看台拉起三層樓高的巨幅 Tifo：你${g.signed?'在截止日簽下新合約':'拒絕 '+g.big}的那一天，被畫成了球隊歷史的一頁。`,o:[
+    {t:'走到看台前跟著唱',m:'norm',s:'球迷大幅↑',ok:{fans:8},okt:'整個看台都在唱你的名字'},
+    {t:'用帽子戲法回報',m:'bold',p:35,s:'成功＝球迷大幅↑、狀態↑',ok:{fans:12,form:5},ng:{form:-2},okt:'第三球進了之後，你跪在 Tifo 底下',ngt:'你太想表現，三次射門全偏了'},
+    {t:'低調揮手',m:'safe',s:'球迷↑',ok:{fans:4},okt:'你揮了揮手，眼眶有點熱'}]}),
+   after:(g,i,ok)=>{ g.hero=1; S.hl.push({y:S.year,age:S.age,t:`拒絕 ${g.big}，看台拉起致敬 Tifo`,big:true}); g.out=true; }},
  ],
  fam:[
   {id:'f0',when:()=>true,mk:()=>({n:'第一份大合約',d:'拿到職業生涯第一筆像樣的薪水，媽媽在電話那頭哭了。',o:[
@@ -3183,16 +3214,92 @@ const ARCS={
     {t:'保持低調',m:'safe',s:'狀態↑',ok:{form:3},okt:'你只是笑著揮手'}]}),
    after:a=>{ a.out=true; }},
  ],
+ /* ---- v0.28 新劇情線:更衣室領袖、傷後心理重建、引退後規劃 ---- */
+ lead:[
+  {id:'ld0',when:l=>S.stage==='PRO'&&S.age<=23,mk:l=>({n:'新人的規矩',d:'第一次跟一線隊去客場。晚餐時隊長敲了敲杯子：「老規矩，新人站上椅子唱一首歌。」整桌人都看著你。',o:[
+    {t:'站上椅子大聲唱',m:'norm',s:'教練信任↑',ok:{trust:4},okt:'你唱得五音不全，但全隊笑到拍桌，隊長走過來跟你乾杯'},
+    {t:'「我是來踢球的。」',m:'bold',p:45,s:'成功＝老將反而尊敬你；失敗＝被孤立',ok:{form:4,trust:2},ng:{trust:-5},okt:'隊長愣了一下，笑著說：「好，那明天訓練場上見。」',ngt:'接下來一週，沒有人跟你同桌吃飯'},
+    {t:'唱一首家鄉的歌',m:'safe',s:'狀態↑',ok:{form:3},okt:'餐廳安靜了一下，然後有人跟著打起拍子'}]}),
+   after:(l,i,ok)=>{ if(i===0||(i===1&&ok))l.rep++; if(i===1&&!ok)l.rep--; }},
+  {id:'ld1',when:l=>S.stage==='PRO'&&S.age>=22&&(l.done.ld0||S.age>=24)&&S.year>l.y,mk:l=>({n:'更衣室內鬨',d:'輸球後，兩名主力在更衣室大打出手——一個怪對方不回防，一個怪對方不傳球。其他人都低著頭，只有你站了起來。',o:[
+    {t:'擋在兩人中間',m:'bold',p:clamp(40+(S.trust-50)/2+l.rep*8,20,85),s:'成功＝更衣室服你',ok:{trust:6,form:3},ng:{form:-4},okt:'你把兩人推開：「要打，下週對著對手打。」',ngt:'你被誤傷了一拳，隔天臉上還貼著紗布'},
+    {t:'散場後分別約兩人吃飯',m:'norm',s:'教練信任↑',ok:{trust:4},okt:'一週後，那兩個人在訓練場上撞了撞肩膀'},
+    {t:'戴上耳機離開',m:'safe',s:'狀態小幅↑',ok:{form:2},okt:'你走出更衣室時，聽見裡面有東西被摔碎'}]}),
+   after:(l,i,ok)=>{ if(i===0&&ok)l.rep+=2; if(i===1)l.rep++; if(i===2)l.rep--; }},
+  {id:'ld2',when:l=>S.stage==='PRO'&&S.age>=24&&l.done.ld1&&!(S.mem&&S.mem.captain),mk:l=>{ const v=l.vet||(l.vet=locName()); return {n:'隊長選舉',d:`老隊長離隊了，主帥決定讓球員投票選新隊長。候選人有兩個：你，還有三十二歲的老將 <b class="hl">${v}</b>。${l.rep>=3?'更衣室裡已經有人在替你拉票。':l.rep<=0?'你知道自己在更衣室的人緣不算好。':''}`,o:[
+    {t:'參選，在更衣室發表演說',m:'bold',p:clamp(30+l.rep*12+(S.trust-50)*0.6,10,90),s:'成功＝當上隊長',ok:{trust:6,fans:5,mem:'captain'},ng:{form:-3},okt:`開票結果：十八票對七票。${v} 第一個走過來擁抱你`,ngt:`你以三票之差落選，${v} 拍拍你的肩：「下次一定是你。」`},
+    {t:`投給 ${v}`,m:'safe',s:'教練信任↑；當上副隊長',ok:{trust:3},okt:`${v} 當選後的第一件事，是指定你當副隊長`},
+    {t:'「我只想專心踢球。」',m:'norm',s:'狀態↑',ok:{form:4},okt:'你把選票交了白卷'}]}; },
+   after:(l,i,ok)=>{ if(i===0&&ok){ l.won=1; S.hl.push({y:S.year,age:S.age,t:'更衣室投票當選隊長',big:true}); } if(i===1){ l.rep++; l.vice=1; } }},
+  {id:'ld3',when:l=>S.stage==='PRO'&&S.age>=26&&l.done.ld1&&(l.done.ld2||(S.mem&&S.mem.captain)),mk:l=>{ const k=l.kid||(l.kid=locName()); return {n:'問題新星',d:`球隊花大錢買來 19 歲的天才 <b class="hl">${k}</b>，但他上週凌晨被拍到在夜店，主帥氣到要把他下放預備隊。他坐在更衣室角落，誰也不理。`,o:[
+    {t:'把他接到家裡住一陣子',m:'norm',s:'教練信任↑；他會記得你',ok:{trust:5,mem:'protege',memN:k},okt:'他在你家沙發睡了一個月，每天早上被你拖去晨跑'},
+    {t:'替他向主帥求情',m:'bold',p:clamp(45+l.rep*8,20,88),s:'成功＝教練信任↑、球迷↑',ok:{trust:4,fans:3},ng:{trust:-6},okt:'主帥說：「看在你的面子上，再給他一次機會。」',ngt:'主帥冷冷地說：「你也想一起去預備隊嗎？」'},
+    {t:'讓他自己承擔後果',m:'safe',s:'狀態↑',ok:{form:3},okt:'他在預備隊待了半季，回來時瘦了一圈'}]}; },
+   after:(l,i,ok)=>{ if(i===0||(i===1&&ok))l.rep++; }},
+  {id:'ld4',when:l=>S.stage==='PRO'&&S.age>=30&&l.done.ld3&&l.rep>=2,mk:l=>({n:'最後的更衣室演說',d:'賽季最關鍵的一戰。開賽前十分鐘，主帥把戰術板收起來，看著你：「剩下的時間交給你。」',o:[
+    {t:'講你剛來時站上椅子唱歌的故事',m:'norm',p:clamp(55+l.rep*6,30,92),s:'成功＝狀態大幅↑、教練信任↑',ok:{form:8,trust:5},ng:{form:2},okt:'全隊笑完之後，安靜得只剩呼吸聲。那天你們贏了',ngt:'大家都很感動，但比賽還是輸了'},
+    {t:'一句話也不說，把球衣掛回牆上',m:'bold',p:50,s:'成功＝球迷大幅↑、狀態↑',ok:{fans:8,form:6},ng:{form:-2},okt:'沉默了一分鐘，年輕球員一個個站了起來',ngt:'有人以為你在生氣'},
+    {t:'讓年輕球員先說',m:'safe',s:'教練信任↑',ok:{trust:4},okt:`${l.kid?l.kid+' 站了起來，說的第一句話是：「學長教我的……」':'最年輕的那位結結巴巴地說完，全隊替他鼓掌'}`}]}),
+   after:(l,i,ok)=>{ if(ok||i===2){ S.flags=S.flags||{}; S.flags.leader=1; } if(ok&&i<2)S.hl.push({y:S.year,age:S.age,t:'賽前更衣室演說，帶隊贏下關鍵戰',big:true}); l.out=true; }},
+ ],
+ mind:[
+  {id:'p0',when:m=>S.stage==='PRO'&&S.year>m.y,mk:m=>({n:'手術之後',d:`上季的${m.rehab?'韌帶斷裂':'肌腱撕裂'}讓你在病床上躺了好幾週。主治醫師給了兩個方案，床頭還放著一張運動心理師 <b class="hl">${m.n}</b> 的名片。`,o:[
+    {t:'二次手術，徹底處理',m:'norm',s:'之後受傷率↓；狀態、教練信任小降',ok:{injP:-3,form:-4,trust:-2},okt:'第二次手術很成功，醫生說：「這次可以撐十年。」'},
+    {t:'保守治療，加速復出',m:'bold',p:55,s:'成功＝早回到場上；失敗＝留下舊傷',ok:{trust:5,form:4},ng:{injP:3,inj:5},okt:'比預定早了三週回到場上，教練在訓練場邊等你',ngt:'提早回到場上，膝蓋卻一直有點不對勁'},
+    {t:`打給心理師 ${m.n}`,m:'safe',s:'狀態↑',ok:{form:3},okt:'第一次諮商，他只問了一個問題：「你最害怕的是什麼？」'}]}),
+   after:(m,i)=>{ if(i===2)m.psy=1; if(i===0)m.surg=1; }},
+  {id:'p1',when:m=>S.stage==='PRO'&&m.done.p0,mk:m=>({n:'不敢放腳',d:'復出後的第一場對抗，你在一顆五五波的球前收了腳。重播畫面裡，你的表情騙不了人。',o:[
+    {t:`每週固定找 ${m.n} 諮商`,m:'norm',p:m.psy?85:60,s:'成功＝狀態↑、之後受傷率小降',ok:{form:6,injP:-1},ng:{form:-2},okt:'第五次諮商後，你終於說出了那天聽到的「啪」一聲',ngt:'你坐在諮商室裡，一句話也說不出來'},
+    {t:'硬逼自己衝撞',m:'bold',p:50,s:'成功＝教練信任↑；失敗＝本季受傷率↑',ok:{form:6,trust:4},ng:{inj:6,form:-6},okt:'第三次對抗你沒有收腳，觀眾席有人站起來鼓掌',ngt:'你太用力，反而扭到了另一邊的腳踝'},
+    {t:'改踢更聰明的位置',m:'safe',s:'視野↑',ok:{ab:['vis',1],form:2},okt:'你學會用預判取代衝撞'}]}),
+   after:(m,i,ok)=>{ if(i===0&&ok)m.psy=2; }},
+  {id:'p2',when:m=>S.stage==='PRO'&&m.done.p1,mk:m=>({n:'受傷一週年',d:'手機跳出一則「一年前的今天」：你被擔架抬下場的照片。隊友在底下留言：「看看你現在。」',o:[
+    {t:'發文：「謝謝那天沒有放棄的自己。」',m:'norm',s:'球迷↑、狀態↑',ok:{fans:6,form:3},okt:'這則貼文被好幾個正在復健的球員轉發'},
+    {t:'回到受傷的那座球場進球',m:'bold',p:50,s:'成功＝球迷大幅↑',ok:{fans:8,form:6},ng:{form:-3},okt:'你在當年倒下的位置破門，跪在草皮上很久',ngt:'你沒有進球，但完整踢滿了九十分鐘'},
+    {t:'刪掉照片，往前看',m:'safe',s:'狀態↑',ok:{form:4},okt:'你把手機收進口袋，走進訓練場'}]}),
+   after:(m,i,ok)=>{ if(i===1&&ok)S.hl.push({y:S.year,age:S.age,t:'重傷一年後，在倒下的球場破門',big:true}); if(m.psy){ S.flags=S.flags||{}; S.flags.mind=m.n; } m.out=true; }},
+ ],
+ post:[
+  {id:'q0',when:()=>S.stage==='PRO'&&S.age>=28,mk:()=>({n:'退休後的你',d:`續約談完，經紀人突然問：「你 ${S.age} 歲了。有沒有想過，掛靴之後要做什麼？」`,o:[
+    {t:'「我想當教練。」',m:'norm',s:'之後可能有教練實習的機會',ok:{trust:3},okt:'他點點頭：「那我幫你留意足協的課程。」'},
+    {t:'「也許去電視台講球吧。」',m:'safe',s:'之後可能有球評邀約',ok:{fans:3},okt:'「你的口才是不錯。」他在手機上記了一筆'},
+    {t:'「我想做自己的事業。」',m:'bold',s:'之後可能有投資機會',ok:{form:3},okt:'「那就從現在開始存錢。」'}]}),
+   after:(q,i)=>{ q.dir=['coach','tv','biz'][i]; q.dirAge=S.age; }},
+  {id:'q1',when:q=>S.stage==='PRO'&&S.age>=29&&q.done.q0&&(q.dir==='coach'||!!(S.flags||{}).lic),mk:q=>({n:'預備隊實習',d:'主帥把你叫進辦公室：「休賽季的預備隊集訓，你來帶。就當是提早實習。」',o:[
+    {t:'接下，認真寫每天的訓練課表',m:'norm',s:'狀態小幅↓；拿到教練證',ok:{form:-2,trust:5,flag:'lic'},okt:'集訓最後一天，那群孩子把你拋上了天'},
+    {t:'主動提出一軍的戰術建議',m:'bold',p:55,s:'成功＝教練信任大幅↑、拿到教練證',ok:{trust:8,flag:'lic'},ng:{trust:-4},okt:'主帥採用了你的高位逼搶方案，下一場就贏了',ngt:'主帥說：「先把預備隊帶好。」'},
+    {t:'先在旁邊觀摩',m:'safe',s:'狀態↑',ok:{form:3},okt:'你在筆記本上抄了整整三十頁'}]}),
+   after:(q,i,ok)=>{ if(i===0||(i===1&&ok))q.coach=(q.coach||0)+(i===1?2:1); }},
+  {id:'q2',when:q=>S.stage==='PRO'&&S.age>=29&&q.done.q0&&(q.dir==='tv'||S.fans>=55),mk:()=>({n:'客座球評',d:`電視台邀你擔任${CUP_N[S.lv]||'盃賽'}決賽的客座球評。導播說：「觀眾想聽的是球員的真心話。」`,o:[
+    {t:'答應，犀利點評',m:'bold',p:55,s:'成功＝球迷大幅↑；失敗＝得罪人',ok:{fans:8,flag:'tv'},ng:{fans:-5,trust:-3,flag:'tv'},okt:'你的一句「這不是戰術，是運氣」上了熱搜',ngt:'被你批評的球員，下週剛好對上你的球隊'},
+    {t:'答應，溫和講解',m:'norm',s:'球迷↑',ok:{fans:4,flag:'tv'},okt:'導播說：「你講得比我們的正職球評還清楚。」'},
+    {t:'婉拒，現在專心踢球',m:'safe',s:'狀態↑',ok:{form:3},okt:'那天晚上你在家裡看完了決賽'}]}),
+   after:(q,i,ok)=>{ if(i===0&&ok)q.sharp=1; }},
+  {id:'q3',when:q=>S.stage==='PRO'&&S.age>=30&&q.done.q0,mk:q=>({n:'合夥的提案',d:'家鄉的老朋友帶著一份企劃書來找你：「用你的名字開一間青訓營，或是做一個運動品牌，你選。」',o:[
+    {t:'投資青訓營',m:'norm',s:'花一筆錢；引退後多一條路',ok:{pay:-2,fans:3,flag:'acad'},okt:'開幕那天，第一批學員只有十二個人，你一個一個記住了他們的名字'},
+    {t:'開運動品牌',m:'bold',p:q.dir==='biz'?65:50,s:'可能大賺，也可能虧本',ok:{pay:2,flag:'biz'},ng:{pay:-2},okt:'第一款球鞋上市三天就賣光',ngt:'第一批貨卡在海關三個月'},
+    {t:'等退休再說',m:'safe',s:'狀態↑',ok:{form:3},okt:'你把企劃書收進抽屜'}]})},
+  {id:'q4',when:q=>S.stage==='PRO'&&S.age>=32&&q.done.q0&&(q.done.q1||q.done.q2||q.done.q3),mk:q=>{ const F=S.flags||{}, A=S.arcs||{}, k=[];
+    if(F.lic)k.push('coach'); if(F.tv)k.push('tv'); if(F.acad)k.push('acad'); if(F.biz)k.push('biz'); if(F.leader)k.push('leader'); if(F.youth&&A.mentor)k.push('youth'); if(F.mind)k.push('mind');
+    if(k.length<3)k.push('home'); if(k.length<3)k.push('quiet');
+    q.opts=k.slice(0,4);
+    const T={coach:'「我要成為一名主帥。」',tv:'「我要坐進轉播室。」',acad:'「我要把青訓營做大。」',biz:'「我要把品牌經營起來。」',leader:'「我想回俱樂部的辦公室。」',youth:`「我答應過 ${A.mentor?A.mentor.n:'恩師'}。」`,mind:'「我想幫助受傷的球員。」',home:'「回家鄉教孩子踢球。」',quiet:'「離開足球，好好過日子。」'};
+    return {n:'退休計畫書',d:'快要掛靴了。休賽季的某個晚上，你在筆記本上寫下退休後第一年的計畫。第一行寫的是——',o:q.opts.map((x,i)=>({t:T[x],m:i?'safe':'norm',s:'引退時的首選',ok:{form:3},okt:'你在那一行底下畫了兩條線'}))}; },
+   after:(q,i)=>{ q.plan=q.opts[i]; q.out=true; }},
+ ],
 };
-function arcDue(){ if(!S.arcs||!chance(55))return null;
-  const due=[];
+function arcList(){ const due=[]; if(!S.arcs)return due;
   Object.keys(ARCS).forEach(id=>{ const st=S.arcs[id]; if(!st||st.out)return;
     ARCS[id].forEach(ev=>{ const n=st.done[ev.id]||0;
       if(n<(ev.rep||1)&&st.last!==S.year&&(!st.lastEv||!ev.gap||st.lastEv!==ev.id||S.year-st.last>=ev.gap)&&ev.when(st))due.push({id,ev,st}); }); });
-  if(!due.length)return null;
+  return due; }
+function arcDue(force){ if(!S.arcs||(!force&&!chance(55)))return null;
+  const due=arcList(); if(!due.length)return null;
   /* 每條線一次只推進最早的事件 */
   const first={}; due.forEach(x=>{ if(!first[x.id])first[x.id]=x; });
-  const x=pick(Object.values(first));
+  /* v0.28 第二批劇情線有年齡窗口,抽選權重較高 */
+  const AW={lead:2,post:3,mind:2,sg:2}, wl=[]; Object.values(first).forEach(x=>{ for(let i=0;i<(AW[x.id]||1);i++)wl.push(x); });
+  const x=pick(wl);
   return {mk:()=>x.ev.mk(x.st),after:(i,ok,dice)=>{ x.st.done[x.ev.id]=(x.st.done[x.ev.id]||0)+1; x.st.last=S.year; x.st.lastEv=x.ev.id;
     if(x.ev.after)x.ev.after(x.st,i,ok,dice); if(x.id==='cb'&&!ARCS.cb.some(e=>!(x.st.done[e.id])))delete S.arcs.cb; }};
 }
@@ -3705,6 +3812,7 @@ function midSchedule(){
   if(S.stage==='PRO'&&chance(35))q.splice(ri(1,q.length),0,next=>dialogEvent(next)); /* 職業期偶爾一季兩則場外對話 */
   if(chance(40))q.splice(ri(0,q.length),0,next=>vignette(next));
   if(followDue()&&chance(45))q.splice(ri(1,q.length),0,next=>echoEvent(next)); /* v0.27.2 回聲有自己的時段 */
+  if(S.stage==='PRO'&&arcList().length&&chance(40))q.splice(ri(1,q.length),0,next=>arcEvent(next)); /* v0.28 劇情線也有自己的時段 */
   q.splice(ri(Math.ceil(q.length/2),q.length),0,next=>winterWindow(next));
   return q;
 }
@@ -3730,6 +3838,7 @@ function injuryProb(){
   let p=12+S.tmpInj-(S.ab.sta-40)*0.1+((S.fatigue??30)-30)*0.2; /* 訓練疲勞 */
   if(!isGK())p-=(S.ab.phy-40)*0.15;
   if(S.age>=30)p+=(S.age-29)*1.5;
+  p+=S.injMod||0; /* v0.28 傷後重建:手術與復健選擇的長期影響 */
   if(S.traits.scholar&&S.age<27)p-=5; /* 學院派 */
   if(S.ntRetired)p-=3; /* 退出國家隊,少了國際賽奔波 */
   if(S.traits.iron)p=Math.min(p,10);  /* 鐵人 */
@@ -3741,6 +3850,7 @@ function rollInjury(){
   if(chance(15)){ S.seasonFactor*=0.5; S.bigInj++;
     if(chance(30)){ S.rehab=1; card('bad','重傷','韌帶斷裂，本季後半報銷，<b class="dn">下季也要全年復健</b>。'); }
     else card('bad','重傷','肌腱撕裂，缺席<b class="dn">半個賽季</b>。');
+    if(S.stage==='PRO'){ S.arcs=S.arcs||{}; if(!S.arcs.mind||S.arcs.mind.out)S.arcs.mind={y:S.year,n:locName(),rehab:!!S.rehab,done:{}}; }
     /* 32 歲前第二次大傷才定性為玻璃體質;之後算老化 */
     if(S.bigInj>=2&&!S.traits.glass&&!S.traits.phoenix&&S.age<32)
       traitCard('glass','生涯第二次大傷。從此傷病如影隨形，未來每季受傷機率<b class="dn">不低於 35%</b>。','bad');
@@ -4932,15 +5042,23 @@ function endGame(reason){
 }
 /* 引退後的路:依生涯經歷給選項,寫進場外人生 */
 function afterLife(reason){
-  const F=S.flags||{}, A=S.arcs||{}, o=[];
-  if(F.youth)o.push({t:`回青訓當教練（答應過 ${A.mentor.n}）`,a:`回到青訓，接下 ${A.mentor.n} 留給你的位置，帶著一群跟當年的你一樣的孩子。`});
-  if(F.lic)o.push({t:'走上職業教練之路',a:'拿著教練證從助理教練做起，十年後帶隊站上了職業聯賽的場邊。'});
-  if(S.fans>=50)o.push({t:'轉任球評',a:'成了電視台的球評，你的口頭禪被觀眾做成梗圖。'});
-  if(F.fund)o.push({t:'全心經營基金會',a:'基金會送出了一萬雙球鞋，有三個受助的孩子後來踢上了職業。'});
-  if(S.salary>=800)o.push({t:'創業開公司',a:'開了運動品牌，第一款球鞋用你的背號命名。'});
-  o.push({t:F.field?'回家鄉，在那座以你命名的球場開足球學校':'回家鄉開足球學校',a:F.field?'每個週末，你都站在那座以你命名的球場上，教孩子們第一次踢球。':'在家鄉開了足球學校，學費很便宜，報名的孩子很多。'});
-  o.push({t:'離開足球，過平凡的生活',a:'你搬到海邊，偶爾在電視上看到老隊友，會笑著轉台。'});
-  card('talk','引退之後','鞋櫃裡的球鞋都收好了。接下來的人生，你想怎麼過？');
+  const F=S.flags||{}, A=S.arcs||{}, P=A.post||{}, o=[];
+  const yrs={}; S.log.filter(l=>l.lv&&!l.loan).forEach(l=>yrs[l.tm]=(yrs[l.tm]||0)+1); const home=Object.keys(yrs).sort((a,b)=>yrs[b]-yrs[a])[0]||S.club;
+  if(F.youth)o.push({k:'youth',t:`回青訓當教練（答應過 ${A.mentor.n}）`,a:`回到青訓，接下 ${A.mentor.n} 留給你的位置，帶著一群跟當年的你一樣的孩子。`});
+  if(F.lic)o.push({k:'coach',t:'走上職業教練之路',a:P.coach>=2?`現役時帶預備隊、提戰術建議的經驗全派上用場：退休第三年，你就坐上了 ${home} 的主帥位置。`:P.coach?'拿著教練證從助理教練做起，帶過預備隊的經驗讓你升得很快，七年後站上了職業聯賽的場邊。':'拿著教練證從助理教練做起，十年後帶隊站上了職業聯賽的場邊。'});
+  if(F.leader)o.push({k:'leader',t:`回 ${home} 當技術總監`,a:`${home} 請你回去當技術總監。更衣室裡的人都說，你只是換了一間辦公室，還是那個隊長。`});
+  if(F.tv||S.fans>=50)o.push({k:'tv',t:'轉任球評',a:F.tv?(P.sharp?'你成了收視率最高的球評，犀利的點評讓好幾位主帥在記者會上點名回嗆你。':'你成了電視台的固定球評，講解清楚又溫和，觀眾說你是「最會教人看球的人」。'):'成了電視台的球評，你的口頭禪被觀眾做成梗圖。'});
+  if(F.fund)o.push({k:'fund',t:'全心經營基金會',a:'基金會送出了一萬雙球鞋，有三個受助的孩子後來踢上了職業。'});
+  if(F.biz||S.salary>=800)o.push({k:'biz',t:F.biz?'全心經營自己的運動品牌':'創業開公司',a:F.biz?'現役時開的品牌，退休後你全心經營，第三年營收翻了兩倍，最暢銷的球鞋用你的背號命名。':'開了運動品牌，第一款球鞋用你的背號命名。'});
+  if(F.mind)o.push({k:'mind',t:'推廣運動心理',a:`你和當年的心理師 ${typeof F.mind==='string'?F.mind:''} 一起巡迴各地青訓，告訴孩子們受傷之後怎麼走回球場。`});
+  o.push(F.acad?{k:'acad',t:'全心經營自己的青訓營',a:'現役時開的青訓營擴大成三個校區，第一屆學員裡已經有人簽下職業合約。'}:
+    {k:'home',t:F.field?'回家鄉，在那座以你命名的球場開足球學校':'回家鄉開足球學校',a:F.field?'每個週末，你都站在那座以你命名的球場上，教孩子們第一次踢球。':'在家鄉開了足球學校，學費很便宜，報名的孩子很多。'});
+  o.push({k:'quiet',t:'離開足球，過平凡的生活',a:'你搬到海邊，偶爾在電視上看到老隊友，會笑著轉台。'});
+  /* 引退後規劃線:寫過退休計畫書的那條路排第一 */
+  /* 沒寫計畫書的話,改用當年跟經紀人說的方向 */
+  const pk=P.plan==='home'&&F.acad?'acad':P.plan||P.dir, pi=pk?o.findIndex(x=>x.k===pk):-1;
+  if(pi>=0){ const x=o.splice(pi,1)[0]; o.unshift(P.plan?{...x,t:x.t+'（計畫書上的第一行）',a:'你照著那本計畫書走：'+x.a}:{...x,t:x.t+'（當年說過的路）',a:`就像 ${P.dirAge||30} 歲那年你跟經紀人說的——`+x.a}); }
+  card('talk','引退之後',pi>=0&&P.plan?'鞋櫃裡的球鞋都收好了。抽屜裡那本退休計畫書，終於要派上用場了。':pi>=0?`鞋櫃裡的球鞋都收好了。你想起 ${P.dirAge||30} 歲那年，經紀人問你的那個問題。`:'鞋櫃裡的球鞋都收好了。接下來的人生，你想怎麼過？');
   choose('引退之後 — 你的選擇？',o.map(x=>({t:x.t,main:x===o[0],f:()=>{ S.after=x.a; endGameFinal(reason); }})));
 }
 const nextPage=(t,f)=>choose('',[{t:`▸ ${t}`,main:true,f}]);
@@ -4993,6 +5111,8 @@ function epilogue(ev,chs,hb){
   if(top.length)s.push(`${top.map(b=>b.txt.replace(/<[^>]+>/g,'').replace(/：.*/,'')).join('、')}的榜首，至今仍寫著你的名字。`);
   if(L.st==='married')s.push(L.kids?`你和 ${L.partner} 的${L.kids>1?`${L.kids} 個孩子`:'孩子'}${Math.random()<0.5?'也開始在青訓踢球了，你從不缺席任何一場比賽。':'對足球沒什麼興趣，你反而鬆了一口氣。'}`:`你和 ${L.partner} 終於有時間一起去旅行。`);
   else if(L.st==='dating')s.push(`你和 ${L.partner} 決定結婚，婚禮上來了半支當年的球隊。`);
+  if(A.lead&&A.lead.done&&A.lead.done.ld4)s.push('多年以後，那支球隊的更衣室裡還流傳著你那場賽前演說。');
+  if(A.sg&&A.sg.hero)s.push(A.sg.burn?'那件被燒過的球衣，後來被你親手掛進了球隊博物館。':`拒絕 ${A.sg.big} 的那一天，至今還是球迷津津樂道的故事。`);
   if(A.rival&&A.rival.n&&A.rival.w+A.rival.l>=3)s.push(`每年夏天，你和 ${A.rival.n} 都會約一場業餘賽，誰也不肯讓誰。`);
   if(S.fans>=80)s.push('只要你出現在球場，看台上還是會響起你的名字。');
   else if(S.fans<25)s.push('多數球迷已經不記得你了，但你自己記得每一場比賽。');
