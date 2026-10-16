@@ -974,7 +974,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.26.7';
+const APP_VER='v0.26.8';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1118,35 +1118,35 @@ const LV={
    home 本土聯賽(高→低)、scout 首次進歐洲／五大的球探打折、wp 英格蘭工作證、mil 兵役制度 */
 const NATS={
   TW:{cf:'AFC',n:'台灣',tier:5,wc:1,cap:20,nt:34,home:['TW1'],scout:2,wp:1,mil:'TW'},
-  JP:{cf:'AFC',n:'日本',tier:1,wc:90,cap:10,nt:50,home:['J1','J2'],scout:0,wp:0},
-  KR:{cf:'AFC',n:'韓國',tier:1,wc:85,cap:10,nt:49,home:['K1','K2'],scout:0,wp:0,mil:'KR'},
-  AU:{cf:'AFC',n:'澳洲',tier:2,wc:70,cap:25,nt:46,home:['AUS'],scout:0,wp:0},
-  CN:{cf:'AFC',n:'中國',tier:3,wc:30,cap:30,nt:42,home:['CSL','CHN2'],scout:1,wp:1},
+  JP:{cf:'AFC',n:'日本',tier:1,wc:85,cap:10,nt:50,home:['J1','J2'],scout:0,wp:0},
+  KR:{cf:'AFC',n:'韓國',tier:1,wc:78,cap:10,nt:49,home:['K1','K2'],scout:0,wp:0,mil:'KR'},
+  AU:{cf:'AFC',n:'澳洲',tier:2,wc:55,cap:18,nt:46,home:['AUS'],scout:0,wp:0},
+  CN:{cf:'AFC',n:'中國',tier:3,wc:22,cap:25,nt:42,home:['CSL','CHN2'],scout:1,wp:1},
   VN:{cf:'AFC',n:'越南',tier:4,wc:4,cap:12,nt:38,home:['VIE'],scout:2,wp:1},
   TH:{cf:'AFC',n:'泰國',tier:4,wc:4,cap:12,nt:38,home:['THA'],scout:2,wp:1},
   ID:{cf:'AFC',n:'印尼',tier:4,wc:8,cap:15,nt:37,home:['IDN'],scout:2,wp:1},
-  SA:{cf:'AFC',n:'沙烏地阿拉伯',tier:3,wc:60,cap:15,nt:45,home:['SAU'],scout:2,wp:1},
+  SA:{cf:'AFC',n:'沙烏地阿拉伯',tier:3,wc:45,cap:12,nt:46,home:['SAU'],scout:2,wp:1},
   /* ---- v0.19 新國籍:cf 洲別、alt 本土太弱時 18 歲的海外去處、trial 赴外青訓試訓的聯賽 ---- */
-  EN:{n:'英格蘭',cf:'UEFA',tier:0,wc:97,cap:3,nt:51,home:['ENG','EFL','ENG3'],scout:0,wp:0},
-  ES:{n:'西班牙',cf:'UEFA',tier:0,wc:97,cap:3,nt:51,home:['ESP','ESP2','ESP3'],scout:0,wp:0},
-  FR:{n:'法國',cf:'UEFA',tier:0,wc:97,cap:3,nt:52,home:['FRA','FRA2','FRA3'],scout:0,wp:0},
-  DE:{n:'德國',cf:'UEFA',tier:0,wc:96,cap:3,nt:51,home:['GER','GER2','GER3'],scout:0,wp:0},
-  IT:{n:'義大利',cf:'UEFA',tier:1,wc:85,cap:8,nt:50,home:['ITA','ITA2','ITA3'],scout:0,wp:0},
-  PT:{n:'葡萄牙',cf:'UEFA',tier:0,wc:95,cap:4,nt:51,home:['POR','POR2'],scout:0,wp:0},
-  NL:{n:'荷蘭',cf:'UEFA',tier:1,wc:90,cap:6,nt:50,home:['NED','NED2'],scout:0,wp:0},
-  HR:{n:'克羅埃西亞',cf:'UEFA',tier:1,wc:85,cap:8,nt:49,home:['CRO','CRO2'],scout:0,wp:0},
-  BR:{n:'巴西',cf:'CONMEBOL',tier:0,wc:97,cap:3,nt:51,home:['BRA','BRA2'],scout:0,wp:0,trial:['POR','ESP2','NED']},
-  AR:{n:'阿根廷',cf:'CONMEBOL',tier:0,wc:97,cap:3,nt:51,home:['ARG','ARG2'],scout:0,wp:0,trial:['ESP2','ITA2','POR']},
-  UY:{n:'烏拉圭',cf:'CONMEBOL',tier:1,wc:85,cap:10,nt:50,home:['URU'],scout:0,wp:0,trial:['ESP2','ITA2','POR']},
-  CO:{n:'哥倫比亞',cf:'CONMEBOL',tier:2,wc:80,cap:12,nt:49,home:['COL'],scout:1,wp:1,trial:['POR','BEL','NED']},
-  US:{n:'美國',cf:'CONCACAF',tier:2,wc:93,cap:5,nt:48,home:['MLS','USL'],scout:1,wp:0,trial:['NED','GER2','BEL']},
-  MX:{n:'墨西哥',cf:'CONCACAF',tier:2,wc:92,cap:6,nt:48,home:['MEX','MEX2'],scout:1,wp:1,trial:['NED','ESP2','POR']},
-  CA:{n:'加拿大',cf:'CONCACAF',tier:3,wc:55,cap:15,nt:45,home:['MLS','CPL'],scout:1,wp:1,alt:['USL'],trial:['BEL','GER2','FRA2']},
-  MA:{n:'摩洛哥',cf:'CAF',tier:1,wc:80,cap:8,nt:51,home:['MAR'],scout:1,wp:1,trial:['FRA2','BEL','ESP2']},
-  SN:{n:'塞內加爾',cf:'CAF',tier:2,wc:60,cap:12,nt:49,home:['SEN'],scout:1,wp:1,alt:['FRA3','BEL'],trial:['FRA2','BEL','FRA3']},
-  NG:{n:'奈及利亞',cf:'CAF',tier:2,wc:45,cap:15,nt:48,home:['NGA'],scout:1,wp:1,alt:['POR2','BEL'],trial:['BEL','POR','NED']},
-  EG:{n:'埃及',cf:'CAF',tier:3,wc:45,cap:15,nt:45,home:['EGY'],scout:2,wp:1,trial:['BEL','POR','FRA2']},
-  CV:{n:'維德角',cf:'CAF',tier:4,wc:15,cap:12,nt:40,home:['CPV'],scout:2,wp:1,alt:['POR2'],trial:['POR','POR2','NED2']},
+  EN:{n:'英格蘭',cf:'UEFA',tier:0,wc:97,cap:3,nt:48,home:['ENG','EFL','ENG3'],scout:0,wp:0},
+  ES:{n:'西班牙',cf:'UEFA',tier:0,wc:97,cap:3,nt:48,home:['ESP','ESP2','ESP3'],scout:0,wp:0},
+  FR:{n:'法國',cf:'UEFA',tier:0,wc:97,cap:3,nt:49,home:['FRA','FRA2','FRA3'],scout:0,wp:0},
+  DE:{n:'德國',cf:'UEFA',tier:0,wc:96,cap:3,nt:48,home:['GER','GER2','GER3'],scout:0,wp:0},
+  IT:{n:'義大利',cf:'UEFA',tier:1,wc:85,cap:8,nt:48,home:['ITA','ITA2','ITA3'],scout:0,wp:0},
+  PT:{n:'葡萄牙',cf:'UEFA',tier:0,wc:95,cap:4,nt:48,home:['POR','POR2'],scout:0,wp:0},
+  NL:{n:'荷蘭',cf:'UEFA',tier:1,wc:90,cap:6,nt:48,home:['NED','NED2'],scout:0,wp:0},
+  HR:{n:'克羅埃西亞',cf:'UEFA',tier:1,wc:75,cap:8,nt:48,home:['CRO','CRO2'],scout:0,wp:0},
+  BR:{n:'巴西',cf:'CONMEBOL',tier:0,wc:97,cap:3,nt:48,home:['BRA','BRA2'],scout:0,wp:0,trial:['POR','ESP2','NED']},
+  AR:{n:'阿根廷',cf:'CONMEBOL',tier:0,wc:97,cap:3,nt:48,home:['ARG','ARG2'],scout:0,wp:0,trial:['ESP2','ITA2','POR']},
+  UY:{n:'烏拉圭',cf:'CONMEBOL',tier:1,wc:75,cap:10,nt:50,home:['URU'],scout:0,wp:0,trial:['ESP2','ITA2','POR']},
+  CO:{n:'哥倫比亞',cf:'CONMEBOL',tier:2,wc:68,cap:12,nt:49,home:['COL'],scout:1,wp:1,trial:['POR','BEL','NED']},
+  US:{n:'美國',cf:'CONCACAF',tier:2,wc:85,cap:5,nt:48,home:['MLS','USL'],scout:1,wp:0,trial:['NED','GER2','BEL']},
+  MX:{n:'墨西哥',cf:'CONCACAF',tier:2,wc:85,cap:6,nt:48,home:['MEX','MEX2'],scout:1,wp:1,trial:['NED','ESP2','POR']},
+  CA:{n:'加拿大',cf:'CONCACAF',tier:3,wc:42,cap:12,nt:45,home:['MLS','CPL'],scout:1,wp:1,alt:['USL'],trial:['BEL','GER2','FRA2']},
+  MA:{n:'摩洛哥',cf:'CAF',tier:1,wc:70,cap:8,nt:50,home:['MAR'],scout:1,wp:1,trial:['FRA2','BEL','ESP2']},
+  SN:{n:'塞內加爾',cf:'CAF',tier:2,wc:50,cap:10,nt:50,home:['SEN'],scout:1,wp:1,alt:['FRA3','BEL'],trial:['FRA2','BEL','FRA3']},
+  NG:{n:'奈及利亞',cf:'CAF',tier:2,wc:38,cap:12,nt:49,home:['NGA'],scout:1,wp:1,alt:['POR2','BEL'],trial:['BEL','POR','NED']},
+  EG:{n:'埃及',cf:'CAF',tier:3,wc:35,cap:12,nt:47,home:['EGY'],scout:2,wp:1,trial:['BEL','POR','FRA2']},
+  CV:{n:'維德角',cf:'CAF',tier:4,wc:10,cap:10,nt:42,home:['CPV'],scout:2,wp:1,alt:['POR2'],trial:['POR','POR2','NED2']},
 };
 const NAT_CODE=Object.fromEntries(Object.entries(NATS).map(([k,v])=>[v.n,k])); /* 國名 → 代碼 */
 const NAT_TIERN={0:'世界強權',1:'強',2:'中強',3:'中',4:'中弱',5:'弱'};
@@ -1982,11 +1982,11 @@ function sceneBonus(sc){ let b=0; const T=S.traits;
 function trackMomentTraits(sc,ok,sub){ const T=S.traits, inc=k=>(S[k]=(S[k]||0)+1);
   if(ok&&isDerbySTK()&&inc('cDerby')>=3&&!T.derby)traitCard('derby','第三次在德比裡扛起球隊。看台上的人開始叫你「德比先生」——<b class="hl">德比關鍵時刻成功率 +10%、球迷人氣加倍</b>。');
   if(MTAG&&BIG_RE.test(MTAG)&&!/資格賽|小組賽|第三輪/.test(MTAG)){
-    if(ok){ S.bigFail=0; if(inc('cBig')>=8&&!T.bignight)traitCard('bignight','燈光越亮，你踢得越好——<b class="hl">洲際賽與大賽淘汰賽成功率 +8%</b>。'); }
+    inc('bigN'); if(ok){ S.bigFail=0; if(inc('cBig')>=12&&S.cBig/S.bigN>=0.65&&!T.bignight)traitCard('bignight','燈光越亮，你踢得越好——<b class="hl">洲際賽與大賽淘汰賽成功率 +8%</b>。'); }
     else if(inc('bigFail')>=5&&!T.bigfear&&!T.bignight)traitCard('bigfear','大賽連續失手五次，媒體說你「一到大場面就消失」——<b class="dn">大賽成功率 −8%</b>。（贏下一場決賽可以解除）','bad'); }
   if(ok&&/點球/.test(sc.t)&&inc('cPk')>=5&&!T.pkpro){ traitCard('pkpro','第五個點球得手。站上十二碼，你的心跳比門將還慢——<b class="hl">點球場景成功率 +15%</b>。');
     if(T.yips){ removeTrait('yips'); card('good','心魔解除','點球恐懼症痊癒了。'); } }
-  if(ok&&sub&&S.age>=20&&inc('cSub')>=8&&!T.supersub)traitCard('supersub','第八次替補登場改變比賽。教練說：「你是我最好的武器。」——<b class="hl">替補身分時賽季評分 +0.2</b>。');
+  if(ok&&sub&&S.age>=20&&inc('cSub')>=14&&!T.supersub)traitCard('supersub','第十四次替補登場改變比賽。教練說：「你是我最好的武器。」——<b class="hl">替補身分時賽季評分 +0.2</b>。');
 }
 const FOUL_RE=/鏟|犯規|上搶|斷球|出腳|撲搶|硬吃|貼上去|撲向腳下|撲向持球者|衝出去封堵/;
 let LAST_MO=null;
@@ -4261,7 +4261,8 @@ function clubCups(cont){
 }
 const ASIA_TOP=['J1','K1','CSL','AUS'], ASIA_2=['J2','K2'];
 const lgW=k=>LV[k].top5?1:clamp((LV[k].par-28)/32,0.1,0.75); /* 依聯賽水準:英冠約 0.75、日職約 0.6、台灣企甲約 0.16 */
-const seasonPts=r=>r.lv&&r.st.App?Math.max(0,r.st.Rt-ptsBase(r.lv))*r.st.Min/90*(r.dp==='GK'?0.8:1):0; /* 門將每場踢滿,分鐘數 ×0.8 */
+const seasonPts=r=>r.lv&&r.st.App?Math.max(0,r.st.Rt-ptsBase(r.lv))*r.st.Min/90*(POS_PTS[DP_GRP[r.dp]]??1):0; /* v0.26.8:門將每場踢滿 ×0.55、後衛評分偏低 ×1.12 */
+const POS_PTS={GK:0.55,DF:1.12,MF:1.04,FW:1};
 const ptsBase=k=>clamp(6.0-(LV[k].par-45)*0.015,5.75,6.25); /* v0.21.1:評分基準依聯賽水準(英超約 5.78、台灣企甲約 6.18),強聯賽同樣評分更值錢 */
 /* 榮譽加分:由上往下取第一個符合的規則 */
 const HONOR_PTS=[[/自由盃（冠軍/,90],[/自由盃（亞軍/,45],[/自由盃（4 強/,20],[/南美盃（冠軍/,40],[/南美盃（亞軍/,20],[/南美盃（4 強/,8],
