@@ -907,6 +907,26 @@ html.calm .hero-pitch.tac .tc-p .halo,html.calm .hero-pitch.tac .tc-rec,html.cal
 @media (min-width:900px){ #start .wrap{max-width:1180px;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);align-items:start;gap:44px}
   #start .hero{position:sticky;top:24px;align-self:start;padding-top:12px} #start .panel{align-self:start}
   #start .hero .hero-pitch{max-width:none;width:100%} #start .hero>*{max-width:none} }
+/* ---------- v0.26.18 手機版:關掉雙擊縮放、精簡記分板、精簡選項、縮小場景圖 ---------- */
+html{touch-action:manipulation} button,a,input,select,label{touch-action:manipulation}
+#bd-mini{display:none}
+@media (max-width:700px){
+  #seed-show{font-size:16px}
+  #board{padding-top:8px;padding-bottom:8px}
+  #bd-mini{display:flex;align-items:baseline;gap:6px;margin-top:6px;padding:5px 9px;border:1px solid var(--edge);border-radius:7px;background:color-mix(in srgb,var(--panel) 70%,transparent);font-size:12.5px;color:var(--dim);cursor:pointer;white-space:nowrap;overflow:hidden}
+  #bd-mini b{font:800 17px var(--num);color:var(--amber);line-height:1} #bd-mini .mo{font-size:10.5px;letter-spacing:.1em}
+  #bd-mini .ma{color:var(--chalk);font-weight:700} #bd-mini .mw{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  #bd-mini i{font-style:normal;color:var(--amber)}
+  #board:not(.full) #bd-bug,#board:not(.full) #bd-grid,#board:not(.full) #bd-abt,#board:not(.full) #bd-ab,#board:not(.full) #bd-tick,#board:not(.full) #bd-time{display:none!important}
+  #board:not(.full) #bd-meters{margin-top:6px;gap:8px} #board:not(.full) .mt{font-size:10.5px} #board:not(.full) .mt em{font-size:12.5px;top:-1px} #board:not(.full) .mt i{height:5px;margin-top:2px}
+  #board.full{max-height:78vh;max-height:78dvh;overflow-y:auto}
+  #act{padding-top:8px;padding-bottom:calc(8px + env(safe-area-inset-bottom))} #act .title{margin-bottom:6px;font-size:12px}
+  .btn.tac{grid-template-columns:38px 1fr;gap:9px;padding:7px 10px 7px 8px;margin-bottom:6px}
+  .btn.tac .ring{width:38px;height:38px} .btn.tac .ring b{font-size:14px} .btn.tac .ring i{font-size:9px}
+  .btn.tac .tx{font-size:14px;line-height:1.3;padding-right:30px} .btn.tac .risk{top:7px;right:10px;font-size:10.5px}
+  .btn.tac small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px;margin-top:1px}
+  svg.scene{max-height:150px;width:auto;max-width:100%;margin-left:auto;margin-right:auto}
+}
 html.calm *,html.calm *::before,html.calm *::after{animation:none!important;transition:none!important}
 html.calm .var{display:none}
 </style>
@@ -974,6 +994,7 @@ html.calm .var{display:none}
 <div id="app">
   <header id="board" style="display:none">
     <div id="bd-top"><span id="bd-num">7</span><div id="bd-name"></div><button id="btn-rev" title="回顧之前的畫面">回顧</button><button id="btn-side" title="生涯面板與里程碑">生涯</button><button id="btn-prefs" title="配色與動畫">⚙</button><button id="btn-restart" title="重新開始">↺</button></div>
+    <div id="bd-mini" role="button" title="展開記分板"></div>
     <div id="bd-bug"><span id="bd-lg">青訓</span><span id="bd-team"></span><span id="bd-clock">0'</span></div>
     <div id="bd-grid">
       <div class="bd-cell"><b id="bd-age">15</b><span>年齡</span></div>
@@ -1016,7 +1037,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.26.17';
+const APP_VER='v0.26.18';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1365,7 +1386,7 @@ function scrHead(){ if(typeof S==='undefined'||!S)return '';
   const dots=pg?`<span class="dots">${Array.from({length:pg.n},(_,i)=>`<i class="${i<pg.i-1?'d':i===pg.i-1?'c':''}"></i>`).join('')}</span>`:'';
   return `<span>${HDR||`${seasonLabel(S.year)} 賽季・${S.age} 歲・${stageLabel()}`}</span><b>${ph}${pg?` ${pg.i}/${pg.n}`:''}</b>${dots}`; }
 function showScreen(sc){
-  if(SCR&&SCR!==sc){ SCR.classList.remove('cur'); wipeFx(); }
+  if(SCR&&SCR!==sc){ SCR.classList.remove('cur'); wipeFx(); boardMini(); }
   SCR=sc; sc.classList.add('cur'); $('log').classList.remove('review'); syncRev();
   sc.classList.toggle('dec',!!sc.querySelector('.card.moment,.card.talk'));
   let h=sc.querySelector(':scope>.scr-head'); if(!h){ h=document.createElement('div'); h.className='scr-head'; sc.prepend(h); }
@@ -1484,6 +1505,8 @@ function board(phase){ if(phase!==undefined)S.ph=phase; /* 不帶參數時沿用
     el.classList.toggle('lo',S[k]<30); el.classList.toggle('hi',S[k]>=70); });
   $('bd-time').dataset.ph=S.ph||0; [0,1,2].forEach(i=>$('lp'+i).classList.toggle('on',i===(S.ph||0)));
   abPanel(); sideDash();
+  { const mi=$('bd-mini'); if(mi){ const where=S.stage==='PRO'?S.club+(S.loan?'（租）':''):S.stage==='UNI'?S.uni:S.team;
+    mi.innerHTML=`<b>${ovr()}</b><span class="mo">綜合</span><span class="ma">${S.age} 歲・${seasonLabel(S.year)} ${['季前','季中','季末'][S.ph||0]}</span><span class="mw">${where||''}</span><i>${$('board').classList.contains('full')?'▴':'▾'}</i>`; } }
 }
 /* 記分板能力面板:數值/潛力、能力條(白線＝潛力)、下方細條＝升下一級的累積進度;黃字＝計入目前位置綜合 */
 let AB_PREV=null;
@@ -4874,6 +4897,11 @@ function acadReview(){
   if(t)t.onclick=()=>{ $('act').classList.toggle('collapsed');
     t.textContent=$('act').classList.contains('collapsed')?'⌃ 展開選項':'⌄ 收合選項'; };
 })();
+/* v0.26.18 手機版記分板:平常只顯示精簡列,點一下展開完整記分板;換畫面時自動收回 */
+const MOBILE=()=>!!window.matchMedia&&window.matchMedia('(max-width:700px)').matches;
+function boardMini(){ const B=$('board'); if(B&&B.classList.contains('full')){ B.classList.remove('full'); const i=document.querySelector('#bd-mini i'); if(i)i.textContent='▾'; } }
+$('bd-mini').onclick=()=>{ const on=$('board').classList.toggle('full'); const i=document.querySelector('#bd-mini i'); if(i)i.textContent=on?'▴':'▾'; };
+if(MOBILE()){ $('bd-ab').classList.remove('open'); $('bd-abt').textContent='展開全部能力 ▾'; }
 $('bd-abt').onclick=function(){ const on=$('bd-ab').classList.toggle('open'); /* 預設展開,只記住「收起」 */
   this.textContent=on?'收起能力 ▴':'展開全部能力 ▾'; try{localStorage.setItem('fl_abshut',on?'':'1');}catch(e){} };
 try{ if(localStorage.getItem('fl_abshut')){ $('bd-ab').classList.remove('open'); $('bd-abt').textContent='展開全部能力 ▾'; } }catch(e){}
