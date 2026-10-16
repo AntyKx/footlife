@@ -902,7 +902,7 @@ html.calm .hero-pitch.tac .tc-p .halo,html.calm .hero-pitch.tac .tc-rec,html.cal
 .recap span{font:700 10.5px var(--num);letter-spacing:.12em;color:var(--dim)} .recap b{color:var(--chalk)} .recap em{font-style:normal;color:var(--dim);flex-basis:100%}
 .recap.ok{border-left-color:var(--amber)} .recap.ok b{color:var(--amber)} .recap.ng{border-left-color:var(--bad)} .recap.ng b{color:var(--bad)}
 /* v0.26.14 首頁排版:寬螢幕左右欄頂端對齊,左欄跟著捲動(sticky),戰術畫面放大到整欄寬 */
-@media (min-width:900px){ #start .wrap{max-width:1200px;grid-template-columns:1.15fr 1fr;align-items:start;gap:44px}
+@media (min-width:900px){ #start .wrap{max-width:1180px;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);align-items:start;gap:44px}
   #start .hero{position:sticky;top:24px;align-self:start;padding-top:12px} #start .panel{align-self:start}
   #start .hero .hero-pitch{max-width:none;width:100%} #start .hero>*{max-width:none} }
 html.calm *,html.calm *::before,html.calm *::after{animation:none!important;transition:none!important}
@@ -1014,7 +1014,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.26.15';
+const APP_VER='v0.26.16';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
