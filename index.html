@@ -1044,7 +1044,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.28.0';
+const APP_VER='v0.28.1';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -2033,7 +2033,7 @@ function momentSplit(o,mag){ const a=o.ab.length>1&&mag>1?[Math.ceil(mag/2),Math
 function momentSub(o,p){ const g=momentSplit(o,momentMag(o)).map(([k,v])=>`${ABL[k]}+${v}`).join(' ');
   return `${MODEN[o.m]}｜成功率 ${p}%｜成功 ${g}${o.m==='safe'?'':o.m==='sig'?'｜失敗 狀態−3':`｜失敗 ${ABL[o.ab[0]]}−1`}`; }
 function momentOdds(o,par){ /* par:大賽與盃賽用對手強度,預設為目前球隊 par */
-  const base={safe:70,norm:50,bold:S.traits.clutch?50:35,sig:60}[o.m];
+  const base={safe:70,norm:50,bold:S.traits.clutch?50:35,sig:45}[o.m];
   const a=o.ab.reduce((s,k)=>s+S.ab[k],0)/o.ab.length;
   const p=base+clamp((a-(par??curPar()))*2,-25,20)+((S.traits.genius||S.traits.late)?12:0)-(S.traits.yips?10:0)-(MCTX.ten&&o.m==='bold'?8:0)+(o.m==='sig'&&S.traits.sigstar?5:0); /* 少一人作戰:冒險 −8%;招牌球星:招牌 +5% */
   return clamp(Math.round(p),5,95);
