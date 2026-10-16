@@ -1014,7 +1014,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.26.14';
+const APP_VER='v0.26.15';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -4945,7 +4945,7 @@ function openPrefs(){ renderPrefs(); $('prefs').classList.add('open'); }
 $('btn-prefs').onclick=openPrefs; $('start-prefs').onclick=openPrefs;
 $('start-ach').onclick=openAch; $('achp-x').onclick=()=>$('achp').classList.remove('open');
 /* ================= 首頁球場動畫(v0.26.0):小人球員、一次完整進攻、轉播鏡頭;純裝飾,不碰種子亂數 ================= */
-function heroAnim(){ /* v0.26.13 首頁:轉播戰術分析畫面;v0.26.14 前鋒、中場、門將三個場景輪播,點選位置會切到該位置的場景 */
+function heroAnim(){ /* v0.26.13 首頁:轉播戰術分析畫面;v0.26.14 前鋒、中場、門將、後衛四個場景輪播,點選位置會切到該位置的場景 */
   const sv=document.querySelector('.hero-pitch'), act=$('hp-act'), cam=$('hp-cam'), pit=$('tc-pitch'), fxg=$('tc-fx'); if(!sv||!act||!cam||!pit||!fxg)return;
   const NS='http://www.w3.org/2000/svg', mk=(t,c,par)=>{ const e=document.createElementNS(NS,t); if(c)e.setAttribute('class',c); if(par)par.appendChild(e); return e; };
   const T=10.6, lerp=(a,b,u)=>a+(b-a)*u, ease=u=>u<.5?2*u*u:1-2*(1-u)*(1-u), f1=v=>v.toFixed(1), win=(t,a,b,i=2.5,o=3)=>t>a&&t<b?Math.min(1,(t-a)*i,(b-t)*o):0;
@@ -4998,7 +4998,7 @@ function heroAnim(){ /* v0.26.13 首頁:轉播戰術分析畫面;v0.26.14 前鋒
     STEP:[[0,'01 回撤接應'],[1.4,'02 轉身擺脫'],[3.3,'03 穿透直塞'],[4.2,'04 隊友射門'],[4.78,'05 ASSIST']],
     space:{at:[-.6,12.4],t:[2.2,4.2],lbl:'空檔'},tele:{id:'st',t:[3.3,4.25],show:[2.6,4.3]},back:{ids:['o1','o2','o3','o4'],lbl:'防線',end:4.6},spd:{id:'me',t:[1.9,3.3]},
     tag:{id:'me',t:[1.45,2.1],txt:'轉身擺脫'}},
-   GK:{me:1,min:"88'",clk:[87,31],sc0:'YOU 1 – 0 OPP',sc1:'YOU 1 – 0 OPP',hit:3.55,goal:false,zoom:[1.6,5.4],lt:['SAVE!','YOU ・ 單刀撲救 ・ 保住 1–0'],
+   GK:{me:1,def:1,min:"88'",clk:[87,31],sc0:'YOU 1 – 0 OPP',sc1:'YOU 1 – 0 OPP',hit:3.55,goal:false,zoom:[1.6,5.4],lt:['SAVE!','YOU ・ 單刀撲救 ・ 保住 1–0'],
     PL:[{id:'me',k:'me',n:1,tr:[[0,0,1.2],[1.6,.3,1.6],[2.6,.8,3.6],[3.2,1,4.6],[3.5,2.1,4.3],[4.6,2.2,4.3],[5.3,1.8,4.4],[5.7,1.5,4.6],[7,.6,3],[9.5,.4,2]]},
      {id:'o9',k:'op',n:9,tr:[[0,-4,22],[1.2,-2.2,17],[2.2,-.2,12.4],[3.2,1.3,7.8],[4,1.8,6.2],[6,0,9],[9.5,-1,12]]},
      {id:'o10',k:'op',n:10,tr:[[0,-8,24.4],[1,-7.8,23.8],[2.6,-6,20],[9.5,-5,20]]},
@@ -5013,8 +5013,23 @@ function heroAnim(){ /* v0.26.13 首頁:轉播戰術分析畫面;v0.26.14 前鋒
      [3.55,5.75,'hold','me'],[5.75,6.6,'fly',[1.6,4.8,.6],[16.2,21.2,0],1.6,'手拋'],[6.6,T+1,'own','f2']],
     STEP:[[0,'01 讀到威脅'],[2.2,'02 出擊封角'],[3.3,'03 飛身撲救'],[5.75,'04 快速手拋'],[6.6,'05 反擊發動']],
     space:{at:[-.2,12.2],t:[.4,2.4],lbl:'威脅',bad:1},tele:{id:'o9',t:[1,2.25],show:[.6,2.4],bad:1},back:{ids:['f3','c4','c5','f2'],lbl:'我方防線',end:3.3,mine:1},
-    tag:{id:'me',t:[3.55,4.9],txt:'反應 0.24s'}}};
-  const ORDER=['FW','MF','GK'];
+    tag:{id:'me',t:[3.55,4.9],txt:'反應 0.24s'}},
+   DF:{me:4,def:1,min:"71'",clk:[70,12],sc0:'YOU 0 – 0 OPP',sc1:'YOU 0 – 0 OPP',hit:3.4,goal:false,zoom:[1.6,5.2],lt:['TACKLE!','YOU ・ 關鍵鏟斷 ・ 化解單刀'],
+    PL:[{id:'me',k:'me',n:4,tr:[[0,-1,13],[1.2,-.5,12.6],[2.2,1.2,11.6],[2.9,2.6,10.4],[3.3,3.6,9.4],[3.55,4.1,9],[4.6,4.3,8.8],[5.4,3.9,9.6],[7,2,12],[9.5,1,13]]},
+     {id:'c5',k:'tm',n:5,tr:[[0,5.5,12.6],[2.4,6.4,12],[4,5.6,11],[9.5,5,13]]},
+     {id:'f2',k:'tm',n:2,tr:[[0,12,18],[1.5,13,16.2],[2.4,12.2,14],[4,11,13],[9.5,10,14]]},
+     {id:'f3',k:'tm',n:3,tr:[[0,-12,12.5],[3,-10,12],[9.5,-10,13]]},
+     {id:'m6',k:'tm',n:6,tr:[[0,4,21],[2.4,7,18.5],[3.6,10,17.6],[4.6,11.6,18],[6.4,14,22],[9.5,15,23]]},
+     {id:'g1',k:'tm',n:1,tr:[[0,0,1.5],[2.6,1.4,2.2],[4,1,2],[9.5,.4,1.8]]},
+     {id:'o9',k:'op',n:9,tr:[[0,-2,17],[1.4,0,15],[2.4,2,12.6],[3.2,3.3,10],[3.6,4,8.6],[5,3,10.4],[9.5,0,15]]},
+     {id:'o7',k:'op',n:7,tr:[[0,16,26],[1.5,15,19.5],[2.6,13.4,15.2],[4,12,14],[9.5,10,16]]},
+     {id:'o10',k:'op',n:10,tr:[[0,-3,24],[2,-2,20.5],[4.6,1,19.5],[9.5,3,21]]},
+     {id:'o11',k:'op',n:11,tr:[[0,-13,20],[2,-10,14.5],[9.5,-9,14]]}],
+    BALL:[[0,2.6,'own','o7'],[2.6,3.4,'fly',[12.9,14.9,0],[3.7,9.3,0],.15,'橫傳'],[3.4,4.6,'fly',[3.7,9.3,0],[12,17.6,0],.9,'解圍'],[4.6,T+1,'own','m6']],
+    STEP:[[0,'01 盯防前鋒'],[1.4,'02 保持防線'],[2.6,'03 預判傳球'],[3.4,'04 鏟斷攔截'],[4.6,'05 解圍反擊']],
+    space:{at:[3.8,9.6],t:[1.6,3.4],lbl:'威脅',bad:1},tele:{id:'me',t:[2.2,3.35],show:[1.7,3.4]},back:{ids:['f3','me','c5','f2'],lbl:'我方防線',end:3.3,mine:1},spd:{id:'me',t:[2.6,3.4]},
+    tag:{id:'me',t:[1.9,3.1],txt:'預判傳球'}}};
+  const ORDER=['FW','MF','DF','GK'];
   /* ---- 依場景建立元素 ---- */
   let S0, fig, passes, space, spT, back, backT, tele, trail, btrail, spd, spdT, tag, tagT, bsh, ball, burst, hist=[], bhist=[];
   const at=(k,t)=>{ if(t<=k[0][0])return k[0].slice(1); const L=k.length-1; if(t>=k[L][0])return k[L].slice(1); /* 非均勻 Catmull-Rom:有加減速 */
@@ -5036,7 +5051,7 @@ function heroAnim(){ /* v0.26.13 首頁:轉播戰術分析畫面;v0.26.14 前鋒
       const dir=mk('path','dir',g); dir.setAttribute('d','M7.6 0 L5.2 -2.6 L5.2 2.6Z'); mk('circle','dk',g).setAttribute('r',p.k==='me'?'5.6':'5');
       const tx=mk('text',null,g); tx.textContent=p.n; tx.setAttribute('y','2.3'); tx.setAttribute('text-anchor','middle');
       let yt=null; if(p.k==='me'){ yt=mk('g','tc-you',act); yt.innerHTML='<path d="M-11 -21 H11 V-12 H2.5 L0 -9 L-2.5 -12 H-11Z"/><text y="-14.4" text-anchor="middle">YOU</text>'; }
-      return {p,g,dir,yt,ang:p.k==='op'&&key==='GK'?-90:p.k==='gk'||key==='GK'&&p.k!=='op'?90:-90,ox:0}; });
+      return {p,g,dir,yt,ang:p.k==='op'&&S0.def?-90:p.k==='gk'||S0.def&&p.k!=='op'?90:-90,ox:0}; });
     const chip=()=>{ const g=mk('g','tc-spd',act); g.innerHTML='<rect x="0" y="-6" width="40" height="9" rx="2"/><text x="20" y="1" text-anchor="middle"></text>'; return [g,g.querySelector('text')]; };
     [spd,spdT]=chip(); [tag,tagT]=chip(); if(S0.tag)tagT.textContent=S0.tag.txt;
     bsh=mk('ellipse','tc-bsh',act); ball=mk('circle','tc-ball',act); burst=mk('circle','tc-burst',act); burst.setAttribute('r','1');
@@ -5060,7 +5075,7 @@ function heroAnim(){ /* v0.26.13 首頁:轉播戰術分析畫面;v0.26.14 前鋒
       f.g.classList.toggle('run',sp>3.2);
       if(f.yt)f.yt.setAttribute('transform',`translate(${f1(sx)} ${f1(sy)})`);
       if(S0.spd&&f.p.id===S0.spd.id){ const show=sp>2.6&&t>S0.spd.t[0]&&t<S0.spd.t[1]; spd.setAttribute('transform',`translate(${f1(sx+9)} ${f1(sy+4)})`); spd.style.opacity=show?1:0; if(show)spdT.textContent=`${Math.min(33.8,sp*3.6).toFixed(1)} km/h`; }
-      if(S0.tag&&f.p.id===S0.tag.id){ tag.setAttribute('transform',`translate(${f1(sx+9)} ${f1(sy-4)})`); tag.style.opacity=win(t,S0.tag.t[0],S0.tag.t[1],6,6); }
+      if(S0.tag&&f.p.id===S0.tag.id){ tag.setAttribute('transform',`translate(${f1(sx+9)} ${f1(sy-8)})`); tag.style.opacity=win(t,S0.tag.t[0],S0.tag.t[1],6,6); }
       if(f.p.k==='me'){ hist.push([t,x,z]); hist=hist.filter(h=>t-h[0]<1.1&&h[0]<=t); } });
     if(!S0.spd)spd.style.opacity=0; if(!S0.tag)tag.style.opacity=0;
     trail.setAttribute('d',hist.length>1?'M'+pts(hist.map(h=>[h[1],h[2]])):'');
@@ -5097,7 +5112,7 @@ function heroAnim(){ /* v0.26.13 首頁:轉播戰術分析畫面;v0.26.14 前鋒
     const fo=t<.35?t/.35:t>T-.5?Math.max(0,(T-t)/.5):1; act.style.opacity=fo; fxg.style.opacity=fo;
   }
   const calm=()=>document.documentElement.classList.contains('calm');
-  const CALM_T={FW:3.3,MF:3.6,GK:2.9};
+  const CALM_T={FW:3.3,MF:3.6,DF:3.0,GK:2.9};
   function show(key){ build(key); cx=200; cy=115; cz=1.05; t0=null; lastT=0; }
   function loop(ts){ raf=0; const st=$('start'); if(!st||getComputedStyle(st).display==='none')return;
     if(calm()){ hist=[]; bhist=[]; frame(CALM_T[sv.dataset.scene]||3,0); return; }
@@ -5106,7 +5121,7 @@ function heroAnim(){ /* v0.26.13 首頁:轉播戰術分析畫面;v0.26.14 前鋒
     if(t>=T){ ci=pick!=null?ci:(ci+1)%ORDER.length; show(ORDER[ci]); raf=requestAnimationFrame(loop); return; } /* 選了位置就重播該位置,否則輪播 */
     lastT=t; frame(t,dt); raf=requestAnimationFrame(loop); }
   show(ORDER[ci]); frame(0,0); raf=requestAnimationFrame(loop);
-  /* 點選位置:門將、中場、前鋒切到對應場景(後衛維持輪播) */
+  /* 點選位置:切到該位置的場景並重播 */
   document.querySelectorAll('.seg.pos [data-v]').forEach(b=>b.addEventListener('click',()=>{ const i=ORDER.indexOf(b.dataset.v);
     if(i<0){ pick=null; return; } pick=i; if(ci===i&&!calm())return; ci=i; show(ORDER[i]); if(calm())frame(CALM_T[ORDER[i]],0); }));
   const wake=()=>{ if(!raf&&!document.hidden){ t0=null; lastT=0; raf=requestAnimationFrame(loop); } };
