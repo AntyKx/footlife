@@ -1044,7 +1044,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.28.1';
+const APP_VER='v0.29.0';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -3635,34 +3635,103 @@ function addAbStat(k,amt){
   S.carry[k]=cr; S.ab[k]=cur; if(bud>0)S.pendStat+=bud;
   return gained;
 }
-const breakUp=()=>{ const L=S.love; L.st=L.exes.length?'divorced':'single'; L.partner=null; L.dyrs=0; };
+const breakUp=()=>{ const L=S.love; L.st=L.exes.length?'divorced':'single'; L.partner=null; L.dyrs=0; L.eng=0; };
+/* v0.29 感情值(0–100):交往事件會加減;求婚要交往滿兩季、感情 60 以上、見過家長或同居 */
+const affOf=()=>{ const L=S.love; if(L.aff==null)L.aff=55; return L.aff; };
+function affAdd(d){ const L=S.love; affOf(); L.aff=clamp(L.aff+d,0,100); return d?`♥ 感情 <span class="${d>0?'up':'dn'}">${d>0?'+':''}${d}</span>（${L.aff}）`:''; }
+const propOk=()=>{ const L=S.love; return L.st==='dating'&&!L.eng&&L.dyrs>=2&&affOf()>=60&&(L.metPar||L.live); };
+/* 交往中的故事:每段感情各自抽,不重複 */
+const DATE_EV=[
+ {id:'paps',c:L=>L.dyrs<=2,n:'被拍到了',q:L=>`你和 ${L.partner} 看完午夜場電影，一走出影城就看到閃光燈`,o:L=>[
+  {t:'牽著她的手大方走出去',warn:true,p:60,s:'成功＝感情大幅↑、球迷↑',aff:8,affN:-4,ok:{fans:3},okt:`照片標題是「${S.name} 的另一半曝光」，她把那張報紙剪下來貼在冰箱上`,ngt:'她被網友肉搜，一整週不敢出門'},
+  {t:'隔天主動在社群發合照',main:true,s:'感情↑',aff:6,ok:{fans:2},okt:'留言區最多的一句是：「好登對。」'},
+  {t:'戴上口罩分開走',s:'狀態小幅↑；她可能不開心',aff:-4,ok:{form:2},okt:'她在車上說：「我們又不是在偷情。」'}]},
+ {id:'fight',c:L=>L.dyrs>=1,n:'第一次吵架',q:L=>`${L.partner} 把手機摔在沙發上：「你的行事曆裡，我排在第幾位？」`,o:L=>[
+  {t:'安排休賽季兩個人去旅行',main:true,s:'感情大幅↑、狀態小幅↓',aff:8,ok:{form:-2},okt:'你把整個休賽季的訓練營都推掉了'},
+  {t:'「職業球員就是這樣。」',warn:true,p:40,s:'她可能理解，也可能更生氣',aff:3,affN:-10,okt:'她嘆了口氣：「我知道，我只是想聽你說。」',ngt:'那晚她回了自己家，三天沒有回訊息'},
+  {t:'送花和一張手寫卡片',s:'感情小幅↑',aff:3,okt:'卡片上的字很醜，但她收進了抽屜'}]},
+ {id:'live',c:L=>L.dyrs>=1&&!L.live,n:'鑰匙',q:L=>`${L.partner} 的租約下個月到期。她看著你：「我要續約嗎？」`,o:L=>[
+  {t:'把家裡的備用鑰匙交給她',main:true,s:'同居；感情大幅↑',aff:10,okt:'一週後，你的浴室多了一支粉紅色的牙刷',then:()=>{ S.love.live=1; }},
+  {t:'「先各住各的，比較自在。」',s:'狀態↑；感情↓',aff:-5,ok:{form:3},okt:'她說好，但幫你關門的時候特別用力'}]},
+ {id:'trip',c:L=>L.dyrs>=1,n:'休賽季旅行',q:L=>`休賽季只有兩週。${L.partner} 攤開地圖：「你決定去哪。」`,o:L=>[
+  {t:'飛去海島，手機關機',main:true,s:'感情↑、體能↑',aff:6,sta:1,okt:'你們在沙灘上躺了整整一週，你第一次忘了自己是球員'},
+  {t:'跟她回她的家鄉',s:'感情大幅↑；見到她的家人',aff:8,okt:'她的阿嬤做了一整桌菜，一直往你碗裡夾',then:()=>{ S.love.metPar=true; }},
+  {t:'帶她去你的私人訓練營',warn:true,p:45,s:'她可能覺得很酷，也可能很無聊',aff:5,affN:-7,ok:{form:3},okt:'她跟著你一起做了核心訓練，隔天兩個人都下不了床',ngt:'她在飯店房間裡看了一週的影集'}]},
+ {id:'pet',c:L=>L.dyrs>=2&&L.live,n:'第三個成員',q:L=>`${L.partner} 傳來一張照片：收容所裡一隻缺了一隻耳朵的狗。「我們可以養牠嗎？」`,o:L=>[
+  {t:'「明天就去接牠。」',main:true,s:'感情↑、狀態↑',aff:6,ok:{form:2},okt:'你們用你的背號幫牠取名字'},
+  {t:'「我常常在客場，誰照顧牠？」',s:'感情小幅↓',aff:-3,okt:'她把照片存進手機相簿，沒再提起'}]},
+ {id:'dream',c:L=>L.dyrs>=1,n:'她的夢想',q:L=>`${L.partner} 拿到國外研究所的入學通知，要去一年`,o:L=>[
+  {t:'「去吧，我等你。」',warn:true,p:60,s:'成功＝感情大幅↑；失敗＝感情大幅↓',aff:12,affN:-12,okt:'一年後她回來，下飛機的第一件事是直接到球場看你比賽',ngt:'時差、訓練、論文，你們的訊息越來越短'},
+  {t:'陪她去看學校，再一起決定',main:true,s:'感情↑、教練信任小降',aff:6,ok:{trust:-3},okt:'你請了三天假，陪她在陌生的校園裡走了一整天'},
+  {t:'請她留下來',s:'狀態↑；感情↓',aff:-6,ok:{form:3},okt:'她留下來了，但把那封通知信收得好好的'}]},
+ {id:'tabloid',c:L=>L.dyrs>=1&&S.fans>=45,n:'小報的標題',q:L=>`八卦週刊的封面寫著：「${L.partner}，看上的是球星還是存款？」`,o:L=>[
+  {t:'在社群公開力挺她',main:true,s:'感情大幅↑、球迷↑',aff:8,ok:{fans:3},okt:'你只寫了一句：「她認識我的時候，我還在坐板凳。」'},
+  {t:'委託律師告週刊',warn:true,p:50,s:'成功＝感情↑、球迷↑',aff:6,affN:-2,ok:{fans:4},ng:{fans:-3},okt:'週刊刊登了道歉啟事',ngt:'官司拖了一年，新聞反而越炒越大'},
+  {t:'不回應，讓它過去',s:'感情↓',aff:-5,okt:'她一個人看完了那篇報導'}]},
+ {id:'friends',c:L=>L.dyrs>=1,n:'閨蜜的審查',q:L=>`${L.partner} 的閨蜜們約了週末聚餐。她小聲說：「她們想看看你。」`,o:L=>[
+  {t:'準時到，幫大家拍照',main:true,s:'感情↑',aff:5,okt:'聚會結束，閨蜜群組傳來一句：「通過。」'},
+  {t:'穿著球衣去，順便帶簽名球',warn:true,p:50,s:'可能大受歡迎，也可能喧賓奪主',aff:6,affN:-4,ok:{fans:2},okt:'她們搶著跟你合照，她在旁邊得意地笑',ngt:'整晚都在幫人簽名，她一個人坐在角落'},
+  {t:'說要加練，改天再約',s:'狀態↑；感情↓',aff:-3,ok:{form:3},okt:'她說沒關係，但那天的照片裡沒有你'}]},
+ {id:'hurt',c:L=>L.dyrs>=1&&(S.bigInj||0)>=1,n:'復健室的陪伴',q:L=>`你受傷的那幾個月，${L.partner} 每天下班都繞到復健中心`,o:L=>[
+  {t:'讓她陪著，一起數復健次數',main:true,s:'感情大幅↑',aff:8,okt:'她把每天的復健進度畫成一張表，貼在你家冰箱上'},
+  {t:'「別來了，我不想讓你看到這樣的我。」',s:'狀態↑；感情↓',aff:-5,ok:{form:3},okt:'她站在門外很久，最後把便當放在櫃台'}]},
+ {id:'ring',c:L=>L.dyrs>=2&&affOf()>=55&&!L.ring,n:'戒指',q:()=>'隊長老婆偷偷傳訊息給你：「我知道一家很棒的戒指店，要不要我陪你去？」',o:L=>[
+  {t:'請她幫忙挑',main:true,s:'之後求婚更容易成功',okt:'你們在店裡待了三個小時，最後選了最簡單的那一枚',then:()=>{ S.love.ring=1; }},
+  {t:'自己挑一個最大顆的',warn:true,p:50,s:'可能讓她驚喜，也可能不是她的風格',ok:{},okt:'店員說：「這顆沒有人會說不。」',ngt:'你後來才知道她其實喜歡小一點的',then:ok=>{ S.love.ring=ok?1:0; }},
+  {t:'還沒準備好',s:'狀態↑',ok:{form:2},okt:'你走過店門口，沒有進去'}]},
+ {id:'anniv',c:L=>L.dyrs>=2,n:'交往紀念日',q:L=>`交往紀念日剛好是德比戰。${L.partner} 說：「沒關係，比賽重要。」`,o:L=>[
+  {t:'進球後比出你們的專屬手勢',warn:true,p:45,s:'成功＝感情大幅↑、球迷↑',aff:10,affN:-2,ok:{fans:4},okt:'轉播鏡頭帶到看台上的她，她摀著嘴笑了',ngt:'你沒進球，賽後她傳來：「下次再比給我看。」'},
+  {t:'賽後直接去她最愛的餐廳',main:true,s:'感情↑',aff:6,okt:'你穿著球隊外套就衝進了餐廳，服務生認出你，幫你們升級了座位'},
+  {t:'改天再補過',s:'感情↓',aff:-4,okt:'她說：「好啊。」然後一直沒有提起'}]},
+];
+function dateStory(cont){ const L=S.love; L.dsDone=L.dsDone||[];
+  const pool=DATE_EV.filter(e=>!L.dsDone.includes(e.id)&&e.c(L)); if(!pool.length)return false;
+  const e=pick(pool); L.dsDone.push(e.id);
+  choose(e.q(L),e.o(L).map(o=>({t:o.t,main:o.main,warn:o.warn,s:(o.p!=null?`成功率 ${o.p}%｜`:'')+o.s,f:()=>{
+    const ok=o.p==null||chance(o.p), d=ok?(o.aff||0):(o.affN!=null?o.affN:-(o.aff||0));
+    const out=[affAdd(d),...applyFx((ok?o.ok:o.ng)||{})]; if(ok&&o.sta)out.push(loveGainTxt('sta',o.sta)); if(o.then)o.then(ok); board();
+    card(ok?(d>0?'good':'info'):'bad',e.n,`${ok?o.okt:o.ngt}${out.filter(Boolean).length?'——'+out.filter(Boolean).join('、'):''}。`); cont(); }})));
+  return true; }
+/* 婚禮籌備:訂婚後的下一季 */
+function weddingPlan(next){ const L=S.love;
+  const wed=(t,extra)=>{ L.st='married'; L.kids=0; L.dyrs=0; L.eng=0; const gt=loveGainTxt('sta',2); S.tmpInj-=5; const ex=applyFx(extra||{}); board();
+    S.hl.push({y:S.year,age:S.age,t:`與 ${L.partner} 結婚`});
+    card('gold','婚禮',`${t}——${[gt,'本季受傷機率 <b class="up">−5%</b>',...ex].join('、')}。`); next(); };
+  choose(`訂婚快一年了，${L.partner} 抱著一疊婚禮型錄：「你想要什麼樣的婚禮？」`,[
+    {t:'盛大婚禮，邀請全隊',s:'花一筆錢、球迷↑',f:()=>wed(`教堂外擠滿了球迷，隊友們在門口用球衣搭成一條拱道。<b class="hl">${L.partner}</b> 挽著你的手走出來的時候，全場唱起了你的隊歌`,{pay:-2,fans:6})},
+    {t:'只有家人的小婚禮',main:true,s:'狀態↑',f:()=>wed(`只有二十個人的小婚禮。你媽媽哭得比新娘還厲害，<b class="hl">${L.partner}</b> 的爸爸致詞時講了你當年那件簽名球衣的事`,{form:4})},
+    {t:'兩個人飛到海邊辦',warn:true,s:'教練信任小降；最浪漫',f:()=>wed(`只有你們兩個人、一位證婚人和一整片海。<b class="hl">${L.partner}</b> 赤著腳說：「我願意。」你遲到了兩天才歸隊`,{trust:-3,form:3})}]); }
+
 function loveEvent(next){
   const L=S.love;
   if(S.stage!=='PRO'||S.age<20){ next(); return; }
   /* 交往中:每年必走一輪;交往太久不結婚,分手風險逐年升高 */
   if(L.st==='dating'){
     L.dyrs++; const y=L.dyrs;
-    const cheatPen=(L.cheatYr===S.year-1||L.cheatYr===S.year)?30:0;
-    const bkP=(y>=4?20+(y-4)*15:0)+cheatPen;
+    const cheatPen=(L.cheatYr===S.year-1||L.cheatYr===S.year)?30:0, a=affOf();
+    /* 分手風險:感情太淡,或交往很久卻一直沒訂婚 */
+    const bkP=(a<30?25:a<40?10:0)+(y>=6&&!L.eng?15+(y-6)*10:0)+cheatPen;
     if(bkP>0&&chance(bkP)){
       const k1=pick(GRP_AB[S.grp]),k2=pick(GRP_AB[S.grp]), g1=addAb(k1,-3),g2=addAb(k2,-3), ex=L.partner; breakUp(); board();
-      card('bad','分手',`${cheatPen?'那晚的事她其實都知道。':''}交往 ${y} 年，婚期一延再延。<b class="hl">${ex}</b> 最後留下一句：「我等不到了。」整個夏天你魂不守舍——<b class="dn">${ABL[k1]} ${g1}、${ABL[k2]} ${g2}</b>。`);
+      card('bad','分手',`${cheatPen?'那晚的事她其實都知道。':a<40?`交往 ${y} 年，你們越來越像室友。`:`交往 ${y} 年，婚期一延再延。`}<b class="hl">${ex}</b> 最後留下一句：「${a<40?'我們都累了。':'我等不到了。'}」整個夏天你魂不守舍——<b class="dn">${ABL[k1]} ${g1}、${ABL[k2]} ${g2}</b>。`);
       next(); return; }
+    if(L.eng&&S.year>L.eng){ weddingPlan(next); return; }
     const ask=()=>proposalAsk(next);
     if(loveDating(ask))return;
-    if(chance(30)){ const r=R()*100;
-      if(r<40){ const t=cheerName();
+    if(chance(25)){ const r=R()*100;
+      if(r<55){ const t=cheerName();
         choose(`慶功宴散場，${t} 說順路想搭你的車`,[
           {t:'讓她上車（賭一把）',warn:true,s:'沒被抓到＝體能提升｜被抓到＝能力下跌、當年分手率 +30%',f:()=>{
             L.affairs++;
-            if(chance(55)){ const gt=loveGainTxt('sta',2); board(); card('bad','深夜兜風',`沒有人拍到。你把方向盤握得很緊——${gt}。（這條路不會有好結局）`); checkTraitsMid(); ask(); }
+            if(chance(55)){ const gt=loveGainTxt('sta',2), at=affAdd(-6); board(); card('bad','深夜兜風',`沒有人拍到。你把方向盤握得很緊——${gt}、${at}。（這條路不會有好結局）`); checkTraitsMid(); ask(); }
             else loveCaught(next,true); }},
           {t:`「不順路。」直接載 ${L.partner} 回家`,main:true,s:'感情穩固，絕對不虧',f:()=>{
-            const gt=loveGainTxt('sta',1); board(); card('good','正確答案',`你傳訊息給 ${L.partner}：「馬上到。」——${gt}。`); ask(); }}]); return; }
-      const gt=loveGainTxt('sta',1); board();
-      if(r<70)card('good','進球獻吻',`進球後你跑到角旗區，對著看台上的 <b class="hl">${L.partner}</b> 比出愛心，轉播鏡頭立刻帶到她，隔天甜上熱搜——${gt}。`);
-      else card('good','愛情長跑',`交往邁入第 ${y} 年。沒有大新聞，只有每次客場比賽結束，機場出口那杯她替你買好的熱美式——${gt}。`);
+            const gt=loveGainTxt('sta',1), at=affAdd(4); board(); card('good','正確答案',`你傳訊息給 ${L.partner}：「馬上到。」——${gt}、${at}。`); ask(); }}]); return; }
+      const gt=loveGainTxt('sta',1), at=affAdd(4); board();
+      if(r<78)card('good','進球獻吻',`進球後你跑到角旗區，對著看台上的 <b class="hl">${L.partner}</b> 比出愛心，轉播鏡頭立刻帶到她，隔天甜上熱搜——${gt}、${at}。`);
+      else card('good','愛情長跑',`交往邁入第 ${y} 年。沒有大新聞，只有每次客場比賽結束，機場出口那杯她替你買好的熱美式——${gt}、${at}。`);
       ask(); return; }
+    if(dateStory(ask))return;
     ask(); return;
   }
   const fire=(L.st==='married'&&L.kids===0)?45:(L.st==='single'||L.st==='divorced')?55:45; /* v0.22:戀愛事件變多 */
@@ -3674,11 +3743,9 @@ function loveEvent(next){
     card('info','場外話題',`你和${job} <b class="hl">${p}</b> 被拍到球場外同框，緋聞登上娛樂版頭條。${L.exes.length?'（評論區：「離過婚還這麼搶手」）':''}`);
     choose('記者把麥克風遞到你面前：「兩位是在交往嗎？」',[
       {t:'大方承認：「請大家祝福我們」',s:'還要看她那邊願不願意公開',f:()=>{
-        if(chance(65)){ L.st='dating'; L.partner=p; L.dyrs=0; L.datedTimes++;
+        if(chance(65)){ startDating(p);
           const gt=loveGainTxt('sta',1); board();
           card('gold','戀情公開',`<b class="hl">${p}</b> 在社群發出十指緊扣的照片：「謝謝大家的祝福。」戀愛使人容光煥發——${gt}。你們正式交往了。`);
-          if(L.datedTimes>=3&&L.kids===0&&!S.traits.confidante)
-            traitCard('confidante','第三段戀情，還是走到了同樣的結局——有些人註定是別人生命裡的過客。');
         } else card('bad','單方面承認',`她隔天透過經紀公司否認：「只是普通朋友。」你一個人站在風裡，超級尷尬。`);
         next(); }},
       {t:'笑而不答，快步走過',main:true,s:'不承認就沒有下文',f:()=>{ card('info','未完待續','緋聞燒了三天就退燒。也許時機還沒到。'); next(); }}]);
@@ -3705,7 +3772,7 @@ function loveEvent(next){
   next();
 }
 /* v0.22 新增戀愛事件:回傳 true 表示已處理(會自己呼叫 cont) */
-const startDating=p=>{ const L=S.love; L.st='dating'; L.partner=p; L.dyrs=0; L.datedTimes++;
+const startDating=p=>{ const L=S.love; L.st='dating'; L.partner=p; L.dyrs=0; L.datedTimes++; L.aff=55; L.dsDone=[]; L.live=0; L.eng=0; L.ring=0; L.metPar=false; L.bday=0;
   if(L.datedTimes>=3&&L.kids===0&&!S.traits.confidante)traitCard('confidante','第三段戀情，還是走到了同樣的結局——有些人註定是別人生命裡的過客。'); };
 function loveMeet(next){
   const abroad=S.lv&&LV[S.lv].cty!==S.nat, r=R()*100;
@@ -3734,19 +3801,19 @@ function loveDating(cont){
   if(moved&&L.ldYr!==S.year&&chance(70)){ L.ldYr=S.year;
     choose(`轉隊到 ${S.club}，${L.partner} 還留在原本的城市`,[
       {t:'請她搬來一起生活',main:true,s:'她可能答應，也可能放不下工作',f:()=>{ if(chance(60)){ const gt=loveGainTxt('sta',1); board();
-          card('good','一起出發',`<b class="hl">${L.partner}</b> 辭掉工作，拖著兩個行李箱出現在新城市的機場——${gt}。`); }
-        else { L.dyrs++; card('bad','放不下',`${L.partner} 沉默了很久：「我的人生也在這裡啊。」你們決定先遠距離。（交往壓力增加）`); } cont(); }},
+          L.live=1; card('good','一起出發',`<b class="hl">${L.partner}</b> 辭掉工作，拖著兩個行李箱出現在新城市的機場——${gt}、${affAdd(8)}。`); }
+        else card('bad','放不下',`${L.partner} 沉默了很久：「我的人生也在這裡啊。」你們決定先遠距離——${affAdd(-8)}。`); cont(); }},
       {t:'談遠距離戀愛',s:'狀態小幅↓；有分手風險',f:()=>{ if(chance(25)){ const ex=L.partner; breakUp(); card('bad','時差',`八個小時的時差，訊息越來越短。三個月後，<b class="hl">${ex}</b> 說：「我們都累了。」`); }
-        else card('info','視訊的晚上',`每晚十一點，你們準時視訊。有時候她講到一半就睡著了。${meter('form',-3)}`); cont(); }}]); return true; }
+        else card('info','視訊的晚上',`每晚十一點，你們準時視訊。有時候她講到一半就睡著了。${meter('form',-3)}、${affAdd(-4)}`); cont(); }}]); return true; }
   if(L.dyrs>=1&&!L.metPar&&chance(40)){ L.metPar=true;
     choose(`${L.partner} 說：「這個週末，我爸媽想見見你。」`,[
-      {t:'穿上西裝，提早半小時到',main:true,s:'穩紮穩打',f:()=>{ const gt=loveGainTxt('sta',1); board(); card('good','見家長',`她爸爸全程話不多，臨走前拍了拍你的肩：「好好照顧她。」——${gt}。`); cont(); }},
-      {t:'帶一件簽名球衣當伴手禮',warn:true,s:'看她爸支持哪一隊',f:()=>{ if(chance(55)){ const gt=loveGainTxt('sta',2); board(); card('good','岳父是球迷',`她爸爸當場換上球衣，拿出你新秀年的剪報——他追蹤你很多年了。${gt}、${meter('fans',2)}。`); }
-        else card('bad','死敵球迷',`她爸爸看了球衣一眼：「我是你們死敵的季票會員。」整頓飯你都在冒冷汗。${meter('form',-3)}`); cont(); }}]); return true; }
-  if(L.dyrs>=1&&chance(25)){
+      {t:'穿上西裝，提早半小時到',main:true,s:'穩紮穩打',f:()=>{ const gt=loveGainTxt('sta',1); board(); card('good','見家長',`她爸爸全程話不多，臨走前拍了拍你的肩：「好好照顧她。」——${gt}、${affAdd(6)}。`); cont(); }},
+      {t:'帶一件簽名球衣當伴手禮',warn:true,s:'看她爸支持哪一隊',f:()=>{ if(chance(55)){ const gt=loveGainTxt('sta',2); board(); card('good','岳父是球迷',`她爸爸當場換上球衣，拿出你新秀年的剪報——他追蹤你很多年了。${gt}、${meter('fans',2)}、${affAdd(8)}。`); }
+        else card('bad','死敵球迷',`她爸爸看了球衣一眼：「我是你們死敵的季票會員。」整頓飯你都在冒冷汗。${meter('form',-3)}、${affAdd(-3)}`); cont(); }}]); return true; }
+  if(L.dyrs>=1&&!L.bday&&chance(25)){ L.bday=S.year;
     choose(`${L.partner} 的生日剛好撞上客場比賽`,[
-      {t:'跟教練請假陪她',s:'感情↑；教練信任↓',f:()=>{ const gt=loveGainTxt('sta',1); board(); card('info','缺席',`她看到你出現在餐廳門口時哭了。教練就沒那麼開心了。${gt}、${meter('trust',-5)}`); cont(); }},
-      {t:'比賽優先，賽後視訊',main:true,s:'狀態↑；交往壓力增加',f:()=>{ L.dyrs++; card('info','螢幕那頭',`你在客場更衣室唱完生日快樂歌。她說沒關係，但聲音聽起來不太像沒關係。${meter('form',3)}`); cont(); }}]); return true; }
+      {t:'跟教練請假陪她',s:'感情↑；教練信任↓',f:()=>{ const gt=loveGainTxt('sta',1); board(); card('info','缺席',`她看到你出現在餐廳門口時哭了。教練就沒那麼開心了。${gt}、${meter('trust',-5)}、${affAdd(8)}`); cont(); }},
+      {t:'比賽優先，賽後視訊',main:true,s:'狀態↑；感情↓',f:()=>{ card('info','螢幕那頭',`你在客場更衣室唱完生日快樂歌。她說沒關係，但聲音聽起來不太像沒關係。${meter('form',3)}、${affAdd(-5)}`); cont(); }}]); return true; }
   return false;
 }
 function loveFamily(cont){
@@ -3764,12 +3831,20 @@ function loveFamily(cont){
   return false;
 }
 function proposalAsk(next){
-  const L=S.love; if(L.st!=='dating'){ next(); return; }
-  choose(`交往第 ${L.dyrs} 年——${L.partner} 看著別人的婚禮影片看了很久`,[
-    {t:'就是現在——求婚',s:'體能提升、本季更不容易受傷',f:()=>{
-      L.st='married'; L.kids=0; L.dyrs=0; const gt=loveGainTxt('sta',2); S.tmpInj-=5; board();
-      card('gold','婚禮',`你在主場中圈單膝跪地，大螢幕打出「Marry Me」。<b class="hl">${L.partner}</b> 哭著點頭——${gt}、本季受傷機率 <b class="up">−5%</b>。`); next(); }},
-    {t:'再存一點錢吧',main:true,s:'她沒說什麼，但交往越久分手風險越高',f:()=>{ card('info','再等等','她關掉影片，笑著說沒事。你假裝沒看到她眼裡的東西。'); next(); }}]);
+  const L=S.love; if(L.st!=='dating'||L.propYr===S.year){ next(); return; }
+  if(!propOk()){ if(L.dyrs>=1&&!L.eng&&affOf()<60&&L.dyrs>=2&&chance(40))card('info','還不是時候',`交往第 ${L.dyrs} 年。你想過求婚，但你們最近好像有點距離——${affAdd(0)||`♥ 感情 ${L.aff}`}（求婚需要 60）。`); next(); return; }
+  L.propYr=S.year; const a=affOf(), rb=L.ring?15:0;
+  const pA=clamp(a-10+rb,15,95), pB=clamp(a+5+rb,25,97);
+  const yes=how=>{ L.eng=S.year; const gt=loveGainTxt('sta',1); board();
+    card('gold','她說「我願意」',`${how}<b class="hl">${L.partner}</b> 哭著點頭。婚禮訂在明年——${gt}、${affAdd(6)}。`); next(); };
+  choose(`交往第 ${L.dyrs} 年——${L.partner} 看著別人的婚禮影片看了很久（♥ 感情 ${a}${L.ring?'・戒指準備好了':''}）`,[
+    {t:'主場中圈單膝跪地',warn:true,s:`成功率 ${pA}%｜全場見證、球迷↑｜失敗＝感情大幅↓`,f:()=>{
+      if(chance(pA)){ applyFx({fans:5}); yes('賽後你在中圈單膝跪地，大螢幕打出「Marry Me」，四萬人一起倒數。'); }
+      else { card('bad','她跑出了球場',`她摀著臉跑進球員通道。那晚她說：「你為什麼不先問我，想不想在四萬人面前做這件事？」——${affAdd(-12)}。`); next(); } }},
+    {t:'帶她回第一次約會的地方',main:true,s:`成功率 ${pB}%｜失敗＝感情↓`,f:()=>{
+      if(chance(pB))yes('你帶她回到第一次約會的那間小店，老闆還記得你們。甜點盤上寫著一行字。');
+      else { card('bad','「我還沒準備好」',`她握著戒指盒很久，最後輕輕闔上：「再給我一點時間，好嗎？」——${affAdd(-6)}。`); next(); } }},
+    {t:'再等等',s:'交往太久沒有下文，分手風險會升高',f:()=>{ card('info','再等等',`她關掉影片，笑著說沒事。你假裝沒看到她眼裡的東西。${L.dyrs>=4?'——'+affAdd(-3):''}`); next(); }}]);
 }
 /* 外遇/劈腿被抓:第二次起解鎖渣男,之後每次全能力 −5 */
 function loveCaught(next,dating){
@@ -5110,7 +5185,7 @@ function epilogue(ev,chs,hb){
   else if(loyal&&byClub[loyal]>=8)s.push(`${loyal} 把 ${jerseyFor(loyal)} 號球衣保留了一整季，向你致敬。`);
   if(top.length)s.push(`${top.map(b=>b.txt.replace(/<[^>]+>/g,'').replace(/：.*/,'')).join('、')}的榜首，至今仍寫著你的名字。`);
   if(L.st==='married')s.push(L.kids?`你和 ${L.partner} 的${L.kids>1?`${L.kids} 個孩子`:'孩子'}${Math.random()<0.5?'也開始在青訓踢球了，你從不缺席任何一場比賽。':'對足球沒什麼興趣，你反而鬆了一口氣。'}`:`你和 ${L.partner} 終於有時間一起去旅行。`);
-  else if(L.st==='dating')s.push(`你和 ${L.partner} 決定結婚，婚禮上來了半支當年的球隊。`);
+  else if(L.st==='dating')s.push(L.eng?`你和 ${L.partner} 的婚禮延到了引退之後，婚禮上來了半支當年的球隊。`:`你和 ${L.partner} 決定結婚，婚禮上來了半支當年的球隊。`);
   if(A.lead&&A.lead.done&&A.lead.done.ld4)s.push('多年以後，那支球隊的更衣室裡還流傳著你那場賽前演說。');
   if(A.sg&&A.sg.hero)s.push(A.sg.burn?'那件被燒過的球衣，後來被你親手掛進了球隊博物館。':`拒絕 ${A.sg.big} 的那一天，至今還是球迷津津樂道的故事。`);
   if(A.rival&&A.rival.n&&A.rival.w+A.rival.l>=3)s.push(`每年夏天，你和 ${A.rival.n} 都會約一場業餘賽，誰也不肯讓誰。`);
