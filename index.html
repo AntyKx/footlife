@@ -859,6 +859,8 @@ html.calm .lv-l p{opacity:1;animation:none}
 .ft-me{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:10px;border-top:1px solid var(--edge);font-size:13.5px}
 .ft-me b{margin-left:auto;font:800 24px var(--num);background:var(--sub);border-radius:8px;padding:0 10px} .ft-me b.up{color:var(--good)} .ft-me b.dn{color:var(--bad)}
 .ft-me em{font-style:normal;font-size:11.5px;background:var(--amber);color:var(--on-amber);border-radius:4px;padding:1px 7px;font-weight:700}
+.dtr{display:flex;flex-wrap:wrap;gap:5px;padding:0 4px} .dtr span{font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--amber) 55%,transparent);color:var(--amber);background:color-mix(in srgb,var(--amber) 10%,transparent);cursor:help}
+.dtr span.neg{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 55%,transparent);background:color-mix(in srgb,var(--bad) 10%,transparent)} .dtr span.off{color:var(--dim);border-color:var(--edge);background:none;text-decoration:line-through;cursor:default}
 html.calm *,html.calm *::before,html.calm *::after{animation:none!important;transition:none!important}
 html.calm .var{display:none}
 </style>
@@ -974,7 +976,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.26.10';
+const APP_VER='v0.26.11';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -1395,6 +1397,8 @@ function sideDash(){ const D=$('side-dash'); if(!D||typeof S==='undefined'||!S)r
   if(typeof ACH!=='undefined'&&pro.length){ const A=achCtx([]);
     const gs=ACH.filter(a=>a.lv).map(a=>{ let v=0; try{ v=+a.v(A)||0; }catch(e){} const l=a.lv.filter(x=>v>=x).length; if(!v||l>=a.lv.length)return null; return {a,l,v,nx:a.lv[l],r:v/a.lv[l]}; }).filter(Boolean).sort((x,y)=>y.r-x.r).slice(0,3);
     if(gs.length)h+=sec('下一個目標',gs.map(g=>`<div class="dg"><span>${g.a.tn?g.a.tn[g.l]:`${g.a.n}（${ACH_TIER[g.l]}）`}</span><b>${g.v}/${g.nx}</b><i style="width:${Math.round(g.r*100)}%"></i></div>`).join('')); }
+  { const tr=Object.keys(TRAITN).filter(k=>S.traits[k]), D2=S.trDesc||{}, esc=t=>String(t).replace(/"/g,'&quot;'); /* v0.26.11 隱藏特質:滑過看解鎖時的說明 */
+    if(tr.length||S.removed.length)h+=sec('隱藏特質',`<div class="dtr">${tr.map(k=>`<span class="${NEG_TRAITS.includes(k)||k==='bigfear'?'neg':''}"${D2[k]?` title="${esc(D2[k])}"`:''}>${TRAITN[k]}</span>`).join('')}${S.removed.map(n=>`<span class="off" title="已解除">${n}</span>`).join('')}</div>`); }
   const RV=S.arcs&&S.arcs.rival; if(RV&&RV.n&&RV.w+RV.l)h+=`<p class="drv">宿敵 <b>${RV.n}</b>：${RV.w} 勝 ${RV.l} 敗</p>`;
   D.innerHTML=h; }
 function divider(t){ /* 新賽季:畫面裡加一條年度標記(回顧模式才顯示),並清掉太舊的畫面 */
@@ -3024,7 +3028,7 @@ const TRAITN={genius:'天才',late:'大器晚成',iron:'鐵人',glass:'玻璃人
   distract:'外務纏身',cancer:'更衣室毒瘤',scum:'渣男',confidante:'閨中密友',scholar:'學院派'};
 Object.assign(TRAITN,{gent:'紳士球員',redcard:'紅牌專家',derby:'德比之王',bignight:'歐戰之夜',pkpro:'點球專家',supersub:'超級替補',bigfear:'大賽恐懼'});
 const NEG_TRAITS=['glass','yips','distract','cancer','scum','redcard'];
-function traitCard(key,desc,tone){ S.traits[key]=true; card(tone||'gold','隱藏特質解鎖：'+TRAITN[key],desc); board(); }
+function traitCard(key,desc,tone){ S.traits[key]=true; (S.trDesc=S.trDesc||{})[key]=String(desc).replace(/<[^>]+>/g,''); card(tone||'gold','隱藏特質解鎖：'+TRAITN[key],desc); board(); }
 function removeTrait(key){ if(S.traits[key]){ S.traits[key]=false; if(!S.removed.includes(TRAITN[key]))S.removed.push(TRAITN[key]); } }
 /* 事件卡、戀愛之後即時檢查的特質 */
 function checkTraitsMid(){
