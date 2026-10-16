@@ -1044,7 +1044,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.27.0';
+const APP_VER='v0.27.1';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -2272,10 +2272,19 @@ const tierTx=(t,k)=>{ const L=(TIER_TX[t]||{})[k]||(TIER_TX[t]||{}).K||['']; ret
 const TIER_FX={G:'WORLDIE!',A:'MASTERCLASS',S:'WHAT A SAVE!',D:'PERFECT!'};
 /* 第二拍:冒險成功(標準 25%)→ 乘勝追擊/斷球反擊;冒險失敗 50% → 補救機會 */
 function followSet(kind,o){ const gk=isGK(), atk=/[GAF]/.test(o.k)&&!gk;
-  if(kind==='press'&&atk)return ['乘勝追擊','對手陣腳大亂，球又回到你腳下！',[
-    {t:'再射一次',m:'bold',ab:['sho'],k:'G',ok:'再一腳！球又飛進網窩！',ng:'這次被門將撲住了'},
-    {t:'傳給空檔隊友',m:'norm',ab:['pas','vis'],k:'A',ok:'送出一記妙傳，隊友再入一球！',ng:'傳球被攔截'},
-    {t:'穩住節奏',m:'safe',ab:['vis'],k:'K',ok:'穩住節奏，球隊牢牢控住局面',ng:'被對手搶回球權'}]];
+  /* 造點球成功:接主罰點球 */
+  if(kind==='press'&&o.k==='F')return ['主罰點球','裁判指向點球點，隊友把球交到你手上。',[
+    {t:'大力轟中路',m:'bold',ab:['sho'],k:'G',ok:'一腳轟向正中，門將早已倒向一邊！',ng:'門將沒動，雙拳把球擊出'},
+    {t:'推左下角',m:'norm',ab:['sho'],k:'G',ok:'冷靜推左下角，球進了！',ng:'門將猜對方向撲出'},
+    {t:'讓給隊友罰',m:'safe',ab:['vis'],k:'K',ok:'把球交給隊長，他罰進了',ng:'隊友罰丟了'}]];
+  /* 進球或助攻之後:比賽重新開球,幾分鐘後才有下一次機會(依比分決定對手的反應) */
+  if(kind==='press'&&/[GA]/.test(o.k)){ const C=MCTX, a2=C.a+1, b=C.b, mn=C.mn+6, et=C.mn>90, opp=C.opp&&C.opp!=='對手'?C.opp:'對手';
+    const when=et?(mn>=120?'延長賽補時':`延長賽第 ${Math.min(mn,119)} 分鐘`):mn>=90?'傷停補時':`第 ${mn} 分鐘`;
+    const why=a2>b?`${opp}急著扳平，整條防線壓得很高`:a2===b?'比分扳平，雙方都想再進一球，場面完全打開':`還落後 ${b-a2} 球，${opp}全員退守，你們繼續圍攻`;
+    return ['乘勝追擊',`重新開球後，${why}——${when}，${gk?'你抱住對方的傳中，對手大半還壓在前場！':'你在中場拿到球，前面一大片空檔！'}`,[
+    {t:gk?'大腳直接找前鋒':'一路帶到禁區射門',m:'bold',ab:gk?['kic']:['sho','pac'],k:gk?'A':'G',ok:gk?'一腳大腳越過中場，前鋒單刀再入一球！':'一路殺進禁區，冷靜推射——梅開二度！',ng:gk?'大腳被對方中衛頂回':'射門被回追的後衛擋出'},
+    {t:gk?'快速手拋發動反擊':'分給插上的隊友',m:'norm',ab:gk?['kic','gkp']:['pas','vis'],k:'A',ok:'送出一記妙傳，隊友再入一球！',ng:'傳球被攔截'},
+    {t:gk?'穩穩短傳給後衛':'放慢節奏控球',m:'safe',ab:gk?['kic']:['vis'],k:'K',ok:'放慢節奏，球隊牢牢控住局面',ng:'被對手搶回球權'}]]; }
   if(kind==='press')return [gk?'快速反擊':'斷球反擊',gk?'你穩穩控住球，對手大半還在前場！':'球被你斷下，對手大半還壓在前場！',gk?[
     {t:'大腳找前鋒',m:'bold',ab:['kic'],k:'A',ok:'一腳大腳越過中場，前鋒單刀破門！',ng:'大腳太遠直接出了底線'},
     {t:'快速手拋',m:'norm',ab:['kic','gkp'],k:'A',ok:'快速手拋發動反擊，三傳兩遞就打進！',ng:'手拋被對方中場截斷'},
