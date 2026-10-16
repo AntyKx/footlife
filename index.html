@@ -862,6 +862,39 @@ html.calm .lv-l p{opacity:1;animation:none}
 .dtr{display:flex;flex-wrap:wrap;gap:5px;padding:0 4px} .dtr span{font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--amber) 55%,transparent);color:var(--amber);background:color-mix(in srgb,var(--amber) 10%,transparent);cursor:help}
 .dtr span.neg{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 55%,transparent);background:color-mix(in srgb,var(--bad) 10%,transparent)} .dtr span.off{color:var(--dim);border-color:var(--edge);background:none;text-decoration:line-through;cursor:default}
 .hlrow small.hlq{display:block;margin-top:2px;font-size:12px;font-weight:400;color:var(--dim)}
+/* ---------- v0.26.13 首頁戰術分析畫面 ---------- */
+.hero-pitch.tac .tc-bg{fill:#081019}
+.hero-pitch.tac .tc-st0{fill:#0f2a20} .hero-pitch.tac .tc-st1{fill:#123024}
+.hero-pitch.tac .tc-ln{fill:none;stroke:#ffffff5c;stroke-width:.9;stroke-linejoin:round} .hero-pitch.tac .tc-spot{fill:#ffffff80}
+.hero-pitch.tac .tc-post{fill:none;stroke:#fff;stroke-width:1.6;stroke-linejoin:round}
+.hero-pitch.tac .tc-net path{fill:none;stroke:#ffffff40;stroke-width:.4} .hero-pitch.tac .tc-net.hit path{stroke:var(--amber);stroke-opacity:.9}
+.hero-pitch.tac .tc-space{fill:url(#tcsp);stroke:var(--amber);stroke-width:.6;stroke-dasharray:2 2;stroke-opacity:.7}
+.hero-pitch.tac .tc-back{fill:none;stroke:#ff6b6b;stroke-width:1;stroke-dasharray:3 2.5;stroke-opacity:.75}
+.hero-pitch.tac .tc-lbl.sp{fill:var(--amber)} .hero-pitch.tac .tc-lbl{font:700 6px var(--num);letter-spacing:.08em;fill:#fff;paint-order:stroke;stroke:#081019;stroke-width:2.2}
+.hero-pitch.tac .tc-tele{fill:none;stroke:var(--amber);stroke-width:1.2;stroke-dasharray:3 3;stroke-linecap:round;animation:dash 1.2s linear infinite}
+.hero-pitch.tac .tc-trail{fill:none;stroke:var(--amber);stroke-width:2.4;stroke-linecap:round;stroke-opacity:.28}
+.hero-pitch.tac .tc-btrail{fill:none;stroke:#fff;stroke-width:1.6;stroke-linecap:round;stroke-opacity:.35}
+.hero-pitch.tac .tc-pass path:first-child{fill:none;stroke:#fff;stroke-width:1.3;stroke-linecap:round;filter:drop-shadow(0 0 2px #fff8)} .hero-pitch.tac .tc-pass .hd{fill:#fff}
+.hero-pitch.tac .tc-pass.shot path:first-child{stroke:var(--amber);stroke-width:1.6;filter:drop-shadow(0 0 3px var(--amber))} .hero-pitch.tac .tc-pass.shot .hd{fill:var(--amber)} .hero-pitch.tac .tc-pass.shot .tc-lbl{fill:var(--amber)}
+.hero-pitch.tac .tc-p .dk{stroke-width:1.1} .hero-pitch.tac .tc-p text{font:800 5.6px var(--num);pointer-events:none}
+.hero-pitch.tac .tc-p.op .dk{fill:#d9504f;stroke:#ffb3b0} .hero-pitch.tac .tc-p.op text{fill:#fff} .hero-pitch.tac .tc-p.op .dir{fill:#ff8a87}
+.hero-pitch.tac .tc-p.gk .dk{fill:#8a8fb8;stroke:#d7daf2} .hero-pitch.tac .tc-p.gk text{fill:#fff} .hero-pitch.tac .tc-p.gk .dir{fill:#c4c8ea}
+.hero-pitch.tac .tc-p.tm .dk{fill:#0b1222;stroke:var(--amber)} .hero-pitch.tac .tc-p.tm text{fill:var(--amber)} .hero-pitch.tac .tc-p.tm .dir{fill:var(--amber)}
+.hero-pitch.tac .tc-p.me .dk{fill:var(--amber);stroke:#fff} .hero-pitch.tac .tc-p.me text{fill:#0b1222} .hero-pitch.tac .tc-p.me .dir{fill:#fff}
+.hero-pitch.tac .tc-p .dir{opacity:.55;transition:opacity .2s} .hero-pitch.tac .tc-p.run .dir{opacity:1}
+.hero-pitch.tac .tc-p .halo{fill:none;stroke:var(--amber);stroke-width:1;transform-box:fill-box;transform-origin:center;animation:tcHalo 1.6s ease-out infinite}
+@keyframes tcHalo{0%{transform:scale(.6);opacity:.9}100%{transform:scale(1.5);opacity:0}}
+.hero-pitch.tac .tc-you path{fill:var(--amber)} .hero-pitch.tac .tc-you text{font:800 6.4px var(--num);letter-spacing:.1em;fill:#0b1222}
+.hero-pitch.tac .tc-spd{transition:opacity .25s} .hero-pitch.tac .tc-spd rect{fill:#081019d9;stroke:var(--amber);stroke-width:.5} .hero-pitch.tac .tc-spd text{font:700 5.4px var(--num);fill:var(--amber)}
+.hero-pitch.tac .tc-ball{fill:#fff;stroke:#0b1222;stroke-width:.5;filter:drop-shadow(0 0 2px #fffa)} .hero-pitch.tac .tc-bsh{fill:#000}
+.hero-pitch.tac .tc-pill{fill:#081019cc;stroke:#ffffff26;stroke-width:.6}
+.hero-pitch.tac .tc-rec{fill:var(--bad);animation:tcRec 1.2s steps(2) infinite} @keyframes tcRec{50%{opacity:.25}}
+.hero-pitch.tac .tc-ht{font:800 6.4px var(--num);letter-spacing:.16em;fill:#fff}
+.hero-pitch.tac .tc-step{font:800 7px var(--num);letter-spacing:.08em;fill:var(--amber);paint-order:stroke;stroke:#081019;stroke-width:2.4}
+.hero-pitch.tac .tc-sc{font:800 6.8px var(--num);letter-spacing:.1em;fill:#fff}
+.hero-pitch.tac .tc-clk{font:700 6px var(--num);letter-spacing:.1em;fill:#ffffffa0;paint-order:stroke;stroke:#081019;stroke-width:2}
+.hero-pitch.tac #tc-seg rect{fill:#ffffff2a} .hero-pitch.tac #tc-seg rect.done{fill:color-mix(in srgb,var(--amber) 55%,transparent)} .hero-pitch.tac #tc-seg rect.on{fill:var(--amber)}
+html.calm .hero-pitch.tac .tc-p .halo,html.calm .hero-pitch.tac .tc-rec,html.calm .hero-pitch.tac .tc-tele{animation:none}
 html.calm *,html.calm *::before,html.calm *::after{animation:none!important;transition:none!important}
 html.calm .var{display:none}
 </style>
@@ -877,28 +910,22 @@ html.calm .var{display:none}
       <h1 id="logo-tap"><span class="en">FO<svg class="hball" viewBox="-10 -10 20 20" aria-hidden="true"><circle r="9.3"/><path d="M0 -3.4L3.2 -1L2 2.8H-2L-3.2 -1Z"/><path d="M0 -9.3L0 -6.4L-2.6 -8.9ZM0 -6.4L2.6 -8.9L0 -9.3Z"/><path d="M8.8 -2.9L6.1 -2L6.9 -5.9ZM8.8 -2.9L8.4 1.4L6.1 -2Z"/><path d="M5.5 7.5L3.8 5.2L7.4 4.6ZM5.5 7.5L1.5 9.2L3.8 5.2Z"/><path d="M-5.5 7.5L-3.8 5.2L-1.5 9.2ZM-5.5 7.5L-7.4 4.6L-3.8 5.2Z"/><path d="M-8.8 -2.9L-6.1 -2L-8.4 1.4ZM-8.8 -2.9L-6.9 -5.9L-6.1 -2Z"/><path class="sm" d="M0 -3.4V-6.4M3.2 -1L6.1 -2M2 2.8L3.8 5.2M-2 2.8L-3.8 5.2M-3.2 -1L-6.1 -2"/></svg>TLIFE</span><em>足球人生模擬器</em></h1>
       <div class="lower3"><b>15'</b><span>青訓</span><i class="trk"><i></i></i><span>世界盃</span><b class="end">90+'</b></div>
       <p class="sub">從 15 歲的青訓球場到世界盃決賽——簽約、轉會、德比、國家隊、引退，<br>每一個關鍵時刻都由你決定。</p>
-      <svg class="hero-pitch" viewBox="0 0 400 230" aria-hidden="true">
+      <svg class="hero-pitch tac" viewBox="0 0 400 230" aria-hidden="true">
         <defs><clipPath id="hpc"><rect width="400" height="230" rx="14"/></clipPath>
-          <radialGradient id="hfl" cx="50%" cy="10%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></radialGradient>
-          <linearGradient id="hvg" x1="0" y1="0" x2="0" y2="1"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>
-          <pattern id="hcrowd" width="9" height="7" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.6"/><circle cx="6.5" cy="5.5" r="1.6"/></pattern></defs>
-        <g clip-path="url(#hpc)"><rect width="400" height="230" class="hp-sky"/>
-         <g id="hp-cam">
-          <path d="M-120 -80 H520 V31.3 H-120Z" class="hp-stand"/><path d="M-120 -80 H520 V31.3 H-120Z" fill="url(#hcrowd)" class="hp-crowd"/><path class="hp-tier" d="M-120 -9 H520 M-120 1 H520 M-120 11 H520 M-120 21.5 H520"/>
-          <g class="hp-flash"><circle cx="58" cy="22" r="1.4"/><circle cx="141" cy="9" r="1.2"/><circle cx="262" cy="30" r="1.4"/><circle cx="330" cy="14" r="1.2"/><circle cx="96" cy="38" r="1.1"/><circle cx="371" cy="40" r="1.3"/><circle cx="22" cy="6" r="1.2"/><circle cx="190" cy="16" r="1.3"/><circle cx="300" cy="3" r="1.1"/><circle cx="-30" cy="25" r="1.3"/><circle cx="430" cy="20" r="1.2"/><circle cx="230" cy="-4" r="1.2"/></g>
-          <g class="hp-grass"><path class="g0" d="M-55.6 29.9 L455.6 29.9 L473.3 36.9 L-73.3 36.9 Z"/><path class="g1" d="M-73.3 36.9 L473.3 36.9 L506.7 50.0 L-106.7 50.0 Z"/><path class="g0" d="M-106.7 50.0 L506.7 50.0 L549.4 66.9 L-149.4 66.9 Z"/><path class="g1" d="M-149.4 66.9 L549.4 66.9 L605.9 89.2 L-205.9 89.2 Z"/><path class="g0" d="M-205.9 89.2 L605.9 89.2 L684.2 120.0 L-284.2 120.0 Z"/><path class="g1" d="M-284.2 120.0 L684.2 120.0 L800.0 165.7 L-400.0 165.7 Z"/><path class="g0" d="M-400.0 165.7 L800.0 165.7 L988.6 240.1 L-588.6 240.1 Z"/><path class="g1" d="M-588.6 240.1 L988.6 240.1 L1350.0 382.6 L-950.0 382.6 Z"/><path class="g0" d="M-950.0 382.6 L1350.0 382.6 L2323.1 766.3 L-1923.1 766.3 Z"/><path class="g1" d="M-1923.1 766.3 L2323.1 766.3 L14000.0 5370.9 L-13600.0 5370.9 Z"/></g>
-          <path class="hp-ad" d="M19.6 35.8 L380.4 35.8 L380.4 31.3 L19.6 31.3 Z"/>
-          <text class="hp-adt" x="200" y="34.6" text-anchor="middle">FOOTLIFE ・ 足球人生 ・ FOOTLIFE ・ 足球人生 ・ FOOTLIFE ・ 足球人生</text>
-          <rect x="-120" y="-80" width="640" height="400" fill="url(#hfl)"/>
-          <g class="hp-l"><path d="M26.2 50.0 L373.8 50.0"/><path d="M26.2 50.0 L-1364.0 1017.5"/><path d="M373.8 50.0 L1764.0 1017.5"/><path d="M97.0 50.0 L37.3 120.0 L362.7 120.0 L303.0 50.0"/><path d="M153.2 50.0 L146.7 66.9 L253.3 66.9 L246.8 50.0"/><path d="M141.0 120.0 L143.5 123.8 L146.5 127.4 L150.1 130.9 L154.1 134.2 L158.6 137.2 L163.6 139.9 L169.0 142.3 L174.7 144.3 L180.8 146.0 L187.0 147.1 L193.5 147.8 L200.0 148.1 L206.5 147.8 L213.0 147.1 L219.2 146.0 L225.3 144.3 L231.0 142.3 L236.4 139.9 L241.4 137.2 L245.9 134.2 L249.9 130.9 L253.5 127.4 L256.5 123.8 L259.0 120.0"/><path d="M22.3 52.8 L23.4 52.7 L24.6 52.6 L25.8 52.3 L27.1 52.0 L28.4 51.5 L29.5 51.1 L30.5 50.6 L31.3 50.0"/><path d="M377.7 52.8 L376.6 52.7 L375.4 52.6 L374.2 52.3 L372.9 52.0 L371.6 51.5 L370.5 51.1 L369.5 50.6 L368.7 50.0"/><circle cx="200.0" cy="89.2" r="1.3" class="dotw"/></g>
-          <g id="hp-net" class="hp-net"><path d="M184.0 37.6 L184.7 34.3 L184.7 44.4"/><path d="M186.6 37.6 L187.3 34.3 L187.3 44.4"/><path d="M189.3 37.6 L189.8 34.3 L189.8 44.4"/><path d="M192.0 37.6 L192.4 34.3 L192.4 44.4"/><path d="M194.7 37.6 L194.9 34.3 L194.9 44.4"/><path d="M197.3 37.6 L197.5 34.3 L197.5 44.4"/><path d="M200.0 37.6 L200.0 34.3 L200.0 44.4"/><path d="M202.7 37.6 L202.5 34.3 L202.5 44.4"/><path d="M205.3 37.6 L205.1 34.3 L205.1 44.4"/><path d="M208.0 37.6 L207.6 34.3 L207.6 44.4"/><path d="M210.7 37.6 L210.2 34.3 L210.2 44.4"/><path d="M213.4 37.6 L212.7 34.3 L212.7 44.4"/><path d="M216.0 37.6 L215.3 34.3 L215.3 44.4"/><path d="M181.3 48.0 L182.2 42.4 L217.8 42.4 L218.7 48.0"/><path d="M181.3 45.9 L182.2 40.4 L217.8 40.4 L218.7 45.9"/><path d="M181.3 43.8 L182.2 38.4 L217.8 38.4 L218.7 43.8"/><path d="M181.3 41.7 L182.2 36.5 L217.8 36.5 L218.7 41.7"/><path d="M181.3 39.6 L182.2 34.5 L217.8 34.5 L218.7 39.6"/><path d="M181.5 36.7 L218.5 36.7"/><path d="M181.7 35.9 L218.3 35.9"/><path d="M182.0 35.1 L218.0 35.1"/><path d="M181.3 37.6 L182.2 34.3 L182.2 44.4"/><path d="M218.7 37.6 L217.8 34.3 L217.8 44.4"/><path d="M182.2 34.3 L217.8 34.3"/></g>
-          <path class="hp-post" d="M181.3 50.0 L181.3 37.6 L218.7 37.6 L218.7 50.0"/>
-          <path class="pole" d="M26.2 50.0 L26.2 41.3"/><path class="fl" d="M26.2 41.3 l6 2 l-6 2Z"/><path class="pole" d="M373.8 50.0 L373.8 41.3"/><path class="fl" d="M373.8 41.3 l-6 2 l6 2Z"/>
-          <g id="hp-act"></g>
-         </g>
+          <radialGradient id="tcglow" cx="50%" cy="0%" r="90%"><stop offset="0" stop-color="#9fd8ff" stop-opacity=".13"/><stop offset=".7" stop-color="#9fd8ff" stop-opacity="0"/></radialGradient>
+          <radialGradient id="tcvig" cx="50%" cy="45%" r="75%"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>
+          <radialGradient id="tcsp" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#f2c14e" stop-opacity=".42"/><stop offset="1" stop-color="#f2c14e" stop-opacity="0"/></radialGradient>
+          <pattern id="tcdot" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r=".55" fill="#ffffff1c"/></pattern></defs>
+        <g clip-path="url(#hpc)"><rect width="400" height="230" class="tc-bg"/>
+         <g id="hp-cam"><g id="tc-pitch"></g><g id="tc-fx"></g><g id="hp-act"></g></g>
+         <rect width="400" height="230" fill="url(#tcglow)"/><rect width="400" height="230" fill="url(#tcvig)"/>
          <rect id="hp-fl" width="400" height="230" fill="#fff" opacity="0"/>
+         <g class="tc-hud"><path class="tc-pill" d="M10 9 H104 V23 H10Z"/><circle class="tc-rec" cx="18" cy="16" r="2.4"/><text class="tc-ht" x="24" y="19">TACTICAL CAM</text>
+          <text class="tc-step" id="tc-step" x="110" y="19">01 邊路推進</text>
+          <path class="tc-pill" d="M296 9 H390 V23 H296Z"/><text class="tc-sc" id="tc-sc" x="343" y="19.6" text-anchor="middle">YOU 0 – 0 OPP</text>
+          <text class="tc-clk" id="tc-clk" x="390" y="33" text-anchor="end">14:47</text>
+          <g id="tc-seg"><rect x="110" y="25" width="12" height="2" rx="1"/><rect x="124" y="25" width="12" height="2" rx="1"/><rect x="138" y="25" width="12" height="2" rx="1"/><rect x="152" y="25" width="12" height="2" rx="1"/><rect x="166" y="25" width="12" height="2" rx="1"/></g></g>
          <g id="hp-gl" opacity="0"><g class="gin"><path class="gbar2" d="M14 170 H64 L58 196 H8Z"/><text class="gm" x="35" y="188.5" text-anchor="middle">15'</text><path class="gbar" d="M66 170 H196 L190 196 H60Z"/><text class="gt" x="124" y="191" text-anchor="middle">GOAL!</text><path class="gbar3" d="M60 198 H232 L229 210 H57Z"/><text class="gs" x="66" y="207">YOU ・ 第一個職業進球 ・ 1–0</text></g></g>
-         <rect width="400" height="230" fill="url(#hvg)"/>
         </g>
       </svg>
       <div class="hbug"><div><b>29</b><span>國籍</span></div><div><b>53</b><span>聯賽</span></div><div><b>934</b><span>真實球隊</span></div><div><b>∞</b><span>種人生</span></div></div>
@@ -977,7 +1004,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.26.12';
+const APP_VER='v0.26.13';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -4889,89 +4916,116 @@ function openPrefs(){ renderPrefs(); $('prefs').classList.add('open'); }
 $('btn-prefs').onclick=openPrefs; $('start-prefs').onclick=openPrefs;
 $('start-ach').onclick=openAch; $('achp-x').onclick=()=>$('achp').classList.remove('open');
 /* ================= 首頁球場動畫(v0.26.0):小人球員、一次完整進攻、轉播鏡頭;純裝飾,不碰種子亂數 ================= */
-function heroAnim(){
-  const sv=document.querySelector('.hero-pitch'), act=$('hp-act'), cam=$('hp-cam'); if(!sv||!act||!cam)return;
-  const NS='http://www.w3.org/2000/svg', mk=(t,c)=>{ const e=document.createElementNS(NS,t); if(c)e.setAttribute('class',c); return e; };
-  const ZC=45, F=230, H=23.66, HOR=-70.9, CX=200, T=10.6;
-  const P=(X,Z,Y=0)=>{ const d=ZC-Z; return [CX+F*X/d, HOR+F*(H-Y)/d]; }, SC=Z=>F/(ZC-Z);
-  const lerp=(a,b,u)=>a+(b-a)*u, ease=u=>u<.5?2*u*u:1-2*(1-u)*(1-u);
-  const at=(k,t)=>{ if(t<=k[0][0])return k[0].slice(1); for(let i=0;i<k.length-1;i++){ const a=k[i],b=k[i+1]; if(t<b[0]){ const u=(t-a[0])/(b[0]-a[0]); return a.slice(1).map((v,j)=>lerp(v,b[j+1],u)); } } return k[k.length-1].slice(1); };
-  /* 球衣:我方琥珀、對手白衫藍褲、門將螢光綠 */
-  const KIT={me:['#f2c14e','#1b2440','#f2c14e'],tm:['#f2c14e','#1b2440','#f2c14e'],op:['#eef2f8','#22346b','#c8323a'],gk:['#b9e83a','#1a1a1a','#b9e83a']};
-  const SKIN=['#f1c7a3','#d9a06f','#a86b43','#6e4429','#e3b38a'], HAIR=['#1a1410','#3b2616','#111','#6b4a2a','#1a1410'];
-  /* 球員動線 [秒, X, Z];X 橫向(公尺)、Z 距球門線 */
+function heroAnim(){ /* v0.26.13 首頁:轉播戰術分析畫面(斜俯視半場、號碼圓點、傳球線、跑位預測、防線、數據標籤) */
+  const sv=document.querySelector('.hero-pitch'), act=$('hp-act'), cam=$('hp-cam'), pit=$('tc-pitch'), fxg=$('tc-fx'); if(!sv||!act||!cam||!pit||!fxg)return;
+  const NS='http://www.w3.org/2000/svg', mk=(t,c,par)=>{ const e=document.createElementNS(NS,t); if(c)e.setAttribute('class',c); if(par)par.appendChild(e); return e; };
+  const T=10.6, lerp=(a,b,u)=>a+(b-a)*u, ease=u=>u<.5?2*u*u:1-2*(1-u)*(1-u), f1=v=>v.toFixed(1);
+  /* 斜俯視投影:X 橫向(公尺)、Z 距球門線、Y 高度;越遠(靠球門)越窄 */
+  const sc=Z=>.84+.16*Z/34, Q=(X,Z,Y=0)=>[200+X*5.9*sc(Z),42+Z*5.5-Y*4.2*sc(Z)];
+  const pts=a=>a.map(([X,Z])=>Q(X,Z).map(f1).join(' ')).join(' L');
+  /* 球場:條紋、白線、球門 */
+  for(let z=-6,i=0;z<40;z+=5.5,i++){ const p=mk('path','tc-st'+(i%2),pit); p.setAttribute('d','M'+pts([[-40,z],[40,z],[40,z+5.5],[-40,z+5.5]])+'Z'); }
+  const grid=mk('rect',null,pit); grid.setAttribute('width','400'); grid.setAttribute('height','230'); grid.setAttribute('fill','url(#tcdot)');
+  const line=(a,c='tc-ln')=>{ const p=mk('path',c,pit); p.setAttribute('d','M'+pts(a)); return p; };
+  const arc=(cx,cz,r,a0,a1,keep)=>{ const a=[]; for(let k=0;k<=24;k++){ const t=lerp(a0,a1,k/24), x=cx+r*Math.cos(t), z=cz+r*Math.sin(t); if(!keep||keep(z))a.push([x,z]); } return a; };
+  line([[-34,40],[-34,0],[34,0],[34,40]]); line([[-20.16,0],[-20.16,16.5],[20.16,16.5],[20.16,0]]); line([[-9.16,0],[-9.16,5.5],[9.16,5.5],[9.16,0]]);
+  line(arc(0,11,9.15,0,Math.PI,z=>z>=16.5)); line(arc(-34,0,1,0,Math.PI/2)); line(arc(34,0,1,Math.PI/2,Math.PI));
+  { const [x,y]=Q(0,11); const s=mk('circle','tc-spot',pit); s.setAttribute('cx',f1(x)); s.setAttribute('cy',f1(y)); s.setAttribute('r','1.1'); }
+  const net=mk('g','tc-net',pit); { const d=[]; for(let x=-3.66;x<=3.7;x+=.9)d.push('M'+pts([[x,0],[x,-2]])); for(let z=0;z>=-2.01;z-=.66)d.push('M'+pts([[-3.66,z],[3.66,z]])); const p=mk('path',null,net); p.setAttribute('d',d.join(' ')); }
+  line([[-3.66,0],[-3.66,-2],[3.66,-2],[3.66,0]],'tc-post');
+  /* 球員:號碼圓點;我方琥珀、對手珊瑚紅、對方門將淡紫灰 */
   const PL=[
-    {id:'me',k:'me',tr:[[0,-7,27],[1.6,-6.5,24],[2.4,-5.2,21.5],[3.7,1.6,13.4],[4.0,2.6,11.8],[4.4,3.3,10.8],[4.9,5.5,10.6],[6.6,15,7.5],[7.4,16.5,7],[9.5,16.5,7]]},
-    {id:'a',k:'tm',tr:[[0,15.5,27],[1.85,13,21],[2.4,12.6,20],[4.3,12,14.5],[5.2,13,12],[7.4,15.7,8.4],[9.5,15.7,8.4]]},
-    {id:'b',k:'tm',tr:[[0,-2,31],[1.9,-1.2,24.5],[2.5,-1,23.6],[2.8,-.6,23.2],[4.6,1,18],[7.6,13.6,9],[9.5,13.6,9]]},
-    {id:'c',k:'tm',tr:[[0,-15,23],[2.8,-12,16],[4.4,-8,10],[7.4,14.5,6],[9.5,14.5,6]]},
-    {id:'o1',k:'op',tr:[[0,-3,12],[2.5,-2,12.5],[3.7,0,11.4],[4.4,1.6,10.3],[5,1.8,9.8],[9.5,0,11]]},
-    {id:'o2',k:'op',tr:[[0,5,12],[2.5,4.5,13],[3.9,4.6,11.6],[4.6,4.2,10.8],[9.5,4.2,11.5]]},
-    {id:'o3',k:'op',tr:[[0,15,13],[1.7,14,18.5],[2.4,13.2,19],[4.2,11.2,15.5],[9.5,10,14]]},
-    {id:'o4',k:'op',tr:[[0,-14,12],[3,-11.5,12.5],[4.6,-9,11],[9.5,-8,11]]},
-    {id:'o5',k:'op',tr:[[0,2,19],[1.8,-.2,21.5],[2.6,-.6,21.2],[3.9,1,16],[9.5,1,15]]},
-    {id:'gk',k:'gk',tr:[[0,0,1.4],[3.7,.6,2.4],[4.36,1.3,2.8],[4.66,-1.6,2.1],[7.2,-1.6,2.1],[8,-.4,1.8],[9.5,-.4,1.8]],rot:[[0,0],[4.36,0],[4.62,-82],[7.2,-82],[7.9,0],[9.5,0]]}];
-  /* 球:持球(own)或飛行(fly:起點、終點、弧高) */
-  const BALL=[[0,1.85,'own','a'],[1.85,2.5,'fly',[13,21,0],[-1,23.6,0],0],[2.5,2.66,'own','b'],[2.66,3.72,'fly',[-.7,23.2,0],[1.8,13.2,0],2.6],
-    [3.72,4.38,'own','me'],[4.38,4.66,'fly',[3.3,10.8,0],[-2.9,0,1.95],.35],[4.66,4.84,'fly',[-2.9,0,1.95],[-3.1,-1.9,1.3],0],[4.84,5.3,'fly',[-3.1,-1.9,1.3],[-2.9,-1.6,0],.2],[5.3,T+1,'fly',[-2.9,-1.6,0],[-2.9,-1.6,0],0]];
-  const fig=PL.map((p,i)=>{ const [sh,so,sk]=KIT[p.k], skin=SKIN[i%5], g=mk('g','fig'+(p.k==='me'?' me':''));
-    g.innerHTML=`<ellipse class="fs" rx=".46" ry=".13"/>${p.k==='me'?'<ellipse class="fr" rx=".75" ry=".24"/>':''}<g class="bd">`+
-      [0,1].map(()=>`<g class="lg"><path d="M0 0V.5" stroke="${skin}" stroke-width=".15" stroke-linecap="round"/><path d="M0 .42V.84" stroke="${sk}" stroke-width=".17"/><ellipse cx=".04" cy=".88" rx=".11" ry=".055" fill="#111"/></g>`).join('')+
-      `<rect x="-.25" y="-1.1" width=".5" height=".32" rx=".06" fill="${so}"/>`+
-      [0,1].map(()=>`<g class="ar"><path d="M0 0V.5" stroke="${skin}" stroke-width=".11" stroke-linecap="round"/><path d="M0 0V.2" stroke="${sh}" stroke-width=".15" stroke-linecap="round"/></g>`).join('')+
-      `<path d="M-.29 -1.56Q0 -1.64 .29 -1.56L.26 -1.02H-.26Z" fill="${sh}"/><path d="M-.26 -1.1H.26" stroke="#0002" stroke-width=".05"/>`+
-      `<circle cy="-1.75" r=".145" fill="${skin}"/><path d="M-.15 -1.76A.15 .15 0 0 1 .15 -1.76Q0 -1.8 -.15 -1.76Z" fill="${HAIR[i%5]}"/></g>`+
-      '';
-    act.appendChild(g); return {p,g,bd:g.querySelector('.bd'),lg:[...g.querySelectorAll('.lg')],ar:[...g.querySelectorAll('.ar')],ph:i*1.7}; });
-  const run=mk('path','hp-tele'), bsh=mk('ellipse','fs'), ball=mk('g','hp-ball'), yt=mk('g','yt');
-  yt.innerHTML='<path d="M-3 -4H3L0 -.6Z"/><text y="-6" text-anchor="middle">YOU</text>';
-  ball.innerHTML='<circle r="1"/><path d="M0 -.48L.46 -.15L.28 .4H-.28L-.46 -.15Z"/>';
-  const tele=[]; for(let t=2.4;t<=3.76;t+=.12){ const [x,z]=at(PL[0].tr,t); tele.push(P(x,z).map(v=>v.toFixed(1)).join(' ')); }
-  run.setAttribute('d','M'+tele.join(' L'));
-  const gl=$('hp-gl'), gin=gl.querySelector('.gin'), fl=$('hp-fl'), net=$('hp-net');
-  let cx=200, cy=115, cz=1.12, t0=null, prev=null, raf=0, lastT=0;
+    {id:'me',k:'me',n:10,tr:[[0,-7,27],[1.6,-6.5,24],[2.4,-5.2,21.5],[3.7,1.6,13.4],[4.0,2.6,11.8],[4.4,3.3,10.8],[4.9,5.5,10.6],[6.6,15,7.5],[7.4,16.5,7],[9.5,16.5,7]]},
+    {id:'a',k:'tm',n:7,tr:[[0,15.5,27],[1.85,13,21],[2.4,12.6,20],[4.3,12,14.5],[5.2,13,12],[7.4,15.7,8.4],[9.5,15.7,8.4]]},
+    {id:'b',k:'tm',n:8,tr:[[0,-2,31],[1.9,-1.2,24.5],[2.5,-1,23.6],[2.8,-.6,23.2],[4.6,1,18],[7.6,13.6,9],[9.5,13.6,9]]},
+    {id:'c',k:'tm',n:11,tr:[[0,-15,23],[2.8,-12,16],[4.4,-8,10],[7.4,14.5,6],[9.5,14.5,6]]},
+    {id:'o1',k:'op',n:4,tr:[[0,-3,12],[2.5,-2,12.5],[3.7,0,11.4],[4.4,1.6,10.3],[5,1.8,9.8],[9.5,0,11]]},
+    {id:'o2',k:'op',n:5,tr:[[0,5,12],[2.5,4.5,13],[3.9,4.6,11.6],[4.6,4.2,10.8],[9.5,4.2,11.5]]},
+    {id:'o3',k:'op',n:2,tr:[[0,15,13],[1.7,14,18.5],[2.4,13.2,19],[4.2,11.2,15.5],[9.5,10,14]]},
+    {id:'o4',k:'op',n:3,tr:[[0,-14,12],[3,-11.5,12.5],[4.6,-9,11],[9.5,-8,11]]},
+    {id:'o5',k:'op',n:6,tr:[[0,2,19],[1.8,-.2,21.5],[2.6,-.6,21.2],[3.9,1,16],[9.5,1,15]]},
+    {id:'gk',k:'gk',n:1,tr:[[0,0,1.4],[3.7,.6,2.4],[4.36,1.3,2.8],[4.66,-1.9,1.9],[7.2,-1.9,1.9],[8,-.4,1.8],[9.5,-.4,1.8]]}];
+  /* 平滑動線(非均勻 Catmull-Rom):有加減速,轉向不再生硬 */
+  const at=(k,t)=>{ if(t<=k[0][0])return k[0].slice(1); const L=k.length-1; if(t>=k[L][0])return k[L].slice(1);
+    let i=0; while(t>=k[i+1][0])i++; const p0=k[Math.max(0,i-1)], p1=k[i], p2=k[i+1], p3=k[Math.min(L,i+2)], h=p2[0]-p1[0], u=(t-p1[0])/h, u2=u*u, u3=u2*u;
+    return [1,2].map(j=>{ const m1=(p2[j]-p0[j])/Math.max(.01,p2[0]-p0[0])*h*.8, m2=(p3[j]-p1[j])/Math.max(.01,p3[0]-p1[0])*h*.8;
+      return (2*u3-3*u2+1)*p1[j]+(u3-2*u2+u)*m1+(-2*u3+3*u2)*p2[j]+(u3-u2)*m2; }); };
+  /* 球:持球(own)或飛行(fly:起點、終點、弧高、標籤) */
+  const BALL=[[0,1.85,'own','a'],[1.85,2.5,'fly',[13,21,0],[-1,23.6,0],0,'回傳'],[2.5,2.66,'own','b'],[2.66,3.72,'fly',[-.7,23.2,0],[1.8,13.2,0],2.6,'直塞'],
+    [3.72,4.38,'own','me'],[4.38,4.66,'fly',[3.3,10.8,0],[-2.9,0,1.95],.35,'SHOT'],[4.66,4.84,'fly',[-2.9,0,1.95],[-3.1,-1.9,1.3],0],[4.84,5.3,'fly',[-3.1,-1.9,1.3],[-2.9,-1.6,0],.2],[5.3,T+1,'fly',[-2.9,-1.6,0],[-2.9,-1.6,0],0]];
+  const STEP=[[0,'01 邊路推進'],[1.85,'02 回傳中路'],[2.66,'03 直塞穿透'],[3.72,'04 單刀射門'],[4.66,'05 GOAL']];
+  /* 特效層:空檔區、防線、傳球線、跑位預測、軌跡 */
+  const space=mk('ellipse','tc-space',fxg), spT=mk('text','tc-lbl sp',fxg), back=mk('path','tc-back',fxg), backT=mk('text','tc-lbl',fxg), tele=mk('path','tc-tele',fxg), trail=mk('path','tc-trail',fxg), btrail=mk('path','tc-btrail',fxg);
+  backT.textContent='防線'; spT.textContent='空檔';
+  const passes=BALL.filter(b=>b[6]).map(b=>{ const g=mk('g','tc-pass'+(b[6]==='SHOT'?' shot':''),fxg), l=mk('path',null,g), hd=mk('path','hd',g), tx=mk('text','tc-lbl',g);
+    const [x1,y1]=Q(b[3][0],b[3][1]), [x2,y2]=Q(b[4][0],b[4][1]), len=Math.hypot(x2-x1,y2-y1), m=Math.hypot(b[4][0]-b[3][0],b[4][1]-b[3][1]);
+    const mx=(x1+x2)/2, my=(y1+y2)/2-b[5]*6; l.setAttribute('d',`M${f1(x1)} ${f1(y1)} Q${f1(mx)} ${f1(my)} ${f1(x2)} ${f1(y2)}`);
+    l.style.strokeDasharray=f1(len*1.15); const ang=Math.atan2(y2-my,x2-mx)*180/Math.PI; hd.setAttribute('d','M0 0 L-5 -2.6 L-5 2.6Z'); hd.setAttribute('transform',`translate(${f1(x2)} ${f1(y2)}) rotate(${f1(ang)})`);
+    tx.textContent=b[6]==='SHOT'?'xG 0.41':`${b[6]} ${Math.round(m)}m`; tx.setAttribute('x',f1(mx)); tx.setAttribute('y',f1(my-4)); tx.setAttribute('text-anchor','middle');
+    return {b,g,l,hd,len:len*1.15}; });
+  { const a=[]; for(let t=2.66;t<=3.75;t+=.1)a.push(at(PL[0].tr,t)); tele.setAttribute('d','M'+pts(a)); }
+  const fig=PL.map(p=>{ const g=mk('g','tc-p '+p.k,act); if(p.k==='me'){ mk('circle','halo',g).setAttribute('r','9'); }
+    const dir=mk('path','dir',g); dir.setAttribute('d','M7.6 0 L5.2 -2.6 L5.2 2.6Z'); mk('circle','dk',g).setAttribute('r',p.k==='me'?'5.6':'5');
+    const tx=mk('text',null,g); tx.textContent=p.n; tx.setAttribute('y','2.3'); tx.setAttribute('text-anchor','middle');
+    let tag=null; if(p.k==='me'){ tag=mk('g','tc-you',act); tag.innerHTML='<path d="M-11 -21 H11 V-12 H2.5 L0 -9 L-2.5 -12 H-11Z"/><text y="-14.4" text-anchor="middle">YOU</text>'; }
+    return {p,g,dir,tag,ang:-90,ox:0}; });
+  const spd=mk('g','tc-spd',act); spd.innerHTML='<rect x="0" y="-6" width="38" height="9" rx="2"/><text x="19" y="1" text-anchor="middle"></text>'; const spdT=spd.querySelector('text');
+  const bsh=mk('ellipse','tc-bsh',act), ball=mk('circle','tc-ball',act);
+  const gl=$('hp-gl'), gin=gl.querySelector('.gin'), fl=$('hp-fl'), stepT=$('tc-step'), segs=[...document.querySelectorAll('#tc-seg rect')], scT=$('tc-sc'), clk=$('tc-clk');
+  let cx=200, cy=115, cz=1, t0=null, prev=null, raf=0, lastT=0, hist=[], bhist=[];
   function ballAt(t){ const s=BALL.find(b=>t>=b[0]&&t<b[1])||BALL[BALL.length-1];
     if(s[2]==='own'){ const f=PL.find(p=>p.id===s[3]), [x,z]=at(f.tr,t), [x2,z2]=at(f.tr,t+.12), dx=x2-x, dz=z2-z, m=Math.hypot(dx,dz)||1;
-      return [x+dx/m*.45,z+dz/m*.45+(m<.01?-.4:0),.11]; }
-    const u=Math.min(1,(t-s[0])/(s[1]-s[0])), a=s[3], b=s[4]; return [lerp(a[0],b[0],u),lerp(a[1],b[1],u),lerp(a[2],b[2],u)+4*s[5]*u*(1-u)+.11]; }
+      return [x+dx/m*.7,z+dz/m*.7+(m<.01?-.6:0),0]; }
+    const u=Math.min(1,(t-s[0])/(s[1]-s[0])), a=s[3], b=s[4]; return [lerp(a[0],b[0],u),lerp(a[1],b[1],u),lerp(a[2],b[2],u)+4*s[5]*u*(1-u)]; }
   function frame(t,dt){
-    const order=[];
-    fig.forEach(f=>{ const [x,z]=at(f.p.tr,t), [px,pz]=at(f.p.tr,Math.max(0,t-.05)), sp=t>.05?Math.hypot(x-px,z-pz)/.05:0, s=SC(z)*1.4, [sx,sy]=P(x,z);
-      const rot=f.p.rot?at(f.p.rot,t)[0]:0, cel=f.p.k!=='op'&&f.p.k!=='gk'&&t>5&&t<9.6;
-      f.ph+=dt*Math.min(sp,9)*2.2; const sw=Math.sin(f.ph)*Math.min(1,sp/2)*30;
-      f.g.setAttribute('transform',`translate(${sx.toFixed(2)} ${sy.toFixed(2)}) scale(${s.toFixed(3)})`);
-      const bob=Math.abs(Math.cos(f.ph))*Math.min(1,sp/3)*.06+(cel&&sp<.5?Math.abs(Math.sin(t*6+f.ph))*.28:0);
-      f.bd.setAttribute('transform',rot?`translate(0 -.45) rotate(${rot.toFixed(1)}) translate(0 .45)`:`translate(0 ${(-bob).toFixed(3)})`);
-      f.lg.forEach((l,i)=>l.setAttribute('transform',`translate(${i?.11:-.11} -.93) rotate(${(i?sw:-sw).toFixed(1)})`));
-      const kick=f.p.id==='me'&&t>4.25&&t<4.5?Math.sin((t-4.25)/.25*Math.PI)*-70:0; if(kick)f.lg[1].setAttribute('transform',`translate(.11 -.93) rotate(${kick.toFixed(1)})`);
-      f.ar.forEach((a,i)=>a.setAttribute('transform',`translate(${i?.29:-.29} -1.5) rotate(${(cel?(i?-155:155)+Math.sin(t*9+i)*12:(i?-sw*.8-10:sw*.8+10)).toFixed(1)})`));
-      if(f.p.k==='me')yt.setAttribute('transform',`translate(${sx.toFixed(2)} ${(sy-s*(2.05+bob)).toFixed(2)})`);
-      order.push([z,f.g]); });
-    const [bx,bz,by]=ballAt(t), [gx,gy]=P(bx,bz), [hx,hy]=P(bx,bz,by), r=Math.max(1.6,.2*SC(bz)*1.4);
-    ball.setAttribute('transform',`translate(${hx.toFixed(2)} ${hy.toFixed(2)}) scale(${r.toFixed(2)}) rotate(${((t*620)%360).toFixed(0)})`);
-    bsh.setAttribute('cx',gx.toFixed(2)); bsh.setAttribute('cy',gy.toFixed(2)); bsh.setAttribute('rx',(r*.9).toFixed(2)); bsh.setAttribute('ry',(r*.3).toFixed(2));
-    order.push([bz+.3,ball]); order.sort((a,b)=>a[0]-b[0]);
-    act.appendChild(run); act.appendChild(bsh); order.forEach(([,e])=>act.appendChild(e)); act.appendChild(yt);
-    run.style.opacity=t>1.5&&t<3.9?Math.min(1,(t-1.5)*2,(3.9-t)*3):0;
-    /* 進球:球網鼓起、閃光、字卡 */
-    const nb=t>4.62&&t<5.3?Math.sin((t-4.62)/.68*Math.PI):0; net.setAttribute('transform',`translate(0 ${(-nb*1.8).toFixed(2)})`);
-    fl.setAttribute('opacity',t>4.66&&t<5.1?((5.1-t)/.44*.4).toFixed(2):0);
+    const [bx,bz,by]=ballAt(t);
+    fig.forEach(f=>{ let [x,z]=at(f.p.tr,t); const [px,pz]=at(f.p.tr,Math.max(0,t-.08)), sp=t>.08?Math.hypot(x-px,z-pz)/.08:0;
+      if(f.p.k==='op'){ const want=Math.max(-2.2,Math.min(2.2,(bx-x)*.12)); f.ox+=(want-f.ox)*(dt?1-Math.exp(-dt*3):1); x+=f.ox; } /* 防守球員跟著球橫移 */
+      f.x=x; f.z=z; const [sx,sy]=Q(x,z); f.sx=sx; f.sy=sy;
+      if(sp>.4){ const [qx,qy]=Q(px,pz), a=Math.atan2(sy-qy,sx-qx)*180/Math.PI; let d=a-f.ang; d=((d+540)%360)-180; f.ang+=d*(dt?Math.min(1,dt*8):1); }
+      else if(f.p.k!=='me'||t<4.4){ const a=Math.atan2(Q(bx,bz)[1]-sy,Q(bx,bz)[0]-sx)*180/Math.PI; let d=a-f.ang; d=((d+540)%360)-180; f.ang+=d*(dt?Math.min(1,dt*4):1); } /* 站定時面向球 */
+      f.g.setAttribute('transform',`translate(${f1(sx)} ${f1(sy)}) scale(${(sc(z)*1.05).toFixed(3)})`); f.dir.setAttribute('transform',`rotate(${f1(f.ang)})`);
+      f.g.classList.toggle('run',sp>3.2);
+      if(f.tag)f.tag.setAttribute('transform',`translate(${f1(sx)} ${f1(sy)})`);
+      if(f.p.k==='me'){ hist.push([t,x,z]); hist=hist.filter(h=>t-h[0]<1.1&&h[0]<=t);
+        const kmh=Math.min(33.8,sp*3.6), show=sp>3&&t>2.5&&t<4.5; spd.setAttribute('transform',`translate(${f1(sx+9)} ${f1(sy+4)})`); spd.style.opacity=show?1:0; if(show)spdT.textContent=`${kmh.toFixed(1)} km/h`; } });
+    trail.setAttribute('d',hist.length>1?'M'+pts(hist.map(h=>[h[1],h[2]])):'');
+    bhist.push([t,bx,bz]); bhist=bhist.filter(h=>t-h[0]<.35&&h[0]<=t); btrail.setAttribute('d',bhist.length>1?'M'+pts(bhist.map(h=>[h[1],h[2]])):'');
+    const [gx,gy]=Q(bx,bz), [hx,hy]=Q(bx,bz,by), r=2.1*(1+by*.16)*sc(bz);
+    ball.setAttribute('cx',f1(hx)); ball.setAttribute('cy',f1(hy)); ball.setAttribute('r',r.toFixed(2));
+    bsh.setAttribute('cx',f1(gx)); bsh.setAttribute('cy',f1(gy+1)); bsh.setAttribute('rx',(r*.9).toFixed(2)); bsh.setAttribute('ry',(r*.4).toFixed(2)); bsh.style.opacity=Math.max(.15,.6-by*.12);
+    /* 防線:四名後衛連線,高亮兩人之間的空檔 */
+    const D=fig.filter(f=>/o[1-4]/.test(f.p.id)).sort((a,b)=>a.x-b.x);
+    back.setAttribute('d','M'+D.map(f=>`${f1(f.sx)} ${f1(f.sy)}`).join(' L')); const bo=t<4.5?.9:Math.max(0,.9-(t-4.5)*2); back.style.opacity=bo;
+    backT.setAttribute('x',f1(D[0].sx-4)); backT.setAttribute('y',f1(D[0].sy-8)); backT.style.opacity=bo;
+    const [spx,spy]=Q(1.8,13.2), su=t>1.9&&t<3.9?Math.min(1,(t-1.9)*2.5,(3.9-t)*3):0;
+    space.setAttribute('cx',f1(spx)); space.setAttribute('cy',f1(spy)); space.setAttribute('rx',f1(26+Math.sin(t*5)*1.5)); space.setAttribute('ry',f1(11+Math.sin(t*5)*.6)); space.style.opacity=su; spT.setAttribute('x',f1(spx+28)); spT.setAttribute('y',f1(spy+2)); spT.style.opacity=su;
+    tele.style.opacity=t>2.2&&t<3.8?Math.min(1,(t-2.2)*2.5,(3.8-t)*4):0;
+    passes.forEach(P=>{ const [s0,s1]=P.b, u=t<s0?0:Math.min(1,(t-s0)/(s1-s0)); P.l.style.strokeDashoffset=f1(P.len*(1-u)); P.hd.style.opacity=u>=1?1:0;
+      P.g.style.opacity=t<s0?0:t<s1+.9?1:Math.max(0,1-(t-s1-.9)/.4); });
+    /* 進球:閃光、球網、字卡、比分 */
+    fl.setAttribute('opacity',t>4.66&&t<5.1?((5.1-t)/.44*.35).toFixed(2):0);
+    const nb=t>4.62&&t<5.4?Math.sin((t-4.62)/.78*Math.PI):0; net.setAttribute('transform',`translate(0 ${(-nb*2).toFixed(2)})`); net.classList.toggle('hit',nb>0);
     const gu=t<4.85?0:t<5.15?ease((t-4.85)/.3):t<8.6?1:t<8.9?1-(t-8.6)/.3:0;
     gl.setAttribute('opacity',gu.toFixed(2)); gin.setAttribute('transform',`translate(${((1-gu)*-70).toFixed(1)} 0)`);
     sv.classList.toggle('scored',t>4.7&&t<8.6);
+    let si=0; STEP.forEach((s,i)=>{ if(t>=s[0])si=i; }); if(stepT.textContent!==STEP[si][1])stepT.textContent=STEP[si][1];
+    segs.forEach((r,i)=>r.setAttribute('class',i<si?'done':i===si?'on':''));
+    const gs=t>4.66?'YOU 1 – 0 OPP':'YOU 0 – 0 OPP'; if(scT.textContent!==gs)scT.textContent=gs;
+    const sec=47+Math.floor(t*1.6); clk.textContent=`${14+Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;
     /* 鏡頭:跟著球、進攻時推近 */
-    const fx=200+(hx-200)*.5, fy=115+(hy-115)*.45, fz=t<3.2?1.12:t<6?1.32:t<9?1.18:1.12, k=dt?1-Math.exp(-dt*2.6):1;
+    const fx=200+(hx-200)*.55, fy=115+(hy-115)*.5, fz=t<2.4?1.05:t<6?1.32:t<9?1.15:1.05, k=dt?1-Math.exp(-dt*2.4):1;
     cx+=(fx-cx)*k; cy+=(fy-cy)*k; cz+=(fz-cz)*k;
-    const hw=200/cz, hh=115/cz; cx=Math.min(Math.max(cx,-100+hw),500-hw); cy=Math.min(Math.max(cy,-60+hh),250-hh);
+    const hw=200/cz, hh=115/cz; cx=Math.min(Math.max(cx,hw),400-hw); cy=Math.min(Math.max(cy,hh),230-hh,31+76/cz); /* 球門不被上方資訊列擋住 */
     cam.setAttribute('transform',`translate(200 115) scale(${cz.toFixed(3)}) translate(${(-cx).toFixed(2)} ${(-cy).toFixed(2)})`);
-    act.style.opacity=t<.35?t/.35:t>T-.5?Math.max(0,(T-t)/.5):1;
+    const fo=t<.35?t/.35:t>T-.5?Math.max(0,(T-t)/.5):1; act.style.opacity=fo; fxg.style.opacity=fo;
   }
   const calm=()=>document.documentElement.classList.contains('calm');
   function loop(ts){ raf=0; const st=$('start'); if(!st||getComputedStyle(st).display==='none')return;
-    if(calm()){ frame(4.1,0); return; }
+    if(calm()){ hist=[]; bhist=[]; frame(3.3,0); return; }
     if(t0==null){ t0=ts; prev=ts; }
     const t=((ts-t0)/1000)%T, dt=Math.min(.05,(ts-prev)/1000); prev=ts;
-    if(t<lastT){ fig.forEach(f=>f.ph=0); cx=200; cy=115; cz=1.12; } lastT=t;
+    if(t<lastT){ cx=200; cy=115; cz=1.05; hist=[]; bhist=[]; fig.forEach(f=>{ f.ang=-90; f.ox=0; }); } lastT=t;
     frame(t,dt); raf=requestAnimationFrame(loop); }
   frame(0,0); raf=requestAnimationFrame(loop);
   const wake=()=>{ if(!raf&&!document.hidden){ t0=null; lastT=0; raf=requestAnimationFrame(loop); } };
