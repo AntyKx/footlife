@@ -1048,7 +1048,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.31.1';
+const APP_VER='v0.32.0';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -4265,6 +4265,7 @@ function awardList(st,got){
   row('金靴',got.includes('金靴')?`${me}・${st.G} 球`:`${oth()}・${gb} 球`);
   row('金手套',got.includes('金手套')?`${me}・零封 ${st.CS} 場`:`${oth()}・零封 ${Math.round(14*g38)+ri(-2,3)} 場`);
   row('最佳球員',got.includes('最佳球員')?`${me}・評分 ${st.Rt}`:oth());
+  if(S.grp==='DF')row('最佳後衛',got.includes('最佳後衛')?`${me}・零封 ${st.CS} 場`:oth());
   row('最佳年輕球員',got.includes('最佳年輕球員')?me:oth(true));
   if(got.includes('年度最佳陣容'))row('年度最佳陣容',me);
   card(got.length?'gold':'info',got.length?'個人獎項':`${L.n}個人獎項`,
@@ -4280,7 +4281,8 @@ function leagueAwards(st){
   else if(main&&st.CS>=Math.round(14*g38)&&chance(50))add('金手套');
   if(main&&st.Rt>=7.7&&chance(30+(st.Rt-7.7)*100))add('最佳球員');
   else if(S.age<=23&&st.Rt>=7.2&&chance(50))add('最佳年輕球員');
-  if(main&&st.Rt>=7.3&&chance(45))add('年度最佳陣容');
+  if(main&&S.grp==='DF'&&st.Rt>=7.2&&st.CS>=Math.round(11*g38)&&chance(45+(st.Rt-7.2)*80))add('最佳後衛'); /* v0.32 後衛專屬獎項(相當於前鋒的金靴、門將的金手套) */
+  if(main&&st.Rt>=(S.grp==='DF'?7.2:7.3)&&chance(45))add('年度最佳陣容');
   awardList(st,got);
   awardTraits(got); if(got.length)meter('fans',6);
 }
@@ -4289,7 +4291,7 @@ function awardTraits(got){
   if(!got.length)return;
   if(got.includes('金靴')&&++S.bootCount>=4&&!S.traits.goal)
     traitCard('goal','第四座金靴。你的腦子裡只有一件事——<b class="hl">進球率 ×1.2，但助攻 ×0.8</b>。');
-  if(S.traits.glass&&got.some(x=>/最佳球員|金靴|金手套/.test(x))){ removeTrait('glass'); S.pool+=8;
+  if(S.traits.glass&&got.some(x=>/最佳球員|最佳後衛|金靴|金手套/.test(x))){ removeTrait('glass'); S.pool+=8;
     traitCard('phoenix','那些殺不死你的，真的讓你更強大了——<b class="hl">玻璃人解除，受傷率恢復正常，並獲得 8 點能力點</b>。'); }
   if(S.traits.yips){ removeTrait('yips'); card('good','走出陰影','拿下獎項的那一刻，腦海裡的雜音消失了——<b class="hl">點球恐懼症痊癒</b>。'); }
 }
@@ -4347,14 +4349,14 @@ function phaseEndIntl(){
    你的影響力(主力全額、輪替半數、替補 15%):(評分 − 6.8) × 0.17,上限 0.2(評分 8.0 的主力約往上 4 名)
    (以下為 v0.21 參數下的估計,v0.21.1 已降低運氣成分)20 隊聯賽、普通表現:豪門冠軍約 32%、中游約 4%、保級降級約 30%;評分 8.0 主力:中游冠軍約 21%、保級隊平均第 11 名
    聯賽關鍵時刻:成功 −0.05(約 1 名)、失敗 +0.025;季末爭冠/保級戰另外 ∓0.05 */
-const TIER_F={1:0.21,2:0.45,3:0.79}; /* v0.21.1:運氣 0.36→0.30、豪門 0.19→0.21,降低生涯聯賽冠軍比例 */
+const TIER_F={1:0.21,2:0.47,3:0.79}; /* v0.32 中游 0.45→0.47 */ /* v0.21.1:運氣 0.36→0.30、豪門 0.19→0.21,降低生涯聯賽冠軍比例 */
 function standingF(){
   const st=S.lastSt||{}, M=S.lgMo||{ok:0,ng:0,stk:null}, rw={主力:1,輪替:0.5,替補:0.15}[st.role]||0;
-  const imp=st.App?clamp((st.Rt-6.8)*0.17,-0.06,0.2)*rw:0;
+  const imp=st.App?clamp((st.Rt-6.8)*0.15,-0.06,0.15)*rw:0; /* v0.32 上限 0.2→0.15 */
   let f=TIER_F[S.clubTier]-imp-M.ok*0.05+M.ng*0.025-(S.traits.clutch?0.02:0);
   if(M.stk)f+=M.stk.ok?-0.05:0.04;
   f+=(st.R||0)*0.02; /* 紅牌停賽拖累球隊 */
-  return {f:f+N0(0.3),imp,M};
+  return {f:f+N0(0.25),imp,M}; /* v0.32 運氣 0.3→0.25:冠軍不再常常爆冷 */
 }
 function teamStanding(){
   const L=LV[S.lv], n=TEAMS[S.lv].length+(TEAMS[S.lv].includes(S.club)?0:1), zone=n>=16?3:n>=12?2:1;
@@ -4720,6 +4722,11 @@ function wcRoll(Y,next,p){
   const qok=chance(p); hlFin({q:qok?1:0});
   if(!qok){ card('bad',`${Y} 世界盃資格賽`,`${N.n}在資格賽出局（出線率 ${p}%）。`); next(); return; }
   if(!S.ntOn){ card('info',`${Y} 世界盃`,`${N.n}打進世界盃（出線率 ${p}%），但你不在名單上。`); next(); return; }
+  /* v0.32 大名單只有 26 人:能力只比徵召門檻高一點的邊緣人選可能在最後一刻被刷掉 */
+  const mg=ovr()-(N.nt-S.ntRep);
+  if(mg<6&&!chance(clamp(35+mg*11+(S.ntCap?30:0),20,95))){ meter('fans',-2);
+    card('bad',`${Y} 世界盃｜大名單`,`${N.n}拿到世界盃門票（出線率 ${p}%）。<br>26 人大名單公布那天，你從頭看到尾，又從尾看到頭——<b class="dn">沒有你的名字</b>。總教練說你是「最後一個被拿掉的人」。`);
+    board(); next(); return; }
   card('gold',`${Y} 世界盃資格賽`,`${N.n}拿到世界盃門票！（出線率 ${p}%）${N.tier>=4?'<br>這是國家足球史上最重要的一刻。':''}`);
   const play=after=>playTourney(T_WC,Y,true,false,()=>{ S.pool+=1; if(after)after(); next(); });
   /* 賽前傷勢:打止痛針上場或退出 */
@@ -4841,7 +4848,7 @@ function finalSeries(c,done){
   }
   function finish(win,x,y,pk,star,note){
     if(win&&S.traits.bigfear){ removeTrait('bigfear'); card('good','心魔解除','捧起獎盃的那一刻，「大賽恐懼」的標籤被撕掉了。'); }
-    hlFin({w:win,x,y,pk}); const sc=`${c.me} ${x}–${y} ${c.opp}${pk?'（點球大戰）':''}`, mvp=win&&!!star&&chance(pk?50:35);
+    hlFin({w:win,x,y,pk}); const sc=`${c.me} ${x}–${y} ${c.opp}${pk?'（點球大戰）':''}`, mvp=win&&!!star&&chance(pk?40:22);
     if(LC){ if(pk)liveStats(LC,{win,mvp,star}); else liveEnd(LC,x,y,{win,mvp,star,et:!!note}); }
     if(win){
       const cheer={世界盃:`你把${tr}高高舉過頭頂。${NATS[S.nat].n}的街頭，此刻一定已經瘋了。`,歐冠:`隊長把${tr}交到你手上，你轉身面向看台，彩帶從天而降。`,
@@ -4899,6 +4906,7 @@ function tourneyAwards(kind,Y,info){
   const bootK=club?'射手王':'金靴', other=club?ri(kind==='CL'?8:7,kind==='CL'?13:11):ri(kind==='WC'?5:4,kind==='WC'?8:7);
   const myBoot=!isGK()&&info.tg>=other&&deep&&chance(70); add(bootK,myBoot,`${myBoot?info.tg:other} 球`);
   if(kind==='WC')add('金手套',isGK()&&fin&&chance(50),'');
+  if(kind==='WC'||kind==='CL')add('最佳後衛',S.grp==='DF'&&deep&&info.okc>=2&&chance(45),'');
   if(kind!=='AC')add('最佳年輕球員',S.age<=21&&info.i>=3&&chance(45),'');
   card(got.length?'gold':'info',`${Y} ${comp}個人獎項`,(got.length?`你拿下 ${got.map(x=>`<b class="hl">${comp}${x}</b>`).join('、')}！`:`${comp}個人獎項揭曉。`)+`<div class="tblwrap"><table class="fin awd">${rows.join('')}</table></div>`);
   if(got.length){ meter('fans',got.length*4); got.forEach(k=>S.hl.push({y:S.year,age:S.age,t:`${Y} ${comp}${k}`,big:true})); }
@@ -5127,7 +5135,7 @@ function clubCups(cont){
         end(); };
       go(); }); }
   /* 國內盃 */
-  q.push(()=>{ let i=0; const p0={1:.6,2:.45,3:.33}[S.clubTier]+rel+role+cb.cup;
+  q.push(()=>{ let i=0; const p0={1:.55,2:.42,3:.3}[S.clubTier]+rel+role+cb.cup; /* v0.32 每輪晉級率略降 */
     const end=win=>{ if(win){ S.honors.push(`${Y} ${CUP_N[S.lv]}冠軍（${S.club}・${L.n}）`); S.cups++; S.cupWon={y:S.year,club:S.club}; S.pool+=2; meter('fans',6); confetti(); }
       card(win?'gold':'info',`${Y} ${CUP_N[S.lv]}`,win?`${S.club}捧起 <b class="hl">${CUP_N[S.lv]}</b>！<br>賽事成果 <b class="up">+2</b> 點（季末自由分配）`:`${S.club}在${CUP_N[S.lv]}${i===4?'決賽落敗，屈居<b>亞軍</b>':'止步'+CUP_ST[i]}。`); board(); next(); };
     while(i<4&&chance(p0*100))i++;
@@ -5141,17 +5149,17 @@ function clubCups(cont){
 const ASIA_TOP=['J1','K1','CSL','AUS'], ASIA_2=['J2','K2'];
 const lgW=k=>LV[k].top5?1:clamp((LV[k].par-28)/32,0.1,0.75); /* 依聯賽水準:英冠約 0.75、日職約 0.6、台灣企甲約 0.16 */
 const seasonPts=r=>r.lv&&r.st.App?Math.max(0,r.st.Rt-ptsBase(r.lv))*r.st.Min/90*(POS_PTS[DP_GRP[r.dp]]??1):0; /* v0.26.8:門將每場踢滿 ×0.55、後衛評分偏低 ×1.12 */
-const POS_PTS={GK:0.55,DF:1.35,MF:1.12,FW:1}; /* v0.31 校準:後衛、中場生涯分偏低 */
+const POS_PTS={GK:0.55,DF:1.5,MF:1.12,FW:1}; /* v0.31 校準:後衛、中場生涯分偏低;v0.32 後衛 1.35→1.5 */
 const ptsBase=k=>clamp(6.0-(LV[k].par-45)*0.015,5.75,6.25); /* v0.21.1:評分基準依聯賽水準(英超約 5.78、台灣企甲約 6.18),強聯賽同樣評分更值錢 */
 /* 榮譽加分:由上往下取第一個符合的規則 */
 const HONOR_PTS=[[/自由盃（冠軍/,90],[/自由盃（亞軍/,45],[/自由盃（4 強/,20],[/南美盃（冠軍/,40],[/南美盃（亞軍/,20],[/南美盃（4 強/,8],
   [/中北美冠軍盃（冠軍/,45],[/中北美冠軍盃（亞軍/,22],[/中北美冠軍盃（4 強/,10],[/非洲冠軍聯賽（冠軍/,50],[/非洲冠軍聯賽（亞軍/,25],[/非洲冠軍聯賽（4 強/,10],
   [/非洲聯合會盃（冠軍/,25],[/非洲聯合會盃（亞軍/,12],[/非洲聯合會盃（4 強/,5],[/(自由盃|中北美冠軍盃|非洲冠軍聯賽)最佳球員/,40],[/(自由盃|中北美冠軍盃|非洲冠軍聯賽)(射手王|最佳年輕球員)/,15],
   [/歐洲國家盃（冠軍/,130],[/歐洲國家盃（亞軍/,65],[/美洲盃（冠軍/,120],[/美洲盃（亞軍/,60],[/非洲國家盃（冠軍/,70],[/非洲國家盃（亞軍/,35],[/金盃賽（冠軍/,40],
-  [/(歐洲國家盃|美洲盃|非洲國家盃|金盃賽)(最佳球員|金靴)/,40],[/(歐洲國家盃|美洲盃|非洲國家盃|金盃賽)（(4 強|止步4 強)/,25],[/(歐洲國家盃|美洲盃|非洲國家盃|金盃賽)/,10],[/世界盃金球獎/,150],[/世界盃(金靴|金手套)/,80],[/世界盃最佳年輕球員/,40],[/歐冠最佳球員/,100],[/歐冠(射手王|最佳年輕球員)/,50],
+  [/(歐洲國家盃|美洲盃|非洲國家盃|金盃賽)(最佳球員|金靴)/,40],[/(歐洲國家盃|美洲盃|非洲國家盃|金盃賽)（(4 強|止步4 強)/,25],[/(歐洲國家盃|美洲盃|非洲國家盃|金盃賽)/,10],[/世界盃金球獎/,150],[/世界盃(金靴|金手套|最佳後衛)/,80],[/歐冠最佳後衛/,50],[/世界盃最佳年輕球員/,40],[/歐冠最佳球員/,100],[/歐冠(射手王|最佳年輕球員)/,50],
   [/亞冠最佳球員/,40],[/亞冠(射手王|最佳年輕球員)/,20],[/亞洲盃(最佳球員|金靴)/,40],[/決賽最佳球員/,25],[/世俱盃（冠軍/,60],[/世俱盃（亞軍/,25],[/歐霸（冠軍/,70],[/歐霸（亞軍/,35],[/歐霸（4 強/,15],[/歐協聯（冠軍/,40],[/歐協聯（亞軍/,20],[/歐協聯（4 強/,8],
   [/亞冠二級（冠軍/,30],[/亞冠二級（亞軍/,15],[/亞冠二級（4 強/,6],[/東協錦標賽（冠軍/,40],[/東亞錦標賽（冠軍/,25],[/(東協|東亞)錦標賽/,5],[/歐冠（冠軍/,150],[/歐冠（亞軍/,70],[/歐冠（4 強/,35],[/亞冠（冠軍/,60],[/亞冠（亞軍/,30],[/亞冠（4 強/,15],[/盃冠軍（/,30],[/金球獎/,300],[/世界盃（(冠軍|亞軍)/,200],[/世界盃（止步(8 強|4 強)/,100],[/世界盃/,40],
-  [/歐足聯年度最佳球員/,150],[/(亞洲|南美|非洲)足球先生|中北美年度最佳球員/,80],[/最佳球員/,60],[/(英超|西甲|德甲|義甲|法甲)冠軍/,60],[/金靴|金手套/,40],
+  [/歐足聯年度最佳球員/,150],[/(亞洲|南美|非洲)足球先生|中北美年度最佳球員/,80],[/最佳球員/,60],[/(英超|西甲|德甲|義甲|法甲)冠軍/,60],[/金靴|金手套/,40],[/最佳後衛/,50],
   [/亞洲盃（冠軍/,60],[/奧運（(金牌|銀牌|銅牌)/,40],[/亞運（金牌/,30],[/亞洲盃（亞軍/,30],
   [/年度最佳陣容/,20],[/冠軍（/,20],[/最佳年輕球員/,10],[/亞洲盃/,10]];
 /* 聯賽獎項與冠軍乘上該聯賽權重;國際賽不打折 */
@@ -5196,7 +5204,7 @@ const baseTm=t=>(t||'').replace('（租）','');
 const yrOf=h=>+(h.match(/^(\d{4})/)||[0,0])[1];
 /* 精華挑選(v0.23.2):依重要程度排序,同一年只取一則,再照時間排列 */
 function hlScore(h){ const t=h.t;
-  return /決賽最佳球員|點球大戰/.test(t)?100:/(金球獎|金靴|金手套|最佳球員|最佳年輕球員)$/.test(t)?85:/決賽/.test(t)?80:
+  return /決賽最佳球員|點球大戰/.test(t)?100:/(金球獎|金靴|金手套|最佳球員|最佳後衛|最佳年輕球員)$/.test(t)?85:/決賽/.test(t)?80:
     /世界盃|歐冠|亞冠|自由盃|中北美冠軍盃|非洲冠軍聯賽|歐洲國家盃|美洲盃|亞洲盃|非洲國家盃|金盃賽|奧運/.test(t)?70:/宿命對決/.test(t)?65:
     /絕殺|延長賽英雄|延長賽建功|扳平/.test(t)?60:/傷癒復出/.test(t)?55:/爭冠|保級|德比|對決|Fla-Flu|Gre-Nal|克拉西科/.test(t)?50:h.big?30:10; }
 function hlPick(list,n){ const out=[], yrs=new Set();
@@ -5308,7 +5316,7 @@ function posStats(){
       T('金靴',cnt(/金靴/),'次'),T('單季最多進球',m('G'),'')); }
   else if(S.grp==='MF'){ tiles.push(T('助攻',t.A,'次'),T('進球',t.G,'球'),T('進球＋助攻',t.G+t.A,''),T('每場助攻',t.App?(t.A/t.App).toFixed(2):'—',''),
       T('年度最佳陣容',cnt(/年度最佳陣容/),'次'),T('單季最多助攻',m('A'),'')); }
-  else { tiles.push(T('出場',t.App,'場'),T('零封',t.CS,'場'),T('進球',t.G,'球'),T('助攻',t.A,'次'),T('年度最佳陣容',cnt(/年度最佳陣容/),'次'),T('單季最多零封',m('CS'),'')); }
+  else { tiles.push(T('最佳後衛',cnt(/最佳後衛$/),'次'),T('零封',t.CS,'場'),T('進球',t.G,'球'),T('助攻',t.A,'次'),T('年度最佳陣容',cnt(/年度最佳陣容/),'次'),T('單季最多零封',m('CS'),'')); }
   const common=[T('職業賽季',pro.length,'季'),T('出場',t.App,'場'),T('出場分鐘',t.Min.toLocaleString(),''),T('平均評分',avg,''),T('巔峰評分',peak?`${peak.st.Rt}（${seasonLabel(peak.y)}）`:'—',''),
     T('黃牌／紅牌',`${t.Y}／${t.R}`,''),T('聯賽最佳球員',cnt(/[^盃]最佳球員$/),'次'),T('國家隊',S.caps?`${S.caps} 場${gk?'':`・${S.intlG} 球`}`:'—','')];
   return {main:tiles,common:common.filter(x=>!tiles.some(y=>y.n===x.n)),t};
