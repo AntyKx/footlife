@@ -43,5 +43,6 @@ const R=a=>a[Math.floor(Math.random()*a.length)];
       avgRt:rts.length?+(rts.reduce((a,b)=>a+b,0)/rts.length).toFixed(2):0,seasons:pro.length,caps:S.caps,
       traits:Object.keys(S.traits).filter(t=>S.traits[t]),cBig:S.cBig||0,bigN:S.bigN||0,cSub:S.cSub||0,cSig:S.cSig||0,cPerfect:S.cPerfect||0,cRead:S.cRead||0,cPk:S.cPk||0,cTen:S.cTen||0,posCh:S.posChanges||0,fanMax:S.fanMax||0,honors:S.honors,top5:pro.filter(r=>LV[r.lv].top5).length,
       Y:pro.reduce((a,r)=>a+(r.st.Y||0),0),R:pro.reduce((a,r)=>a+(r.st.R||0),0),acad:S.acad?(S.acad.foreign?'foreign':'home'):null,acadOut:S.acadOut||null,acadGrad:!!S.acadGrad,boughtBack:!!S.boughtBack,clubs:new Set(pro.filter(r=>!r.loan).map(r=>r.tm)).size,ach:(typeof ACH!=='undefined'?ACH.filter(a=>achLevel(a,achCtx([]))).map(a=>a.id):[])}; })()`);
+  out.tr=w.eval('({sum:S.cSum||0,int:S.cInt||0,rumor:S.cRumor||0,shop:S.cShop||0})'); /* v0.34 夏窗(有約)次數、有人感興趣、傳聞、主動找下家 */
   out.err=err; process.stdout.write(JSON.stringify(out)+'\n');
   w.close(); } })();
