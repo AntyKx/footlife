@@ -1048,7 +1048,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.32.0';
+const APP_VER='v0.32.1';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -4178,6 +4178,7 @@ function simSeason(par,games,r){
   const MC=S.mCards||{y:0,r:0}, yr=YEL_RATE[S.dpos]*(S.traits.redcard?1.4:S.traits.gent?0.3:1);
   const yel=Math.round(app*yr*(0.6+R()*0.8))+MC.y, red=MC.r+(chance(app*yr*0.02*(S.traits.redcard?2:1)*100)?1:0), ban=Math.floor(yel/5)+red*2;
   app=Math.max(0,app-ban);
+  const lm=S.lgMo?S.lgMo.ok+S.lgMo.ng:0; app=Math.max(app,lm); /* v0.32.1 季中踢過的聯賽關鍵時刻一定算出場,不會出現「有比賽卡、季末 0 出場」 */
   let mpg=ri(m1,m2);
   if(isGK())mpg=r<=2?90:75; /* 門將替補多半是盃賽或傷停時先發踢滿;板凳偶爾中途上場 */ else if(S.ab.sta<45)mpg=Math.round(mpg*0.85);
   const min=app*mpg, n90=min/90;
