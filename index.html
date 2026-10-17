@@ -1044,7 +1044,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.29.0';
+const APP_VER='v0.30.0';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -2031,11 +2031,11 @@ const BIGFX={G:'GOAL!',A:'ASSIST!',S:'SAVE!',D:'CLEARED!'};
 function momentMag(o){ const m=o.m==='safe'?1:o.m==='bold'||o.m==='sig'?(S.traits.clutch?4:3):2; return MHALF?Math.ceil(m/2):m; }
 function momentSplit(o,mag){ const a=o.ab.length>1&&mag>1?[Math.ceil(mag/2),Math.floor(mag/2)]:[mag]; return a.map((v,i)=>[o.ab[i],v]); }
 function momentSub(o,p){ const g=momentSplit(o,momentMag(o)).map(([k,v])=>`${ABL[k]}+${v}`).join(' ');
-  return `${MODEN[o.m]}｜成功率 ${p}%｜成功 ${g}${o.m==='safe'?'':o.m==='sig'?'｜失敗 狀態−3':`｜失敗 ${ABL[o.ab[0]]}−1`}`; }
+  return `${MODEN[o.m]}｜成功率 ${p}%${tacB(o)?'（合戰術）':''}｜成功 ${g}${o.m==='safe'?'':o.m==='sig'?'｜失敗 狀態−3':`｜失敗 ${ABL[o.ab[0]]}−1`}`; }
 function momentOdds(o,par){ /* par:大賽與盃賽用對手強度,預設為目前球隊 par */
   const base={safe:70,norm:50,bold:S.traits.clutch?50:35,sig:45}[o.m];
   const a=o.ab.reduce((s,k)=>s+S.ab[k],0)/o.ab.length;
-  const p=base+clamp((a-(par??curPar()))*2,-25,20)+((S.traits.genius||S.traits.late)?12:0)-(S.traits.yips?10:0)-(MCTX.ten&&o.m==='bold'?8:0)+(o.m==='sig'&&S.traits.sigstar?5:0); /* 少一人作戰:冒險 −8%;招牌球星:招牌 +5% */
+  const p=base+clamp((a-(par??curPar()))*2,-25,20)+((S.traits.genius||S.traits.late)?12:0)-(S.traits.yips?10:0)-(MCTX.ten&&o.m==='bold'?8:0)+(o.m==='sig'&&S.traits.sigstar?5:0)+tacB(o); /* 少一人作戰:冒險 −8%;招牌球星:招牌 +5%;合主帥戰術 +5% */
   return clamp(Math.round(p),5,95);
 }
 /* 看懂對手:視野(門將用站位)越高、經驗越多越容易看出 */
@@ -2056,6 +2056,7 @@ function pitchSVG(sc){
 /* 抽場景:同位置最近 6 次出現過的先排除 */
 function pickScene(){ S.seenMom=S.seenMom||[]; let a=MOMENTS.filter(m=>m.g.includes(S.grp)&&(!m.dp||m.dp.includes(S.dpos)));
   const sp=a.filter(m=>m.dp); if(sp.length&&chance(40))a=sp; /* v0.27 細分位置專屬場景優先 */
+  if(tacOn()&&S.coach.st!=='youth'){ const ta=tacAb(), tf=a.filter(m=>m.opts.some(o=>o.ab&&ta.includes(o.ab[0]))); if(tf.length&&tf.length<a.length&&chance(40))a=tf; } /* v0.30 主帥風格的場景較常出現 */
   const f=a.filter(m=>!S.seenMom.includes(m.t)); if(f.length)a=f;
   const sc=pick(a); S.seenMom.push(sc.t); if(S.seenMom.length>6)S.seenMom.shift(); return sc; }
 /* 比賽情境:最後階段落後或平手 = 關鍵一擊(成功額外球迷、教練信任,寫進精華) */
@@ -2160,6 +2161,7 @@ function liveStats(c,o){ const win=o.win, pos=clamp(50+(win?rnd(2,12):rnd(-12,2)
     `<div class="ft-me"><span>${S.name}・${DPN[S.dpos]}</span><b class="${rt>=7.5?'up':rt<6.3?'dn':''}">${rt}</b>${o.mvp?'<em>全場最佳</em>':''}</div>`); }
 /* 單次大舞台關鍵時刻(國際賽淘汰賽、盃賽決賽):done(ok) */
 function bigMoment(tag,me,opp,par,done,fx){ fx=fx||{}; /* fx:min/a/b 指定時間與比分、see 必看出對手、bonus 成功率加成、boldB 冒險加成、half 點數減半 */
+  TAC_OFF=me!==S.club; /* 國家隊不套用俱樂部主帥的戰術 */
   const sc=pickScene(), tell=pick(sc.tells), see=chance(scoutSee())||!!fx.see;
   if(!fx.live)HL_PEND=[];
   const min=fx.min??ri(55,118), a=fx.a??ri(0,1), b=fx.b??a, LC=fx.live||liveStart(tag,me,opp); livePre(LC,min,a,b);
@@ -2170,7 +2172,7 @@ function bigMoment(tag,me,opp,par,done,fx){ fx=fx||{}; /* fx:min/a/b 指定時�
       f:()=>resolveMoment(sc,o,o.bi===tell.o,p,el,ok=>{ MTAG=null; MHALF=false; liveMark(LC,min,ok); board(); done(ok); })}; })); momentLockUI();
 }
 function leagueMoment(last,i,tot,done){
-  const sc=pickScene(), tell=pick(sc.tells), see=chance(scoutSee());
+  TAC_OFF=false; const sc=pickScene(), tell=pick(sc.tells), see=chance(scoutSee());
   const min=ri(8,90), a=ri(0,2), b=ri(0,2), opp=oppName(), me=S.stage==='PRO'?S.club:S.stage==='UNI'?S.uni:S.team;
   const dby=derbyOf(); let vs=opp;
   STK=S.stage!=='PRO'?null:dby&&chance(25)?(vs=dby[0],dby[1]):last&&S.clubTier===1&&chance(35)?'爭冠關鍵戰':last&&S.clubTier===3&&chance(35)?'保級生死戰':null;
@@ -3316,9 +3318,10 @@ function training(){
   const hand=shuffle((isGK()?TRAIN_GK:TRAIN_OUT).slice()).slice(0,5).map(c=>{ /* k 在這裡定案,預覽與套用一致 */
     const k=c.k==='key'?pick(keys):c.k==='weak'?keys.slice().sort((a,b)=>S.ab[a]-S.ab[b])[0]:c.k;
     const v=c.k?(S.traits.genius?ri(4,6):S.traits.late?ri(3,6):S.traits.scholar?ri(2,6):ri(1,6)):0;
-    return {...c,k,v,p:c.k?Math.max(1,Math.round(v*ageMul())):0}; }); /* p = 實際投入點數(年齡修正) */
+    const tc=!!(c.k&&tacOn()&&tacAb().includes(k)); /* v0.30 主帥戰術看重的能力:這堂課 +1 */
+    return {...c,k,v,tc,p:c.k?Math.max(1,Math.round(v*ageMul()))+(tc?1:0):0}; }); /* p = 實際投入點數(年齡修正) */
   let need=S.skipMid?2:(chance(15)?4:3); if(S.traits.distract&&!S.skipMid)need=Math.max(2,need-1); /* 外務纏身 */
-  card('','季前訓練營',`教練組排出 5 堂訓練課，你可以選 <b class="hl">${need}</b> 堂。${need===4?'教練加開了一個訓練時段！':''}${S.skipMid?'（復健中，只能選 2 堂）':''}`);
+  card('','季前訓練營',`教練組排出 5 堂訓練課，你可以選 <b class="hl">${need}</b> 堂。${tacOn()&&tacAb().length&&S.coach.st!=='youth'?`主帥的${COACH_ST[S.coach.st].n}看重 ${tacAb().map(k=>ABL[k]).join('、')}，相關課程訓練量 +1。`:''}${need===4?'教練加開了一個訓練時段！':''}${S.skipMid?'（復健中，只能選 2 堂）':''}`);
   trainUI(hand,need,sel=>applyTraining(hand.filter((c,i)=>sel.includes(i))));
 }
 /* 成長黃金期:18–23 歲訓練效率 ×1.35,24 歲起遞減(星數不變,只影響實際點數) */
@@ -3333,7 +3336,7 @@ function trainUI(hand,need,done){
       d.className='tcard'+(on?' sel':'')+(c.v===6?' six':'');
       d.style.animationDelay=(i*70)+'ms';
       d.innerHTML=`<b>${c.n}</b><span class="tab">${c.k?`訓練量 <b class="hl">+${c.p+(c.x?1:0)}</b>`:'恢復'}</span>`+
-        (c.k?`<span class="tsp">專項 <b>${ABL[c.k]}</b> ×1.5</span>`:'')+
+        (c.k?`<span class="tsp">專項 <b>${ABL[c.k]}</b> ×1.5</span>`:'')+(c.tc?`<span class="tsp">合主帥戰術 <b>+1</b></span>`:'')+
         `<span class="tpow">${c.k?'★'.repeat(c.v)+'<i>'+'★'.repeat(6-c.v)+'</i>':'－'}</span>`+
         `<small>${[c.f?`疲勞 ${c.f>0?'+':''}${c.f}`:'',c.form?`狀態 +${c.form}`:'',c.trust?`信任 +${c.trust}`:''].filter(Boolean).join('｜')}</small>`;
       if(on||sel.length<need)d.onclick=()=>{ if(on)sel.splice(sel.indexOf(i),1); else sel.push(i); render(); };
@@ -3464,7 +3467,12 @@ const COACH_ST={
   counter:{n:'防守反擊',ab:['def','pac','sho'],gk:['ref','gkp'],d:'先守住，再一刀致命'},
   direct:{n:'長傳衝吊',ab:['hea','phy','sho'],gk:['cmd','kic'],d:'把球送到禁區，剩下的交給身體'},
   youth:{n:'重用新人',ab:null,gk:null,d:'年輕人只要敢踢，就有機會'}};
-function newCoach(){ const L=nameSet(S.stage==='PRO'&&S.lv?LV[S.lv].cty:S.nat); return {n:pick(L[0])+pick(L[1]),st:pick(Object.keys(COACH_ST)),y:S.year}; }
+function newCoach(lv){ lv=lv||(S.stage==='PRO'&&S.lv); const L=nameSet(lv&&LV[lv]?LV[lv].cty:S.nat); return {n:pick(L[0])+pick(L[1]),st:pick(Object.keys(COACH_ST)),y:S.year}; }
+/* v0.30 戰術影響比賽:俱樂部比賽(國家隊不算)時,主帥風格偏好的場景較常出現、相關選項 +5% */
+let TAC_OFF=false;
+const tacOn=()=>S.stage==='PRO'&&!!S.coach&&!TAC_OFF&&!(S.ct&&S.ct.mil);
+const tacAb=c=>{ c=c||S.coach; if(!c)return []; const st=COACH_ST[c.st]; return ((isGK()?st.gk:st.ab)||[]).filter(k=>k in S.ab); };
+const tacB=o=>{ if(!tacOn()||!o.ab)return 0; if(S.coach.st==='youth')return o.m==='bold'&&S.age<=24?5:0; return o.ab.some(k=>tacAb().includes(k))?5:0; };
 /* 適配度 −2～+2:風格看重的能力和你的綜合能力相比;重用新人看年齡 */
 function coachFit(c){ c=c||S.coach; if(!c)return 0; const st=COACH_ST[c.st];
   if(c.st==='youth')return S.age<=21?2:S.age<=24?1:S.age>=31?-2:S.age>=28?-1:0;
@@ -3476,12 +3484,12 @@ function coachLine(c){ c=c||S.coach; const f=coachFit(c); return `主帥 <b clas
 function coachCheck(cont){
   if(S.stage!=='PRO'||S.loan||S.skipMid){ cont(); return; }
   if(!S.coach){ S.coach=newCoach(); cont(); return; }
-  const f0=coachFit(); if(f0)meter('trust',f0*2); /* 戰術合不合,每季慢慢反映在信任上 */
+  const f0=coachFit(); if(f0)meter('trust',f0*3); /* 戰術合不合,每季慢慢反映在信任上(v0.30 ±2→±3) */
   const LL=S.lastLg&&S.lastLg.club===S.club?S.lastLg:null, n=TEAMS[S.lv].length, bad=LL&&LL.rank>n*0.7, flop=LL&&S.clubTier===1&&LL.rank>4;
   if(!S.newSign&&S.year-S.coach.y>=1&&chance(8+(S.relegated?30:0)+(bad?15:0)+(flop?12:0)+(S.year-S.coach.y>=4?8:0))){
     const old=S.coach, c=newCoach(); while(c.st===old.st&&chance(50))c.st=pick(Object.keys(COACH_ST)); S.coach=c; const f=coachFit(c);
     card('talk','換帥',`${old.n} 在 ${S.club} 執教 ${S.year-old.y} 年後下課。新主帥 <b class="hl">${c.n}</b> 上任，主打<b class="hl">${COACH_ST[c.st].n}</b>：「${COACH_ST[c.st].d}。」<br>${coachLine(c)}`);
-    S.trust=clamp(50+f*6,0,100); board();
+    S.trust=clamp(50+f*8,0,100); board();
     const ks=c.st==='youth'?[]:(isGK()?COACH_ST[c.st].gk:COACH_ST[c.st].ab).filter(k=>k in S.ab&&S.ab[k]<80);
     choose('新主帥上任 — 你的態度？',[
       {t:'全力適應新戰術',main:true,s:ks.length?`${ks.slice(0,2).map(k=>ABL[k]).join('、')}小幅↑｜信任↑｜狀態小幅↓`:'信任↑｜狀態小幅↓',f:()=>{ const out=ks.slice(0,2).map(k=>loveGainTxt(k,3)); out.push(meter('trust',6),meter('form',-3)); card('good','適應新戰術',`你每天最早到訓練場，把新戰術一條一條背下來。${out.filter(Boolean).join('、')}`); cont(); }},
@@ -3899,7 +3907,7 @@ function schedMoment(m,i,tot,next){
   const Y=seasonLabel(S.year), L=LV[S.lv], cup=m.k==='cup', C=cup?null:CONT[m.n];
   const tag=cup?`${Y} ${CUP_N[S.lv]}${CUP_ST[0]}`:`${Y} ${m.n}${CL_ST[0]}`;
   const opp=cup?oppName():pick(TEAMS[pick(C.pool.filter(k=>k!==S.lv))]), par=cup?curPar():L.par+C.par;
-  const sc=pickScene(), tell=pick(sc.tells), see=chance(scoutSee());
+  TAC_OFF=false; const sc=pickScene(), tell=pick(sc.tells), see=chance(scoutSee());
   const lbl=cup?CUP_N[S.lv]+CUP_ST[0]:m.n+CL_ST[0];
   const el=momentCard(lbl,sc,tell,see,ri(8,90),S.club,ri(0,2),ri(0,2),opp);
   MTAG=tag; MHALF=true;
@@ -3957,7 +3965,9 @@ function simSeason(par,games,r){
   if(isGK())mpg=r<=2?90:75; /* 門將替補多半是盃賽或傷停時先發踢滿;板凳偶爾中途上場 */ else if(S.ab.sta<45)mpg=Math.round(mpg*0.85);
   const min=app*mpg, n90=min/90;
   const st={App:app,Min:min,G:0,A:0,Rt:0,CS:0,GA:0,role:rn,d,Y:yel,R:red,Ban:ban};
-  const pend=S.pendStat, fb=(S.form-50)/50; S.pendStat=0; const boost=(1+pend*0.03)*(1+fb*0.12); /* 狀態 0–100 影響進球效率 */
+  const pend=S.pendStat, fb=(S.form-50)/50; S.pendStat=0; const tf=S.stage==='PRO'&&S.coach&&!S.loan?coachFit():0;
+  const boost=(1+pend*0.03)*(1+fb*0.12)*(1+tf*0.04); /* 狀態 0–100 影響進球效率;v0.30 戰術適配 ±8% */
+  st.fit=tf;
   const dp=S.dpos;
   if(isGK()){
     st.GA=Math.round(clamp(1.3-d*0.025+N0(0.1),0.5,2.2)*n90);
@@ -4011,7 +4021,7 @@ function seasonResult(){
     else if(S.seasonFactor<0.95)S.ironStreak=0; }
   if(!youth&&st.App)cardTraits(st);
   const gk=isGK(), pl=pressLine(st), kp=[['出場',st.App],gk?['零封',st.CS]:['進球',st.G],gk?['失球',st.GA]:['助攻',st.A],['評分',st.Rt||0,2]];
-  const sc=card('info',uni?'大學聯賽成績':youth?'青年聯賽成績':`${LV[S.lv].n}成績`,`<div class="kpis">${kp.map(([n,v,d])=>`<div class="kpi"><small>${n}</small><b data-to="${v}" data-dec="${d||0}">${d?(+v).toFixed(d):v}</b></div>`).join('')}</div><div class="statline">${statLine(st)}</div><p class="press">📰 ${pl}</p>`);
+  const sc=card('info',uni?'大學聯賽成績':youth?'青年聯賽成績':`${LV[S.lv].n}成績`,`<div class="kpis">${kp.map(([n,v,d])=>`<div class="kpi"><small>${n}</small><b data-to="${v}" data-dec="${d||0}">${d?(+v).toFixed(d):v}</b></div>`).join('')}</div><div class="statline">${statLine(st)}</div>${st.fit?`<div class="fx">${COACH_ST[S.coach.st].n}${st.fit>0?'很適合你的踢法':'跟你的踢法格格不入'}：表現效率 <b class="${st.fit>0?'up':'dn'}">${st.fit>0?'+':''}${st.fit*4}%</b></div>`:''}<p class="press">📰 ${pl}</p>`);
   rollNums(sc); tickPush(pl);
   leagueAwards(st);
   board(1); nextStep();
@@ -4258,9 +4268,10 @@ function sauBid(){ if(S.age<28||S.lv==='SAU'||ovr()<LV.SAU.par+5||!chance(30))re
 const ofName=of=>`${of.club}（${LV[of.lv].n}・${TIERN[of.tier]}）`;
 let OFFER_SEEN=[]; /* 這一輪看過的報價,簽約時記下沒選的豪門(回聲用) */
 function offerOpt(of,main,title){ if(of&&of.club)OFFER_SEEN.push(of);
+  const oc=of.club===S.club&&S.coach?S.coach:(of.coach=of.coach||newCoach(of.lv)), of_=coachFit(oc);
   const est=salaryFor(of.lv,ovr()-LV[of.lv].par,TIER_PAY[of.tier]*agentPay()*(of.pay||1));
   return {t:title||ofName(of),main,offer:1,
-    s:`${agentIs('money')?Math.max(1,of.yrs-1):of.yrs} 年｜年薪約 ${fmtMoney(est)}｜${TIER_DESC[of.tier]}${S.agent?`｜經紀人評估：${ROLES[offerRole(of)][0]}`:''}`,f:()=>negotiate(of,()=>signTo(of))};
+    s:`${agentIs('money')?Math.max(1,of.yrs-1):of.yrs} 年｜年薪約 ${fmtMoney(est)}｜${TIER_DESC[of.tier]}${S.agent?`｜經紀人評估：${ROLES[offerRole(of)][0]}`:''}｜主帥：${COACH_ST[oc.st].n}（${FIT_N(of_)}）`,f:()=>negotiate(of,()=>signTo(of))};
 }
 function signTo(of){
   const prev=S.club, oc=S.coach, otr=S.trust;
@@ -4270,12 +4281,12 @@ function signTo(of){
     if(oc&&prev&&of.club!==prev&&!S.mem.oldCoach)S.mem.oldCoach={y:S.year,club:prev,n:oc.n,rel:otr>=65?1:otr<35?-1:0}; } /* v0.25 修正:原本先改 S.club 才比較,換隊判斷永遠不成立 */
   if(of.club!==prev)S.rivals=[]; /* 換隊就換一批競爭者 */
   S.stage='PRO'; S.lv=of.lv; S.club=of.club; S.clubTier=of.tier; S.loan=null;
-  if(of.club!==prev){ S.newSign=true; S.coach=null; } /* 新加盟第一個夏窗不會被賣、也沒人來談;教練信任重新開始 */
+  if(of.club!==prev){ S.newSign=true; S.coach=of.coach?{...of.coach,y:S.year}:null; S.coachNew=1; } /* 新加盟第一個夏窗不會被賣、也沒人來談;教練信任重新開始(主帥就是報價上那一位) */
   if(S.acad&&!S.acadOut&&of.club===S.acad.club&&!S.acadGrad)S.acadGrad=true; /* 學院出身升上一隊 */
   if(S.buyback&&of.club===S.buyback.club){ S.buyback=null; S.boughtBack=true;
     card('gold','回家了',`${of.club}行使當年的買回條款。走進熟悉的訓練基地，青訓教練站在門口等你：「我就知道你會回來。」`); }
   const nw=of.club!==prev; S.ct={yrs:agentIs('money')?Math.max(1,of.yrs-1):of.yrs,mult:TIER_PAY[of.tier]*agentPay()*(of.pay||1),lv:of.lv}; S.wantOut=false; S.relegated=false;
-  if(!S.coach){ S.coach=newCoach(); S.trust=clamp(50+coachFit()*5,0,100); }
+  if(!S.coach)S.coach=newCoach(); if(S.coachNew||nw){ S.coachNew=0; S.trust=clamp(50+coachFit()*8,0,100); } /* v0.30 ±5→±8 */
   const ag=nw&&S.agent?{money:'經紀人抽走一筆可觀的佣金，但合約數字很漂亮。',care:'經紀人事先跟教練確認過你的角色。',star:'經紀人安排了盛大的簽約儀式，社群上全是你的照片。'}[S.agent.k]:'';
   if(nw&&agentIs('money'))S.trust=clamp(S.trust-3,0,100); if(nw&&agentIs('care'))S.trust=clamp(S.trust+6,0,100); if(nw&&agentIs('star'))S.fans=clamp(S.fans+3,0,100);
   card('gold','簽約',`與 <b class="hl">${of.club}</b>（${LV[of.lv].n}・${TIERN[of.tier]}）簽下 <b class="hl">${S.ct.yrs} 年</b>合約。<br>${coachLine()}${ag?`<br>${ag}`:''}`);
