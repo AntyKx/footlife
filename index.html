@@ -938,6 +938,10 @@ html{touch-action:manipulation} button,a,input,select,label{touch-action:manipul
 .seg.dpseg{margin-top:8px;grid-template-columns:repeat(3,1fr)} .seg.dpseg:empty{display:none}
 .seg.dpseg button{padding:7px 2px;font-size:13px}
 .dpdesc{margin:6px 2px 0;font-size:12px;line-height:1.5;color:var(--dim)} .dpdesc:empty{display:none} .dpdesc b{color:var(--amber);font-weight:600}
+.adv{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
+.adv span{display:flex;flex-direction:column;gap:1px;padding:5px 9px;border:1px solid var(--edge);border-radius:8px;background:var(--sub);min-width:0}
+.adv small{font-size:11px;color:var(--dim)}.adv b{font-family:var(--num);font-size:17px;color:var(--chalk);font-weight:600;line-height:1.15}
+.adv em{font-style:normal;font-size:11px;color:var(--hd)}.adv em.top{color:var(--amber);font-weight:700}
 html.calm *,html.calm *::before,html.calm *::after{animation:none!important;transition:none!important}
 html.calm .var{display:none}
 </style>
@@ -1048,7 +1052,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.32.1';
+const APP_VER='v0.33.0';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -4170,6 +4174,36 @@ function seasonRole(){
 const GK_APP=[[.80,1.0],[.30,.55],[.06,.20],[0,.06]]; /* v0.26.9 門將出賽比例:很少輪換,替補一季只有幾場 */
 const YEL_RATE={GK:.008,CB:.19,FB:.16,DM:.24,CM:.17,AM:.10,W:.10,ST:.12,SS:.10}; /* 每場黃牌率 */
 const DEF_BASE={GK:.30,CB:.31,FB:.28,DM:.30,CM:.24}; /* 防守位置的評分基礎貢獻(對應進攻球員的進球助攻) */
+/* v0.33 位置代表數據:每個細分位置 2–3 項,附聯賽排名。只做顯示;用獨立亂數,不動到遊戲主亂數 R() */
+const ADV={Int:{n:'攔截',m:{CB:1.4,FB:1.1,DM:1.7,CM:1.0},ab:['def','vis']},Clr:{n:'解圍',m:{CB:4.2,FB:1.6},ab:['def','hea']},
+  Tk:{n:'搶斷',m:{FB:1.8,DM:2.2,CM:1.6},ab:['def','sta']},KP:{n:'關鍵傳球',m:{AM:2.0,W:1.4,SS:1.5,CM:1.0,FB:0.9},ab:['vis','pas']},
+  Drb:{n:'過人成功',m:{W:2.0,AM:1.4,SS:1.5},ab:['dri','pac']},Sv:{n:'撲救',m:{GK:1},ab:['ref','gkp']},
+  Aer:{n:'空中對抗勝率',pc:1,m:{CB:58,ST:42},cv:8,ab:['hea','phy']},Pas:{n:'傳球成功率',pc:1,m:{DM:87,CM:85},cv:3,ab:['pas','vis']},
+  Sot:{n:'射正率',pc:1,m:{ST:42,SS:38},cv:6,ab:['sho']},SvP:{n:'撲救率',pc:1,m:{GK:70},cv:5,ab:['ref','gkp']}};
+const DP_ADV={CB:['Int','Clr','Aer'],FB:['Tk','Int','KP'],DM:['Int','Tk','Pas'],CM:['Pas','KP','Tk'],AM:['KP','Drb'],W:['Drb','KP'],ST:['Sot','Aer'],SS:['KP','Drb'],GK:['SvP','Sv']};
+const ADV_DEF=['Int','Clr','Tk'];
+function advStats(st,par,dp){
+  if(!st.App||!DP_ADV[dp])return;
+  let h=0; const k0=SEED+'|'+S.year+'|'+S.age+'|'+dp; for(let i=0;i<k0.length;i++)h=Math.imul(h^k0.charCodeAt(i),2654435761)>>>0;
+  const xr=()=>{ h=h+0x6D2B79F5|0; let t=Math.imul(h^h>>>15,1|h); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; };
+  const n90=st.Min/90, X={};
+  DP_ADV[dp].forEach(k=>{ const a=ADV[k], av=a.ab.reduce((s,x)=>s+(S.ab[x]||0),0)/a.ab.length;
+    let q=(av-par)/10+((st.Rt||6.9)-6.9)*0.7+(xr()+xr()+xr()-1.5)*0.6+(ADV_DEF.includes(k)?(S.mDef||0)*0.08:0);
+    q=clamp(q,-2.5,2.5); const top=clamp(Math.round(100/(1+Math.exp(1.702*q))),1,99), m=a.m[dp];
+    if(k==='SvP'){ const v=clamp(Math.round(m+a.cv*q),50,88); X.SvP={v,top}; X.Sv={v:Math.round((st.GA||0)*v/(100-v)),top}; return; }
+    if(k==='Sv')return;
+    if(a.pc)X[k]={v:clamp(Math.round(m+a.cv*q),25,95),top};
+    else { const p9=Math.max(m*0.3,m*(1+0.25*q)); X[k]={v:Math.round(p9*n90),p9:p9.toFixed(1),top}; } });
+  if(X.Sv&&!X.Sv.p9)X.Sv.p9=n90?(X.Sv.v/n90).toFixed(1):"0.0";
+  st.X=X;
+}
+const advRank=(x,min)=>min<900?'':x.top<=50?`聯賽前 ${x.top}%`:x.top<=75?'聯賽中段':'聯賽後段'; /* 出場不到 900 分鐘不列入排名 */
+const advTxt=(k,x)=>ADV[k].pc?`${x.v}%`:`${x.v}（${x.p9}／90 分）`;
+function advLine(st){ if(!st.X)return '';
+  return `<div class="adv">${Object.keys(st.X).map(k=>{ const x=st.X[k], rk=advRank(x,st.Min);
+    return `<span><small>${ADV[k].n}</small><b>${advTxt(k,x)}</b>${rk?`<em class="${x.top<=10?'top':''}">${rk}</em>`:''}</span>`; }).join('')}</div>`; }
+/* 最亮眼的一項(排名最高),給獎項與媒體標題用 */
+const advBest=st=>{ if(!st.X||st.Min<900)return null; const k=Object.keys(st.X).sort((a,b)=>st.X[a].top-st.X[b].top)[0]; return {k,n:ADV[k].n,...st.X[k]}; };
 function simSeason(par,games,r){
   const d=ovr()-par, f=S.seasonFactor;
   const [rn,a0,b0,m1,m2]=ROLES[r], [a,b]=isGK()?GK_APP[r]:[a0,b0];
@@ -4207,6 +4241,7 @@ function simSeason(par,games,r){
     else if(['CB','FB','DM'].includes(dp))dc+=(st.CS/app-0.25)*1.5; }
   dc+=(S.mDef||0)*0.04;
   st.Rt=app>0?+clamp(6.5+(d>0?Math.min(d,dCap)*0.05:Math.max(d,-15)*0.04)+ga+dc+pend*0.02+fb*0.15-(S.traits.yips?0.2:0)-red*0.08+(S.traits.gent?0.05:0)+(S.traits.supersub&&r>=2?0.2:0)+N0(0.15),5.5,9.0).toFixed(2):0; /* 能力差:高於聯賽每點 +0.05(上限依聯賽水準:台灣企甲約 9、日職約 15、英超 20)、低於每點 −0.04(下限 −15);封頂避免碾壓低級別時灌水 */
+  advStats(st,par,dp);
   return st;
 }
 const cardTxt=st=>st.Y||st.R?`｜🟨 ${st.Y||0}${st.R?`　🟥 ${st.R}`:''}${st.Ban?`（停賽 ${st.Ban} 場）`:''}`:'';
@@ -4223,6 +4258,7 @@ function logSeason(st,line,inj){
 /* 季末媒體標題(純裝飾,用 Math.random) */
 function pressLine(st){ const N=S.name, T=S.stage==='PRO'?S.club:S.stage==='UNI'?S.uni:S.team, R=a=>a[Math.floor(Math.random()*a.length)];
   if(!st.App)return R([`「${N}去哪了？」球迷在論壇上發問`,`${T}的板凳末端，坐著一個不甘心的人`]);
+  const ab=advBest(st); if(ab&&ab.top<=5&&Math.random()<0.5)return R([`${ab.n}聯賽前 ${ab.top}%：${N}是${T}最不可或缺的人`,`數據不會說謊——${N}本季${ab.n}${advTxt(ab.k,ab)}`,`沒有進球，但${T}少不了${N}：${ab.n}聯賽前 ${ab.top}%`]);
   if(st.Rt>=7.5)return R([`「${N}時代」來了`,`${T}本季最大的收穫：${N}`,`評分 ${st.Rt}！${N}踢出生涯代表作`]);
   if(st.Rt>=7.0)return R([`穩定輸出，${N}成為${T}不可或缺的一員`,`${N}：「我還能更好。」`]);
   if(st.Rt>=6.5)return R([`${N}本季表現中規中矩`,`${T}教練：「${N}需要更多穩定性。」`]);
@@ -4239,7 +4275,7 @@ function seasonResult(){
     else if(S.seasonFactor<0.95)S.ironStreak=0; }
   if(!youth&&st.App)cardTraits(st);
   const gk=isGK(), pl=pressLine(st), kp=[['出場',st.App],gk?['零封',st.CS]:['進球',st.G],gk?['失球',st.GA]:['助攻',st.A],['評分',st.Rt||0,2]];
-  const sc=card('info',uni?'大學聯賽成績':youth?'青年聯賽成績':`${LV[S.lv].n}成績`,`<div class="kpis">${kp.map(([n,v,d])=>`<div class="kpi"><small>${n}</small><b data-to="${v}" data-dec="${d||0}">${d?(+v).toFixed(d):v}</b></div>`).join('')}</div><div class="statline">${statLine(st)}</div>${st.fit?`<div class="fx">${COACH_ST[S.coach.st].n}${st.fit>0?'很適合你的踢法':'跟你的踢法格格不入'}：表現效率 <b class="${st.fit>0?'up':'dn'}">${st.fit>0?'+':''}${st.fit*4}%</b></div>`:''}<p class="press">📰 ${pl}</p>`);
+  const sc=card('info',uni?'大學聯賽成績':youth?'青年聯賽成績':`${LV[S.lv].n}成績`,`<div class="kpis">${kp.map(([n,v,d])=>`<div class="kpi"><small>${n}</small><b data-to="${v}" data-dec="${d||0}">${d?(+v).toFixed(d):v}</b></div>`).join('')}</div><div class="statline">${statLine(st)}</div>${advLine(st)}${st.fit?`<div class="fx">${COACH_ST[S.coach.st].n}${st.fit>0?'很適合你的踢法':'跟你的踢法格格不入'}：表現效率 <b class="${st.fit>0?'up':'dn'}">${st.fit>0?'+':''}${st.fit*4}%</b></div>`:''}<p class="press">📰 ${pl}</p>`);
   rollNums(sc); tickPush(pl);
   leagueAwards(st);
   board(1); nextStep();
@@ -4266,7 +4302,7 @@ function awardList(st,got){
   row('金靴',got.includes('金靴')?`${me}・${st.G} 球`:`${oth()}・${gb} 球`);
   row('金手套',got.includes('金手套')?`${me}・零封 ${st.CS} 場`:`${oth()}・零封 ${Math.round(14*g38)+ri(-2,3)} 場`);
   row('最佳球員',got.includes('最佳球員')?`${me}・評分 ${st.Rt}`:oth());
-  if(S.grp==='DF')row('最佳後衛',got.includes('最佳後衛')?`${me}・零封 ${st.CS} 場`:oth());
+  if(S.grp==='DF')row('最佳後衛',got.includes('最佳後衛')?`${me}・零封 ${st.CS} 場${advBest(st)?`・${advBest(st).n}聯賽前 ${advBest(st).top}%`:''}`:oth());
   row('最佳年輕球員',got.includes('最佳年輕球員')?me:oth(true));
   if(got.includes('年度最佳陣容'))row('年度最佳陣容',me);
   card(got.length?'gold':'info',got.length?'個人獎項':`${L.n}個人獎項`,
@@ -5318,6 +5354,11 @@ function posStats(){
   else if(S.grp==='MF'){ tiles.push(T('助攻',t.A,'次'),T('進球',t.G,'球'),T('進球＋助攻',t.G+t.A,''),T('每場助攻',t.App?(t.A/t.App).toFixed(2):'—',''),
       T('年度最佳陣容',cnt(/年度最佳陣容/),'次'),T('單季最多助攻',m('A'),'')); }
   else { tiles.push(T('最佳後衛',cnt(/最佳後衛$/),'次'),T('零封',t.CS,'場'),T('進球',t.G,'球'),T('助攻',t.A,'次'),T('年度最佳陣容',cnt(/年度最佳陣容/),'次'),T('單季最多零封',m('CS'),'')); }
+  const adv=[]; (DP_ADV[S.dpos]||[]).forEach(k=>{ const rs=pl.filter(r=>r.st.X&&r.st.X[k]); if(!rs.length)return;
+    if(ADV[k].pc){ const b=rs.reduce((a,r)=>r.st.X[k].v>a.st.X[k].v?r:a); adv.push(T(`單季最佳${ADV[k].n}`,`${b.st.X[k].v}%（${seasonLabel(b.y)}）`,'')); }
+    else adv.push(T(`生涯${ADV[k].n}`,rs.reduce((s,r)=>s+r.st.X[k].v,0).toLocaleString(),'次')); });
+  { const rs=pl.filter(r=>advBest(r.st)); if(rs.length){ const b=rs.reduce((a,r)=>advBest(r.st).top<advBest(a.st).top?r:a), x=advBest(b.st); adv.push(T('最佳數據排名',`${x.n}聯賽前 ${x.top}%（${seasonLabel(b.y)}）`,'')); } }
+  tiles.push(...adv.slice(0,3));
   const common=[T('職業賽季',pro.length,'季'),T('出場',t.App,'場'),T('出場分鐘',t.Min.toLocaleString(),''),T('平均評分',avg,''),T('巔峰評分',peak?`${peak.st.Rt}（${seasonLabel(peak.y)}）`:'—',''),
     T('黃牌／紅牌',`${t.Y}／${t.R}`,''),T('聯賽最佳球員',cnt(/[^盃]最佳球員$/),'次'),T('國家隊',S.caps?`${S.caps} 場${gk?'':`・${S.intlG} 球`}`:'—','')];
   return {main:tiles,common:common.filter(x=>!tiles.some(y=>y.n===x.n)),t};
