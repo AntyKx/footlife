@@ -10,7 +10,8 @@ const R=a=>a[Math.floor(Math.random()*a.length)];
   const w=dom.window,d=w.document; w.scrollTo=()=>{}; w.Element.prototype.scrollIntoView=function(){}; let err=null;
   w.addEventListener('error',e=>{ err=String(e.error&&e.error.message||e.message); });
   const nat=nats[(k*7+3)%nats.length], ps=pos[k%4];
-  d.querySelector(`[data-v="${ps}"]`).click(); d.querySelector(`[data-v="${nat}"]`).click(); d.getElementById('btn-start').click();
+  d.querySelector(`[data-v="${ps}"]`).click(); { const dps=[...d.querySelectorAll('#seg-dp [data-dp]')]; if(dps.length)dps[(k*5+1)%dps.length].click(); } /* v0.31 開局細分位置輪流選 */
+  d.querySelector(`[data-v="${nat}"]`).click(); d.getElementById('btn-start').click();
   let steps=0, idle=0;
   while(steps++<8000){
     const S=w.eval('S'); if(!S||S.done)break;
@@ -40,7 +41,7 @@ const R=a=>a[Math.floor(Math.random()*a.length)];
   const out=w.eval(`(()=>{ const pro=S.log.filter(r=>r.lv&&r.st.App>0); const rts=pro.map(r=>r.st.Rt);
     return {k:${k},nat:S.nat,pos:S.grp,age:S.age,done:!!S.done,score:careerScore(),peakOvr:S.peakOvr||ovr(),peakRt:rts.length?Math.max(...rts):0,
       avgRt:rts.length?+(rts.reduce((a,b)=>a+b,0)/rts.length).toFixed(2):0,seasons:pro.length,caps:S.caps,
-      traits:Object.keys(S.traits).filter(t=>S.traits[t]),cBig:S.cBig||0,bigN:S.bigN||0,cSub:S.cSub||0,honors:S.honors,top5:pro.filter(r=>LV[r.lv].top5).length,
+      traits:Object.keys(S.traits).filter(t=>S.traits[t]),cBig:S.cBig||0,bigN:S.bigN||0,cSub:S.cSub||0,cSig:S.cSig||0,cPerfect:S.cPerfect||0,cRead:S.cRead||0,cPk:S.cPk||0,cTen:S.cTen||0,posCh:S.posChanges||0,fanMax:S.fanMax||0,honors:S.honors,top5:pro.filter(r=>LV[r.lv].top5).length,
       Y:pro.reduce((a,r)=>a+(r.st.Y||0),0),R:pro.reduce((a,r)=>a+(r.st.R||0),0),acad:S.acad?(S.acad.foreign?'foreign':'home'):null,acadOut:S.acadOut||null,acadGrad:!!S.acadGrad,boughtBack:!!S.boughtBack,clubs:new Set(pro.filter(r=>!r.loan).map(r=>r.tm)).size,ach:(typeof ACH!=='undefined'?ACH.filter(a=>achLevel(a,achCtx([]))).map(a=>a.id):[])}; })()`);
   out.err=err; process.stdout.write(JSON.stringify(out)+'\n');
   w.close(); } })();

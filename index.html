@@ -1048,7 +1048,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.31.0';
+const APP_VER='v0.31.1';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -2288,11 +2288,11 @@ function trackMomentTraits(sc,ok,sub){ const T=S.traits, inc=k=>(S[k]=(S[k]||0)+
   if(ok&&isDerbySTK()){ S.mem=S.mem||{}; if(!S.mem.derbyHero||S.mem.derbyHero.done&&S.year-S.mem.derbyHero.y>=3)S.mem.derbyHero={y:S.year,club:S.club,n:''}; }
   if(ok&&isDerbySTK()&&inc('cDerby')>=3&&!T.derby)traitCard('derby','第三次在德比裡扛起球隊。看台上的人開始叫你「德比先生」——<b class="hl">德比關鍵時刻成功率 +10%、球迷人氣加倍</b>。');
   if(MTAG&&BIG_RE.test(MTAG)&&!/資格賽|小組賽|第三輪/.test(MTAG)){
-    inc('bigN'); if(ok){ S.bigFail=0; if(inc('cBig')>=12&&S.cBig/S.bigN>=0.65&&!T.bignight)traitCard('bignight','燈光越亮，你踢得越好——<b class="hl">洲際賽與大賽淘汰賽成功率 +8%</b>。'); }
+    inc('bigN'); if(ok){ S.bigFail=0; if(inc('cBig')>=20&&S.cBig/S.bigN>=0.70&&!T.bignight)traitCard('bignight','燈光越亮，你踢得越好——<b class="hl">洲際賽與大賽淘汰賽成功率 +8%</b>。'); }
     else if(inc('bigFail')>=5&&!T.bigfear&&!T.bignight)traitCard('bigfear','大賽連續失手五次，媒體說你「一到大場面就消失」——<b class="dn">大賽成功率 −8%</b>。（贏下一場決賽可以解除）','bad'); }
-  if(ok&&/點球/.test(sc.t)&&inc('cPk')>=5&&!T.pkpro){ traitCard('pkpro','第五個點球得手。站上十二碼，你的心跳比門將還慢——<b class="hl">點球場景成功率 +15%</b>。');
+  if(ok&&/點球/.test(sc.t)&&inc('cPk')>=12&&!T.pkpro){ traitCard('pkpro','第十二個點球得手。站上十二碼，你的心跳比門將還慢——<b class="hl">點球場景成功率 +15%</b>。');
     if(T.yips){ removeTrait('yips'); card('good','心魔解除','點球恐懼症痊癒了。'); } }
-  if(ok&&sub&&S.age>=20&&inc('cSub')>=14&&!T.supersub)traitCard('supersub','第十四次替補登場改變比賽。教練說：「你是我最好的武器。」——<b class="hl">替補身分時賽季評分 +0.2</b>。');
+  if(ok&&sub&&S.age>=20&&inc('cSub')>=20&&!T.supersub)traitCard('supersub','第二十次替補登場改變比賽。教練說：「你是我最好的武器。」——<b class="hl">替補身分時賽季評分 +0.2</b>。');
 }
 /* v0.26.12 生涯精華:記下賽事、對手、分鐘、比分與動作,組成結果句;原本的現場描述留作灰字 */
 const HL_K=/^[GASDF]$/; let HL_PEND=[];
@@ -2383,11 +2383,11 @@ function momentCount(sc,o,ok,tier,read){ const inc=k=>(S[k]=(S[k]||0)+1);
   if(tier==='blunder'&&big&&(!S.mem.blunder||S.mem.blunder.done))S.mem.blunder={y:S.year,club:S.club,n:big.replace(/^\S+ /,'').replace(/・/g,' ')};
   if(tier==='perfect'&&S.traits.fragile){ removeTrait('fragile'); card('good','心魔解除','一記完美的表現，「玻璃心」的標籤被撕掉了。'); } }
 function momentTraits(){ const T=S.traits, X=k=>S[k]||0;
-  if(!T.sigstar&&X('cSig')>=15)traitCard('sigstar','第十五次招牌動作得手，對手的戰術板上開始專門畫你的那一招——<b class="hl">招牌動作成功率 +5%</b>。');
-  if(!T.iceman&&X('cPerfect')>=15)traitCard('iceman','越是關鍵，你越冷靜。解說員說：「他的血是冰的。」——<b class="hl">更容易打出「完美」</b>。');
+  if(!T.sigstar&&X('cSig')>=35)traitCard('sigstar','第三十五次招牌動作得手，對手的戰術板上開始專門畫你的那一招——<b class="hl">招牌動作成功率 +5%</b>。');
+  if(!T.iceman&&X('cPerfect')>=26)traitCard('iceman','越是關鍵，你越冷靜。解說員說：「他的血是冰的。」——<b class="hl">更容易打出「完美」</b>。');
   if(!T.fireman&&X('cRecov')>=5)traitCard('fireman','第五次替球隊收拾殘局，隊友說你是更衣室的保險——<b class="hl">冒險失敗後出現補救機會的機率 50% → 70%</b>。');
   if(!T.grinder&&X('cFollowWin')>=10&&S.ab.sta>=55)traitCard('grinder','九十分鐘都在衝刺，對手先累垮——<b class="hl">標準選項接第二拍的機率 25% → 40%</b>。');
-  if(!T.fox&&S.age>=32&&X('cRead')>=20)traitCard('fox','看了二十年的球，對手抬腳之前你就知道球要去哪——<b class="hl">球探情報一定看得出對手意圖</b>。');
+  if(!T.fox&&S.age>=33&&X('cRead')>=28)traitCard('fox','看了二十年的球，對手抬腳之前你就知道球要去哪——<b class="hl">球探情報一定看得出對手意圖</b>。');
   if(!T.reckless&&X('cBlunder')>=4)traitCard('reckless','第四次大失誤。教練搖頭：「他要嘛贏下比賽，要嘛輸掉比賽。」——<b class="dn">大失誤更常見</b>，但<b class="hl">「完美」也更常見</b>。','bad');
   if(!T.fragile&&X('blFail')>=3){ S.blFail=0; traitCard('fragile','大失誤之後你一直走不出來，同一季又連續失手——<b class="dn">失敗時狀態掉得更多</b>。（打出一次「完美」可以解除）','bad'); } }
 /* 第二拍:冒險成功(標準 25%)→ 乘勝追擊/斷球反擊;冒險失敗 50% → 補救機會 */
@@ -3625,8 +3625,8 @@ function stageLabel(){
 function startYear(){ const go=()=>{ HDR=null; stepQ=[phasePre,phaseMid,phaseEnd]; divider(`${seasonLabel(S.year)} 賽季 · ${S.age} 歲 · ${stageLabel()}`); nextStep(); };
   /* 季末結算自成一個畫面,按了才進下一季 */
   if(S.log.length){ saveGame(); HDR=HDR_PREV; HDR_PREV=null; } if(S.log.length)choose('',[{t:`▸ 進入 ${seasonLabel(S.year)} 賽季（${S.age} 歲）`,main:true,f:go}]); else go(); }
-function advance(){ OFFER_SEEN=[]; if(S.stage==='PRO'){ S.fanYrs=S.fans>=95?(S.fanYrs||0)+1:0;
-    if(S.fanYrs>=6&&!S.traits.darling)traitCard('darling','連續六季人氣破表，每家媒體都想要你的專訪——<b class="hl">球迷人氣上升 ×1.3</b>。'); }
+function advance(){ OFFER_SEEN=[]; if(S.stage==='PRO'){ S.fanYrs=S.fans>=98?(S.fanYrs||0)+1:0; S.fanMax=Math.max(S.fanMax||0,S.fanYrs);
+    if(S.fanYrs>=10&&!S.traits.darling)traitCard('darling','連續十季人氣破表，每家媒體都想要你的專訪——<b class="hl">球迷人氣上升 ×1.3</b>。'); }
   if(S.stage==='YOUTH'){ S.mem=S.mem||{}; if(!S.mem.junior)S.mem.junior={y:S.year,club:S.team,n:''}; }
   HDR_PREV=`${seasonLabel(S.year)} 賽季・${S.age} 歲・${stageLabel()}`; S.age++; S.year++; if(S.stage==='YOUTH'||S.stage==='UNI')S.stageYr++; startYear(); }
 
@@ -3732,7 +3732,7 @@ const DP_GRP={GK:'GK',CB:'DF',FB:'DF',DM:'MF',CM:'MF',AM:'MF',ST:'FW',SS:'FW',W:
 const DP_VET={W:['AM','FB','CM'],ST:['SS','AM'],SS:['AM','CM'],AM:['CM'],CM:['DM'],DM:['CB'],FB:['CB','DM']};
 const DP_CALM=['CB','DM','CM','AM']; /* 轉型到這些位置:不靠速度吃飯,身體衰退減一級 */
 function setPos(dp,why){ const old=DPN[S.dpos], og=S.grp; S.dpos=dp; S.rivals=[]; const g=DP_GRP[dp]; if(g&&g!==S.grp&&S.grp!=='GK'){ S.grp=g; S.grpMoved=(S.grpMoved||0)+1; }
-  if(++S.posChanges>=2&&!S.traits.versatile)traitCard('versatile','教練要你踢哪裡，你就能踢哪裡——<b class="hl">拒絕轉位不再影響上場時間</b>。');
+  if(++S.posChanges>=4&&!S.traits.versatile)traitCard('versatile','教練要你踢哪裡，你就能踢哪裡——<b class="hl">拒絕轉位不再影響上場時間</b>。');
   sideAdd(`轉任${DPN[dp]}`,'gold',card('info','位置調整',`從${old}轉任 <b class="hl">${DPN[dp]}</b>${S.grp!==og?`（${GRPN[og]} → ${GRPN[S.grp]}）`:''}，綜合評價 <b class="up">${ovrAt(dp)}</b>。${why||''}`)); board(0); }
 function posReview(cont){
   if(S.skipMid||(S.stage==='YOUTH'&&S.stageYr<2)||isGK()){ cont(); return; }
@@ -5141,7 +5141,7 @@ function clubCups(cont){
 const ASIA_TOP=['J1','K1','CSL','AUS'], ASIA_2=['J2','K2'];
 const lgW=k=>LV[k].top5?1:clamp((LV[k].par-28)/32,0.1,0.75); /* 依聯賽水準:英冠約 0.75、日職約 0.6、台灣企甲約 0.16 */
 const seasonPts=r=>r.lv&&r.st.App?Math.max(0,r.st.Rt-ptsBase(r.lv))*r.st.Min/90*(POS_PTS[DP_GRP[r.dp]]??1):0; /* v0.26.8:門將每場踢滿 ×0.55、後衛評分偏低 ×1.12 */
-const POS_PTS={GK:0.55,DF:1.12,MF:1.04,FW:1};
+const POS_PTS={GK:0.55,DF:1.35,MF:1.12,FW:1}; /* v0.31 校準:後衛、中場生涯分偏低 */
 const ptsBase=k=>clamp(6.0-(LV[k].par-45)*0.015,5.75,6.25); /* v0.21.1:評分基準依聯賽水準(英超約 5.78、台灣企甲約 6.18),強聯賽同樣評分更值錢 */
 /* 榮譽加分:由上往下取第一個符合的規則 */
 const HONOR_PTS=[[/自由盃（冠軍/,90],[/自由盃（亞軍/,45],[/自由盃（4 強/,20],[/南美盃（冠軍/,40],[/南美盃（亞軍/,20],[/南美盃（4 強/,8],
@@ -5161,7 +5161,7 @@ function careerScore(){
   return Math.round(S.log.reduce((s,r)=>s+seasonPts(r)*lgW(r.lv||'TW1'),0)+S.honors.reduce((s,h)=>s+honorPts(h),0));
 }
 /* 五帶門檻(批次模擬校準):傳奇 2%、巨星 8%、主力 25%、浮沉 40%、過客 25% */
-const TIER_TH=[1925,1105,537,247]; /* 600 段生涯模擬(v0.26.6:教練、經紀人、轉位、新聯賽與新國籍加入後)的 p98/p90/p65/p25 */
+const TIER_TH=[2394,1494,840,432]; /* 600 段生涯模擬(v0.31:關鍵時刻擴充、劇情線、主帥戰術、細分位置之後)的 p98/p90/p65/p25 */
 const TIERS=['傳奇','巨星','主力','浮沉','過客'];
 const HOF_TH=210; /* 單一聯賽(未加權)生涯分門檻 */
 function mainLeague(){ const m={}; S.log.forEach(r=>{ if(r.lv)m[r.lv]=(m[r.lv]||0)+r.st.Min*lgW(r.lv); }); /* 以加權上場時間選代表聯賽 */
@@ -5582,16 +5582,16 @@ const ACH=[
   {id:'casanova',cat:'趣味',n:'浪子',d:'離過 3 次婚',r:'r',v:A=>S.love.exes.length>=3},
   /* ---- v0.27.2 ---- */
   {id:'globe',cat:'榮譽',n:'冠軍收藏家',d:'在 3／4／5 個不同國家拿到頂級聯賽冠軍',lv:[3,4,5],r:'e',v:A=>new Set(S.honors.map(h=>{ const k=honorLv(h); return k&&!LV[k].up&&/冠軍（[^・）]*）$/.test(h)?LV[k].cty:null; }).filter(Boolean)).size},
-  {id:'worldie',cat:'軌跡',n:'世界波收藏家',d:'關鍵時刻打出「完美」10／25／45 次',lv:[10,25,45],r:'r',v:A=>S.cPerfect||0},
-  {id:'sigmaster',cat:'軌跡',n:'招牌大師',d:'招牌動作成功 10／30／60 次',lv:[10,30,60],r:'e',v:A=>S.cSig||0},
+  {id:'worldie',cat:'軌跡',n:'世界波收藏家',d:'關鍵時刻打出「完美」20／40／70 次',lv:[20,40,70],r:'r',v:A=>S.cPerfect||0},
+  {id:'sigmaster',cat:'軌跡',n:'招牌大師',d:'招牌動作成功 25／50／90 次',lv:[25,50,90],r:'e',v:A=>S.cSig||0},
   {id:'savior',cat:'軌跡',n:'救世主',d:'在最後防線把失球救回來 3／8／15 次',lv:[3,8,15],r:'r',v:A=>S.cSaveGoal||0},
   {id:'brace',cat:'軌跡',n:'乘勝追擊',d:'第二拍再入一球 10 次',r:'r',v:A=>(S.cBrace||0)>=10},
-  {id:'tenmen',cat:'軌跡',n:'十人應戰',d:'少一人作戰時，關鍵時刻成功 3 次',r:'r',v:A=>(S.cTen||0)>=3},
+  {id:'tenmen',cat:'軌跡',n:'十人應戰',d:'少一人作戰時，關鍵時刻成功 6 次',r:'r',v:A=>(S.cTen||0)>=6},
   {id:'bounce',cat:'軌跡',n:'不死鳥',d:'降級後隔年就帶隊升級回來',r:'r',v:A=>!!S.bounce},
   {id:'jersey',cat:'軌跡',n:'退休背號',d:'為同一支球隊效力 10 季，球隊為你退休背號',r:'e',v:A=>{ const c={}; A.pro.filter(r=>!r.loan).forEach(r=>c[r.tm]=(c[r.tm]||0)+1); return Math.max(0,...Object.values(c))>=10; }},
   {id:'gkgoal',cat:'趣味',n:'門將破門',d:'門將衝進對方禁區搶點破門',r:'l',v:A=>!!S.gkGoal},
   {id:'waste',cat:'趣味',n:'拖時間大師',d:'領先時拖時間成功 5 次',r:'c',v:A=>(S.cWaste||0)>=5},
-  {id:'fullhl',cat:'趣味',n:'全面精華',d:'生涯精華裡同時有進球、助攻，以及撲救或防守',r:'r',v:A=>{ const k=new Set((S.hl||[]).map(h=>h.k).filter(Boolean)); return k.has('G')&&k.has('A')&&(k.has('S')||k.has('D')); }},
+  {id:'fullhl',cat:'趣味',n:'全面精華',d:'生涯精華裡進球、助攻、撲救或防守各至少 5 則',r:'r',v:A=>{ const c={}; (S.hl||[]).forEach(h=>{ if(h.k)c[h.k]=(c[h.k]||0)+1; }); return (c.G||0)>=5&&(c.A||0)>=5&&((c.S||0)+(c.D||0))>=5; }},
   {id:'ironbody',cat:'趣味',n:'打不死',d:'生涯輕傷 5 次以上，仍踢到 36 歲',r:'r',v:A=>(S.cKnock||0)>=5&&S.age>=36}];
 function achCtx(hb){
   const pro=S.log.filter(r=>r.lv), tot=pro.reduce((a,r)=>{ ['G','CS','R'].forEach(k=>a[k]+=r.st[k]||0); return a; },{G:0,CS:0,R:0}), N=NATS[S.nat];
