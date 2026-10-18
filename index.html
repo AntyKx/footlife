@@ -1052,7 +1052,7 @@ function scrollBottom(){ /* iOS Safari 於 iframe 內平滑滾動易觸發白畫
 const N0=(sd)=> (R()+R()+R()+R()-2)/2*sd*2; /* 近似常態 */
 
 /* ================= 靜態資料 ================= */
-const APP_VER='v0.34.0';
+const APP_VER='v0.34.1';
 const ABL={sta:'體能',pac:'速度',sho:'射門',pas:'傳球',dri:'盤帶',def:'防守',phy:'對抗',hea:'頭球',vis:'視野',
   ref:'撲救',gkp:'站位',cmd:'出擊指揮',kic:'腳下技術'};
 const OUT_AB=['sta','pac','sho','pas','dri','def','phy','hea','vis'];
@@ -3678,7 +3678,13 @@ const tacB=o=>{ if(!tacOn()||!o.ab)return 0; if(S.coach.st==='youth')return o.m=
 function coachFit(c){ c=c||S.coach; if(!c)return 0; const st=COACH_ST[c.st];
   if(c.st==='youth')return S.age<=21?2:S.age<=24?1:S.age>=31?-2:S.age>=28?-1:0;
   const ks=(isGK()?st.gk:st.ab).filter(k=>k in S.ab), v=ks.reduce((a,k)=>a+S.ab[k],0)/ks.length;
-  return clamp(Math.round((v-ovr())/3),-2,2); }
+  const all=GRP_AB[S.grp].filter(k=>k in S.ab), base=all.reduce((a,k)=>a+S.ab[k],0)/all.length; /* v0.34.1 跟自己全部能力的平均比(原本跟 OVR 比,OVR 是最強的幾項,幾乎永遠「不適合」) */
+  return clamp(Math.round((v-base)/FIT_DIV),-2,2); }
+let FIT_DIV=3; /* 能力差每 3 點 = 適配 1 級(t/fit-test.js 可改這個值看分布) */
+/* v0.34.1 會來報價的球隊,多半是主帥喜歡你這種類型:風格依適配度加權抽 */
+function offerCoach(lv){ const c=newCoach(lv), W={'-2':1,'-1':2,'0':3,'1':4,'2':4}, sts=Object.keys(COACH_ST);
+  const ws=sts.map(st=>W[coachFit({st})]), tot=ws.reduce((a,b)=>a+b,0); let r=R()*tot;
+  for(let i=0;i<sts.length;i++){ r-=ws[i]; if(r<0){ c.st=sts[i]; break; } } return c; }
 const FIT_N=f=>['很不適合','不太適合','普通','適合','非常適合'][f+2];
 function coachLine(c){ c=c||S.coach; const f=coachFit(c); return `主帥 <b class="hl">${c.n}</b>（${COACH_ST[c.st].n}）・戰術適配 <b class="${f>0?'up':f<0?'dn':''}">${FIT_N(f)}</b>`; }
 /* 季前:換帥或冷板凳(一季最多一件) */
@@ -4524,7 +4530,7 @@ function sauBid(){ if(S.age<28||S.lv==='SAU'||ovr()<LV.SAU.par+5||!chance(30))re
 const ofName=of=>`${of.club}（${LV[of.lv].n}・${TIERN[of.tier]}）`;
 let OFFER_SEEN=[]; /* 這一輪看過的報價,簽約時記下沒選的豪門(回聲用) */
 function offerOpt(of,main,title){ if(of&&of.club)OFFER_SEEN.push(of);
-  const oc=of.club===S.club&&S.coach?S.coach:(of.coach=of.coach||newCoach(of.lv)), of_=coachFit(oc);
+  const oc=of.club===S.club&&S.coach?S.coach:(of.coach=of.coach||offerCoach(of.lv)), of_=coachFit(oc);
   const est=salaryFor(of.lv,ovr()-LV[of.lv].par,TIER_PAY[of.tier]*agentPay()*(of.pay||1));
   return {t:title||ofName(of),main,offer:1,
     s:`${agentIs('money')?Math.max(1,of.yrs-1):of.yrs} 年｜年薪約 ${fmtMoney(est)}｜${TIER_DESC[of.tier]}${S.agent?`｜經紀人評估：${ROLES[offerRole(of)][0]}`:''}｜主帥：${COACH_ST[oc.st].n}（${FIT_N(of_)}）`,f:()=>negotiate(of,()=>signTo(of))};
